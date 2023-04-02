@@ -1,0 +1,11 @@
+ubx
+http://online-live1.services.u-blox.com/GetOnlineData.ashx?token=3nry3UNnQlmuqeE9rRWKlg;gnss=gps;datatype=eph,alm,aux,pos;filteronpos;format=aid
+
+ublox
+https://www.espruino.com/agps/assistnow_1d.base64
+https://www.espruino.com/agps/assistnow_2d.base64
+https://www.espruino.com/agps/assistnow_3d.base64
+https://www.espruino.com/agps/assistnow_1wk.base64
+
+ATGM336H-5N (chip-AT6558)
+https://www.espruino.com/agps/casic.base64

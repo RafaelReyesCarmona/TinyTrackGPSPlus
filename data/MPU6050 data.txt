@@ -1,0 +1,18 @@
+Initializing MPU6050 device...
+MPU6050 status: 0
+Calculating offsets, do not move MPU6050
+AccOffset calibration data:
+accXoffset:
+0.04987793
+accYoffset:
+-0.05605518
+accZoffset:
+-1.92807615
+GyroOffset calibration data:
+gyroXoffset:
+0.94549644
+gyroYoffset:
+0.74360263
+gyroZoffset:
+-0.41038153
+Done!
