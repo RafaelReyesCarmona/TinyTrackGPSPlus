@@ -1,0 +1,301 @@
+
+// Chip select may be constant or RAM variable.
+//const uint8_t SD_CS_PIN = SDCARD_SS_PIN;
+// Pin numbers in templates must be constants.
+//const uint8_t SOFT_MISO_PIN = MISO;
+//const uint8_t SOFT_MOSI_PIN = MOSI;
+//const uint8_t SOFT_SCK_PIN  = SCK;
+//SoftSpiDriver<SOFT_MISO_PIN, SOFT_MOSI_PIN, SOFT_SCK_PIN> softSpi;
+//#define SD_CONFIG SdSpiConfig(SDCARD_SS_PIN, SHARED_SPI, SD_SCK_MHZ(0), &softSpi)
+
+   Serial.print("X ");Serial.print(gyroX,1);
+   Serial.print(" Y ");Serial.print(gyroY,1);
+   Serial.print(" Y ");Serial.println(gyroZ,1);
+   Serial.printf("\nX %0.1f Y %0.1f Z %0.1f\n", gyroX, gyroY,gyroZ);
+
+/*
+    Serial.print(F("TEMPERATURE: "));Serial.println(mpu.getTemp());
+    Serial.print(F("ACCELERO  X: "));Serial.print(mpu.getAccX());
+    Serial.print("\tY: ");Serial.print(mpu.getAccY());
+    Serial.print("\tZ: ");Serial.println(mpu.getAccZ());
+  
+    Serial.print(F("GYRO      X: "));Serial.print(mpu.getGyroX());
+    Serial.print("\tY: ");Serial.print(mpu.getGyroY());
+    Serial.print("\tZ: ");Serial.println(mpu.getGyroZ());
+  
+    Serial.print(F("ACC ANGLE X: "));Serial.print(mpu.getAccAngleX());
+    Serial.print("\tY: ");Serial.println(mpu.getAccAngleY());
+    
+    Serial.print(F("ANGLE     X: "));Serial.print(mpu.getAngleX());
+    Serial.print("\tY: ");Serial.print(mpu.getAngleY());
+    Serial.print("\tZ: ");Serial.println(mpu.getAngleZ());
+    Serial.println(F("=====================================================\n"));
+*/
+
+  //double X,Y;
+  //static double dist_x = 0.0, dist_y = 0.0, dist_z = 0.0;
+  //static double vel_x = 0.0, vel_y = 0.0, vel_z = 0.0;
+/*
+  double dT = (double)(micros() - ti) / 1000000; // Calculate delta time
+  ti = micros();
+
+  mpu.update();
+  X = kalmanX.getAngle(mpu.getAccAngleX(),mpu.getGyroX(),dT);
+  Y = kalmanY.getAngle(mpu.getAccAngleY(),mpu.getGyroY(),dT);
+
+  Serial.println(X);
+  Serial.println(Y);
+  Serial.println(dT,6);
+*/
+/*
+  mpu.fetchDataRaw();
+  int acc_mov_x = acc_avg_x.reading(mpu.getAccXRaw());
+  int acc_mov_y = acc_avg_y.reading(mpu.getAccYRaw());
+  int acc_mov_z = acc_avg_z.reading(mpu.getAccZRaw());
+  int gyro_mov_x = gyro_avg_x.reading(mpu.getGyroXRaw());
+  int gyro_mov_y = gyro_avg_y.reading(mpu.getGyroYRaw());
+  int gyro_mov_z = gyro_avg_z.reading(mpu.getGyroZRaw());
+
+  if(_prevtime < now()) {
+    
+    double aT = (float)(now() - _prevtime)/(float)((n_x + n_y + n_z) / 3.0);
+    int *acc_x = acc_avg_x.getReadings();  // returns a pointer to the readings
+    int n_x = acc_avg_x.getCount();
+    int *acc_y = acc_avg_y.getReadings();  // returns a pointer to the readings
+    int n_y = acc_avg_y.getCount(); 
+    int *acc_z = acc_avg_z.getReadings();  // returns a pointer to the readings
+    int n_z = acc_avg_z.getCount();
+    for(int i = 0; i < n_x; i++){
+      vel_x += (float)(*acc_x++) / mpu.getAccConfig() - mpu.getAccXoffset() * aT;
+      dist_x += vel_x * aT + 0.5 * ((float)(*acc_x++) / mpu.getAccConfig() - mpu.getAccXoffset()) * sq(aT);
+    }
+    for(int i = 0; i < n_y; i++){
+      vel_y += (float)(*acc_y++) / mpu.getAccConfig() - mpu.getAccYoffset() * aT;
+      dist_y += vel_y * aT + 0.5 * ((float)(*acc_y++) / mpu.getAccConfig() - mpu.getAccYoffset()) * sq(aT);
+    }
+    for(int i = 0; i < n_z; i++){
+      vel_z += (float)(*acc_z++) / mpu.getAccConfig() - mpu.getAccZoffset() * aT;
+      dist_z += vel_z * aT + 0.5 * ((float)(*acc_z++) / mpu.getAccConfig() - mpu.getAccZoffset()) * sq(aT);
+    }
+    
+    float acc_mov_xf = ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccXoffset())*(float)(now() - _prevtime);
+    float dist_mov_xf = acc_mov_xf * (float)(now() - _prevtime) + 0.5 * ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccYoffset())*sq((float)(now() - _prevtime));
+    float acc_mov_yf = ((float)acc_mov_y  / mpu.getAccConfig() - mpu.getAccYoffset())*(float)(now() - _prevtime);
+    float dist_mov_yf = acc_mov_yf * (float)(now() - _prevtime) + 0.5 * ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccYoffset())*sq((float)(now() - _prevtime));
+    float acc_mov_zf = ((float)acc_mov_z  / mpu.getAccConfig() - mpu.getAccZoffset())*(float)(now() - _prevtime);
+    float dist_mov_zf = acc_mov_zf * (float)(now() - _prevtime) + 0.5 * ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccYoffset())*sq((float)(now() - _prevtime));
+*/
+    //BT.print("Distancia X = ");/*Serial.print(dist_x,2);*/BT.print("\t");BT.println(dist_mov_xf,2);
+    //BT.print("Distancia Y = ");/*Serial.print(dist_y,2);*/BT.print("\t");BT.println(dist_mov_yf,2);
+    //BT.print("Distancia Z = ");/*Serial.print(dist_z,2);*/BT.print("\t");BT.println(dist_mov_zf,2);
+/*
+    dist_x = 0.0;
+    dist_y = 0.0;
+    dist_z = 0.0;
+
+    acc_avg_x.reset();
+    acc_avg_y.reset();
+    acc_avg_z.reset();
+  }
+*/
+  //mpu.update();
+
+/*
+          Filter.update(millis(),    // Marca de tiempo.
+                        gps_data.velocity_north/100.0, 
+                        gps_data.velocity_east/100.0, 
+                        gps_data.velocity_down/100.0, 
+                        gps_data.latitude()*DEG_TO_RAD,   // Radianes
+                        gps_data.longitude()*DEG_TO_RAD,  // Radianes
+                        gps_data.altitude_cm()/100L, 
+                        mpu.getGyroY()*DEG_TO_RAD, 
+                        -1*mpu.getGyroX()*DEG_TO_RAD, 
+                        mpu.getGyroZ()*DEG_TO_RAD, 
+                        mpu.getAccY()*9.807f, 
+                        -1*mpu.getAccX()*9.807f, 
+                        mpu.getAccZ()*9.807f,
+                        compass.getX(), 
+                        compass.getY(), 
+                        compass.getZ());
+*/
+    //utm.UTM((Filter.getLatitude_rad()*RAD_TO_DEG), (Filter.getLongitude_rad()*RAD_TO_DEG));
+
+    //Serial.print("AHRS Gyro X ");Serial.print(mpu.getGyroX(),1);
+    //Serial.print(", Y ");Serial.print(mpu.getGyroY(),1);
+    //Serial.print(", Z ");Serial.println(mpu.getGyroZ(),1);
+  
+  //char bufferTxSer[100];
+  //snprintf(bufferTxSer, sizeof(bufferTxSer)-1, "%.3f %.3f %.3f\r\n", IMU_MAG_B0[0][0], IMU_MAG_B0[1][0], IMU_MAG_B0[2][0]);
+  //Serial.print(bufferTxSer);
+  
+  //const FusionQuaternion quad = FusionAhrsGetQuaternion(&ahrs);
+  //const FusionVector accel = FusionAhrsGetLinearAcceleration(&ahrs);
+//  DEBUG_PORT.printf("X %f, Y %0.1f, Z %0.1f\n",
+//              gyroscope.axis.x, gyroscope.axis.y, gyroscope.axis.z);
+//  DEBUG_PORT.printf("Roll %0.1f, Pitch %0.1f, Yaw %0.1f, X %0.1f, Y %0.1f, Z %0.1f\n",
+//               euler.angle.roll, euler.angle.pitch, euler.angle.yaw,
+//               earth.axis.x, earth.axis.y, earth.axis.z);
+//  DEBUG_PORT.printf("Quaternion: Qw: %0.1f, Qx: %0.1f, Qy: %0.1f, Qz: %0.1f\n",
+//               quad.element.w, quad.element.x, quad.element.y, quad.element.z);
+//  DEBUG_PORT.printf("MAG_X %0.1f, MAG_Y %0.1f, MAG_Z %0.1f, X %0.1f, Y %0.1f, Z %0.1f\n",
+//               magnetometer.axis.x, magnetometer.axis.y, magnetometer.axis.z,
+//               earth.axis.x, earth.axis.y, earth.axis.z);
+//  DEBUG_PORT.printf("Lineal Acc.: X: %0.1f, Y: %0.1f, Z: %0.1f\n",
+//                accel.axis.x, accel.axis.y, accel.axis.z);
+//  int azimuth = compass.getAzimuth();
+  //lineal_acc = sqrt(sq(earth.axis.x)+sq(earth.axis.y)+sq(earth.axis.z));
+//  DEBUG_PORT.println(azimuth);
+
+
+    /*
+  if((charge==0) && bitRead(millis(),9))
+    drawBattery.set();
+  else if((millis()&0x1ff) == 0x1ff)
+    drawBattery.set();
+  */
+  //drawDisplay(ScreenPrint);
+
+  do {
+    if(BT.isListening()) bluetooth_connected = true;
+
+    //delay(300);
+
+    update_time();
+    if(_prevtime < now()) {
+      oled.clear();
+      oled.print_date(_localtime);
+      oled.print_time(trc->abbrev, _localtime);
+      oled.drawbattery(charge_level());
+      (SDReady) ? oled.print_PChar(3) : oled.print_PChar(4);
+      if (bluetooth_connected) oled.print_PChar(5);
+      oled.draw();
+      oled.DrawLogo();
+      oled.wait_anin(time++);
+      _prevtime = now();
+    }
+
+    //for (unsigned long start = millis(); millis() - start < 1000;) {
+      while (gps.available(gpsPort)) {
+        gps_data = gps.read();
+        trace_all( DEBUG_PORT, gps, gps_data );  // uncomment this line if you want to see the GPS data flowing
+        //Serial.write(c); 
+        if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
+          config = true;
+          setSyncProvider(gps_time);
+          rtc.set(gps_time_rtc());
+          DEBUG_PORT.println((long)gps_time_rtc());
+          //delay(100);
+          //DEBUG_PORT.println((long)rtc.get());
+
+        } //else config = false;
+        //else setTime(rtc.get());
+      }
+    //}
+  }while(!config);
+
+  if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
+    TimeZoneMapper TimeZoneGPS;
+    UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+    UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
+    TimeZone.setRules(UST, UT);
+    update_time();
+    //rtc.set(gps_time_rtc());
+    DEBUG_PORT.print(F("Time configured."));
+  }
+
+  _prevtime = now();
+  
+  DEBUG_PORT.println(F("Done."));
+  DEBUG_PORT.println(F("Configuration ended.")); //
+  oled.clear();
+
+  trace_header( DEBUG_PORT );
+  DEBUG_PORT.flush();
+
+
+      //___________________ Evaluar este codigopara optimizarlo_______________________________________
+      if(!SDReady) {
+        //SDReady = card.begin(SD_CONFIG);
+        bool CardInserted;
+        CardInserted = digitalRead(CardDetect);
+        if(CardInserted) {
+          SDReady = card.begin(SD_CONFIG);
+          loadConfigurationProgram();
+          if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
+            TimeZoneMapper TimeZoneGPS;
+            UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
+            UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+            TimeZone.setRules(UST, UT);
+            update_time();
+          }
+        }
+      }//_____________________________________________________________________________________________
+  
+  while (gps.available(gpsPort)) {
+    gps_data = gps.read();
+    //trace_all( DEBUG_PORT, gps, gps_data );
+    trace_all(BT,gps,gps_data);
+    //Serial.write(c); // uncomment this line if you want to see the GPS data flowing
+    if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
+      update_time();
+      gps_signal = true;
+      drawBattery.set();
+      drawDisplay.set();
+      utm.UTM(gps_data.latitudeL(),gps_data.longitudeL());
+      if(!SDReady) {
+        SDReady = card.begin(SDCARD_SS_PIN, SPI_SPEED);
+        if(SDReady) {
+          loadConfigurationProgram();
+          if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
+            TimeZoneMapper TimeZoneGPS;
+            UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
+            UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+            TimeZone.setRules(UST, UT);
+            update_time();
+          }
+        }
+      }
+    }
+    else gps_signal = false;
+  }
+  
+  charge = charge_level();
+
+  if (/*gps_data.valid.time && gps_data.valid.date && gps_data.valid.location &&*/ !(needcharge)) { 
+    if (now() > _prevtime) {
+      calc_altitude();
+      (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
+      if (errorSD == 11) card.end();
+      //Serial.println(errorSD);
+      if (!errorSD) SaveOK = GPSData();
+      else SaveOK = false;
+      _prevtime = now();
+      update_time();
+      drawBattery.set();
+      drawDisplay.set();
+      drawDisplay(ScreenPrint);
+    }
+  }
+  else if (charge==0){
+    while (charge < 5) {
+      oled.clear();
+      delay(500);
+      oled.print_date(_localtime);
+      oled.print_time(trc->abbrev, _localtime);
+      charge = charge_level();
+      oled.drawbattery(charge);
+    }
+    needcharge = true;
+  }
+  else {
+    if (now() > _prevtime) {
+      calc_altitude();
+      _prevtime = now();
+      update_time();
+      drawBattery.set();
+      drawDisplay.set();
+      drawDisplay(ScreenPrint);
+    }
+  }
+
+  if(needcharge) (charge > 5) ? needcharge = false : needcharge = true;

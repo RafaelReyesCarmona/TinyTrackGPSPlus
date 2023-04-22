@@ -13,7 +13,7 @@ uint8_t DS3232RTC::errCode;
 // Initialize the I2C bus.
 void DS3232RTC::begin()
 {
-    i2cBegin();
+    //i2cBegin();
 }
 
 // Read the current time from the RTC and return it as a time_t

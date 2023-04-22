@@ -19,6 +19,7 @@ MPU6050::MPU6050(TwoWire &w){
 }
 
 byte MPU6050::begin(int gyro_config_num, int acc_config_num){
+  wire->begin();
   writeData(MPU6050_SMPLRT_DIV_REGISTER, 0x00);
   writeData(MPU6050_CONFIG_REGISTER, 0x00);
   setGyroConfig(gyro_config_num);

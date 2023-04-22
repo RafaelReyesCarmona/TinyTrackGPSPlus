@@ -156,7 +156,7 @@ template <uint8_t K> boolean ConfigFile<K>::readNextSetting() {
 
   while (bint >= 0 && (char) bint != '\r' && (char) bint != '\n') {
     if (_lineLength >= K) { // -1 for a terminating null.
-      _line[_lineLength] = '\0';
+      _line[_lineLength-1] = '\0';
 #ifdef CONFIGFILE_DEBUG
       Serial.print("Line too long: ");
       Serial.println(_line);

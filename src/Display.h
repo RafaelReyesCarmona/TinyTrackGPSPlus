@@ -81,6 +81,7 @@ class Display {
         void print_UTM_y(long);
         void print_promt();
         void DrawLogo();
+        void DrawLowBat();
         void drawbattery(int8_t);
         Display_Type display_type(){return _screen;};
 };

@@ -43,6 +43,7 @@ rafael.reyes.carmona@gmail.com
 #include "config.h"
 #include "Display.h"
 #include <SoftwareSerial.h>
+
 #include <Wire.h>
 
 #include <NMEAGPS.h>
@@ -50,17 +51,18 @@ rafael.reyes.carmona@gmail.com
 #include <GPSfix.h>
 #include <Streamers.h>
 
-//#include <LowPower.h>
-
 #include <DS3232RTC.h> 
 #define USE_UINT64_T 1
 
+#define SD_FAT_TYPE 3
+#define SPI_SPEED SD_SCK_MHZ(24)
+#define SDCARD_SS_PIN (uint8_t)3U
+//#define SPI_DRIVER_SELECT 2
 #include <SDFat.h>
 #include <sdios.h>
-
-#define SD_FAT_TYPE 3
-#define SPI_SPEED SD_SCK_MHZ(50)
-#define SDCARD_SS_PIN (uint8_t)3U
+#define SD_CONFIG SdSpiConfig(SDCARD_SS_PIN, DEDICATED_SPI, SPI_SPEED)
+const uint8_t CardDetect = 1U;
+bool CardInserted;
 
 #include "SAMDBattery.h"
 #include <UTMConversion.h>
@@ -69,29 +71,64 @@ rafael.reyes.carmona@gmail.com
 #include "ConfigFile.h"
 #include "Semphr.h"
 #include "TimeZoneMapper.h"
-#include "ahrs_ukf.h"
-//#include "uNavINS.h"
+#include <elapsedMillis.h>
+
+elapsedMillis timerdeltatime = 0;
+enum {
+  STARTING,
+  GPS_WAITING,
+  GPS_OK,
+} STATE;
+
+#include "Fusion.h"
+#define SAMPLE_RATE (30) // replace this with actual sample rate (Hz) Samples per second.
+#define SAMPLE_MILIS (float)(1.0/SAMPLE_RATE*1000.0)  /* ms */
+//#define SS_DT       (float)(SS_DT_MILIS/1000.0)   /* Sampling time */
+
+const FusionMatrix gyroscopeMisalignment =      {1.0f, 0.0f, 0.0f, 
+                                                 0.0f, 1.0f, 0.0f, 
+                                                 0.0f, 0.0f, 1.0f};
+const FusionVector gyroscopeSensitivity =       {1.0f, 1.0f, 1.0f};
+const FusionVector gyroscopeOffset =            {0.0f, 0.0f, 0.0f};
+const FusionMatrix accelerometerMisalignment =  {1.0f, 0.0f, 0.0f, 
+                                                 0.0f, 1.0f, 0.0f, 
+                                                 0.0f, 0.0f, 1.0f};
+const FusionVector accelerometerSensitivity =   {1.0f, 1.0f, 1.0f};
+const FusionVector accelerometerOffset =        {0.0f, 0.0f, 0.0f};
+const FusionMatrix softIronMatrix =             { 1.0f, 0.0f, 0.0f, 
+                                                 0.0f, 1.0f, 0.0f, 
+                                                 0.0f, 0.0f, 1.0f};
+const FusionVector hardIronOffset =             {0.0f, 0.0f, 0.0f};
+// Initialise algorithms
+FusionOffset offset;
+FusionAhrs ahrs;
+// Set AHRS algorithm settings
+const FusionAhrsSettings settings = {
+  .convention = FusionConventionNed,
+  .gain = 0.5f,
+  .accelerationRejection = 10.0f,
+  .magneticRejection = 20.0f,
+  .rejectionTimeout = 5 * SAMPLE_RATE, /* 5 seconds */
+};
 
 // Definimos el Display
 Display oled(SIZE_128X64);
 
-// Definimos el MPU6050
-//#include <MPU6050_light.h>
-//MPU6050 mpu(Wire);
-
 // Sensores instalados
-#include "I2Cdev.h"
-#include "BMP085.h"
-#include "HMC5883L.h"
-#include "MPU6050.h"
-BMP085 barometer;
-HMC5883L mag;
-MPU6050 accelgyro(0x69);
+#include <SFE_BMP180.h>
+#include <QMC5883LCompass.h>
+#include <MPU6050_light.h>
+SFE_BMP180 pressure;
+QMC5883LCompass compass;
+MPU6050 mpu(Wire);
+// const uint8_t MPUStatus_DMP = 2U; // Esta en estudio el uso del DMP.
+double barometer_Alt;
 
 // Definimos la conexion con el modulo Bluetooth hm11
-SoftwareSerial BT(2,1);  // RX - 2, TX - 1 BT(recivePin,transmitPin)
-bool bluetooth_connected = false;
+//SoftwareSerial BT(2,1);  // RX - 2, TX - 1 BT(recivePin,transmitPin)
+//bool bluetooth_connected = false;
 
+SPISettings SPI_settings = SPISettings(250000,MSBFIRST,SPI_MODE0);
 SdFat card;   //SdFat.h library.
 File32 file;
 bool SDReady;
@@ -101,13 +138,7 @@ bool SaveOK;
 static NMEAGPS gps;
 static gps_fix gps_data;
 static GPS_UTM utm;
-struct pos_fix{
-  long lati_L;
-  long longi_L;
-} REAL_POS;
-double last_velocity;
-#define KPH_TO_MPS 0.27777777777777777
-//uNavINS Filter;
+bool gps_signal;
 
 // Variables para configurar Timezone.
 static TimeChangeRule UT = {"UTC", Last, Sun, Mar, 1, 0};     // UTC
@@ -120,7 +151,7 @@ static TimeChangeRule *trc;
 #define TIMEZONE_UTC 0
 int TimeZoneConfig;
 
-Semphr drawBattery;
+//Semphr drawBattery;
 Semphr drawDisplay;
 
 // Loads the configuration from a file
@@ -226,14 +257,11 @@ void loadConfigurationProgram() {
   ConfigFile<15> ConfProg;
   if((file = ConfProg.begin("ConfProg.cfg"))){
     while(ConfProg.readNextSetting()){
-    
       char opt[9];
       strcpy(opt,ConfProg.getName());
-
       if (!strcmp(opt,"TIMEZONE")) {
         TimeZoneConfig = ConfProg.getIntValue();
       }
-      
     }
   } 
   else TimeZoneConfig = TIMEZONE_UTC;
@@ -246,12 +274,11 @@ void loadConfigurationProgram() {
 
 // Variables para gestionar el tiempo local.
 TimeElements time_gps;
+time32_t _time_gps;
 //time_t _utctime;    // El reloj lo establecemos siempre a UTC y ajustamos la hora local. 
 time32_t _localtime;
 time32_t _prevtime;
 DS3232RTC rtc;
-//unsigned long ti;
-
 
 //------------------------------------------------------------------------------
 /*
@@ -277,7 +304,7 @@ void dateTime(uint16_t* date, uint16_t* time) {
 #define RESISTOR_VDD  21600L  // Valor de resistencia medida con polimetro.
 #define RESISTOR_GND  47100L  // Valor de resistencia medida con polimetro.
 #define BAT_MIN  3.500
-#define BAT_MAX  4.150
+#define BAT_MAX  4.250
 
 SAMDBattery vcc(PIN_BAT, VREF_BAT, RESISTOR_VDD, RESISTOR_GND, BAT_MIN, BAT_MAX);
 
@@ -286,9 +313,39 @@ int8_t charge_level(){
     return (int8_t)(vcc.GetChargeLevel());
 }
 
+inline time32_t gps_time_rtc(){
+  time_gps.Year = gps_data.dateTime.full_year() - 1970;
+  time_gps.Month = gps_data.dateTime.month;
+  time_gps.Day = gps_data.dateTime.date;
+  time_gps.Hour = gps_data.dateTime.hours;
+  time_gps.Minute = gps_data.dateTime.minutes;
+  time_gps.Second = gps_data.dateTime.seconds;
+  return makeTime(time_gps);
+}
+
+time32_t gps_time(){
+  //static TimeElements time_gps;
+  if (gps_data.valid.time && gps_data.valid.date){
+    _time_gps = gps_time_rtc();
+    rtc.set(_time_gps);
+    return _time_gps;
+  } else return rtc.get();
+}
+
+inline void update_time(){
+  _localtime = TimeZone.toLocal(now(),&trc);
+}
+
+inline void sync_time(){
+  setTime(gps_time());
+  //Serial.println((long)gps_time());
+  update_time();
+}
+
 bool GPSData() {
   static bool save = false;
-  char GPSLogFile[13];
+  char GPSLogFile[14];
+  uint8_t errorSD;
 
   sprintf(GPSLogFile, "%04d%02d%02d.csv", year(_localtime), month(_localtime), day(_localtime));
 
@@ -307,12 +364,15 @@ bool GPSData() {
       //Serial.println(F("** Error creating GPSLogFile. **"));
       //}
   }
-  if (SDReady && (file.open(GPSLogFile, O_APPEND | O_WRITE))) {
+  if (SDReady && (save=file.open(GPSLogFile, O_APPEND | O_WRITE))) {
     //Serial.print(F("Open GPSLogFile to write..."));
     char str[25];
     char comma = 0X2c;
 
-    sprintf(str, "%02d:%02d:%02d", hour(_localtime), minute(_localtime), second(_localtime));
+    //sprintf(str, "%02d:%02d:%02d", hour(_localtime), minute(_localtime), second(_localtime));
+    time32_t save_time_gps = _time_gps; // ------>  gps_time_rtc();
+    time32_t save_time_local = TimeZone.toLocal(save_time_gps);
+    sprintf(str, "%02d:%02d:%02d.%03d", hour(save_time_local), minute(save_time_local), second(save_time_local),gps_data.dateTime_cs);
     file.print(str);
     file.print(comma);
 
@@ -332,7 +392,8 @@ bool GPSData() {
     file.print(str);
     file.print(comma);
     
-    file.print((gps_data.altitude_cm()/100));
+    //file.print((gps_data.altitude_cm()/100));
+    file.print(barometer_Alt,2);
     file.print(comma);
     sprintf(str, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
     file.print(str);
@@ -342,165 +403,174 @@ bool GPSData() {
     //Serial.println(F("Done."));
   } //else {
     //Serial.println(F("** Error opening GPSLogFile. **"));
-  //}
-  //} //else Serial.println(F("** GPS signal lost. **"));
+  (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
+  if (errorSD == 11) card.end();
   return (save && SDReady);
 }
 
-void drawBatteryIcon(){
+void ScreenPrint(){
+  char line[17];
+
+  oled.clear();
+
+  oled.print_date(_localtime);
+  oled.print_time(trc->abbrev, _localtime);
+  //Serial.printf("%2.6f",vcc.GetVoltage());
+  sprintf(line, "%02d%c ", utm.zone(), utm.band());
+  //Serial.println(line); //
+  oled.print(0,18,line);
+  oled.print_UTM_x(utm.X());
+  sprintf(line, "%02hu", gps_data.satellites);
+  //Serial.println(line); //
+  oled.print_PChar(2);
+  oled.print(116,20,line);
+  if (gps_data.status == gps_fix::status_t::STATUS_STD) oled.print_PChar_sat(gps_data.satellites);
+    else oled.print_PChar_Nosat();
+
+  // New line
+  oled.print_UTM_y(utm.Y());
+      
+  //int32_t altitude = gps_data.altitude_cm()/100L;
+  int32_t altitude = barometer_Alt;
+
+  //uint8_t elev_n = (uint8_t)(altitude < 0) ? (-altitude) : altitude;
+  sprintf(line, "%05ldm", altitude);
+  oled.print_PChar(1);
+  oled.print(92,32,line);
+  //Serial.println(line); //
+
+  oled.print(0,44,"LAT:");
+  //int int_lat = Filter.getLatitude_rad()*RAD_TO_DEG;
+  //long f_lat = (Filter.getLatitude_rad()*RAD_TO_DEG - int_lat)*10000000L ;
+  //sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? f_lat : -(f_lat));
+  int int_lat = gps_data.latitudeL() / 10000000L;
+  sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? gps_data.latitudeL()-(long)int_lat*10000000L : -(gps_data.latitudeL()-(long)int_lat*10000000L));
+  //sprintf(line,"%f",Filter.getLatitude_rad()*RAD_TO_DEG);
+  oled.print(21+(strlen(line)-8)*8,45,line);
+  //Serial.print("Latitude:\t");Serial.println(line); //
+
+  oled.print(0,54,"LON:");
+  //int int_lon = Filter.getLongitude_rad()*RAD_TO_DEG;
+  //long f_lon = (Filter.getLongitude_rad()*RAD_TO_DEG - int_lon)*10000000L ;
+  //sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? f_lon : -(f_lon));  
+  int int_lon = gps_data.longitudeL() / 10000000L;
+  sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? gps_data.longitudeL()-(long)int_lon*10000000L : -(gps_data.longitudeL()-(long)int_lon*10000000L));
+  //sprintf(line,"%f",Filter.getLongitude_rad()*RAD_TO_DEG);
+  oled.print(21+(strlen(line)-8)*8,55,line);
+  //Serial.print("Longitude:\t");Serial.println(line); //
+    
+  int c = rtc.temperature();
+  int celsius = (c >> 2);
+  //Serial.println(celsius);
+  sprintf(line,"%02d",celsius);
+  oled.print(127-16,44,line);
+  oled.print_PChar(6);
+    
+  //drawBattery(drawBatteryIcon);
   oled.drawbattery(charge_level());
-  //oled.drawiconbat(charge_level());
+
+  (SaveOK) ? oled.print_PChar(3) : oled.print_PChar(4);
+  //if (bluetooth_connected) oled.print_PChar(5); // No tiene módulo Bluetooth.
+  oled.print_promt();
+  oled.draw();
 }
 
-void BLE(){
-  if (BT.availableForWrite()) BT.print("at\r\n");
-  if (BT.available()){
-    String c = BT.readString();
-    String status = c.substring(7);
-    Serial.println(c);
-    Serial.println(status);
+void calc_altitude(){
+  char status;
+  double barometer_T;
+  double barometer_P;
+
+  status = pressure.startTemperature();
+  if (status != 0)
+  {
+    // Wait for the measurement to complete:
+    delay(status);
+    status = pressure.getTemperature(barometer_T);
+    if (status != 0)
+    {
+      status = pressure.startPressure(2);
+      if (status != 0)
+      {
+        // Wait for the measurement to complete:
+        delay(status);
+        status = pressure.getPressure(barometer_P,barometer_T);
+        if (status != 0)
+        {
+          barometer_Alt = pressure.altitude(barometer_P,1023.25);
+        }
+        else Serial.println("error retrieving pressure measurement\n");
+      }
+      else Serial.println("error starting pressure measurement\n");
+    }
+    else Serial.println("error retrieving temperature measurement\n");
+  }
+  else Serial.println("error starting temperature measurement\n");
+
+  /* ------- Códigos de ejemplo para calcular la altura en funcion de la presion (mbar)-------
+  // barometer_Alt = (1-pow(barometer_P/1023.25,0.190284))*44307.69396; //(145366.45*0.3048)
+  // barometer_Alt = -8434.6677992257846160657 * log(barometer_P / 1013.25);
+  // barometer_Alt = log(1013.25/barometer_P)*7238.003;
+  // -----------------------------------------------------------------------------------------
+  */
+
+  //double alt_dif = barometer_Alt - gps_data.altitude();
+  //barometer_Alt -= alt_dif;  
+  //barometer_Alt += gps_data.altitude();
+  //barometer_Alt /= 2;
+}
+
+inline bool CardChange() {
+  bool CardStatus;
+  bool change;
+  CardStatus = digitalRead(CardDetect);
+  change = CardInserted ^ CardStatus;
+  if(change) {
+    CardInserted = CardStatus;
+    //Serial.println("Card has change!");
+    //Serial.print("Satus ");Serial.println(CardInserted);
+  }
+  return change;
+}
+
+inline void CardDetectFunction() {
+  if(CardInserted) {
+    //Serial.print(F("SD card detect...")); //
+    delay(500);
+    SDReady = card.begin(SD_CONFIG);
+    //(SDReady) ? Serial.println(F("Done.")) : Serial.println(F("FAILED!")); //
+    loadConfigurationProgram();
+    if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
+      TimeZoneMapper TimeZoneGPS;
+      UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
+      UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+      TimeZone.setRules(UST, UT);
+      update_time();
+    }
+  } else {
+    Serial.print(F("SD card... REMOVED!")); //
+    card.end();
+    SDReady = false;
   }
 }
 
-void ScreenPrint(){
-    char line[17];
-
-    oled.clear();
-
-      oled.print_date(_localtime);
-      oled.print_time(trc->abbrev, _localtime);
-      //BT.printf("%2.6f",vcc.GetVoltage());
-      sprintf(line, "%02d%c ", utm.zone(), utm.band());
-      //Serial.println(line); //
-      oled.print(0,18,line);
-      oled.print_UTM_x(utm.X());
-      sprintf(line, "%02hu", gps_data.satellites);
-      //Serial.println(line); //
-      oled.print_PChar(2);
-      oled.print(116,20,line);
-      if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) oled.print_PChar_sat(gps_data.satellites);
-      else oled.print_PChar_Nosat();
-
-      // New line
-      oled.print_UTM_y(utm.Y());
-      
-      int32_t altitude = gps_data.altitude_cm()/100L;
-
-      //uint8_t elev_n = (uint8_t)(altitude < 0) ? (-altitude) : altitude;
-      sprintf(line, "%05ldm", altitude);
-/*
-      byte n = 1;
-      while (elev_n > 9){
-        elev_n /= 10;
-        n++;
-      }
-
-      for(byte i = 5-n; i>0; i--) oled.print(9+i,1," ");
-      if(altitude < 0) oled.print(15-n-1,1,"-");
-
-      */
-      oled.print_PChar(1);
-      oled.print(92,32,line);
-      //Serial.println(line); //
-
-      /*
-      if (elev < 10) oled.print(14,1,line);
-      else if (elev < 100) oled.print(13,1,line);
-      else if (elev < 1000) oled.print(12,1,line);
-      else oled.print(11,1,line);
-      */
-
-      oled.print(0,44,"LAT:");
-      //int int_lat = Filter.getLatitude_rad()*RAD_TO_DEG;
-      //long f_lat = (Filter.getLatitude_rad()*RAD_TO_DEG - int_lat)*10000000L ;
-      //sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? f_lat : -(f_lat));
-      int int_lat = gps_data.latitudeL() / 10000000L;
-      sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? gps_data.latitudeL()-(long)int_lat*10000000L : -(gps_data.latitudeL()-(long)int_lat*10000000L));
-      //sprintf(line,"%f",Filter.getLatitude_rad()*RAD_TO_DEG);
-      oled.print(21+(strlen(line)-8)*8,45,line);
-      Serial.print("Latitude:\t");Serial.println(line); //
-
-      oled.print(0,54,"LON:");
-      //int int_lon = Filter.getLongitude_rad()*RAD_TO_DEG;
-      //long f_lon = (Filter.getLongitude_rad()*RAD_TO_DEG - int_lon)*10000000L ;
-      //sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? f_lon : -(f_lon));  
-      int int_lon = gps_data.longitudeL() / 10000000L;
-      sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? gps_data.longitudeL()-(long)int_lon*10000000L : -(gps_data.longitudeL()-(long)int_lon*10000000L));
-      //sprintf(line,"%f",Filter.getLongitude_rad()*RAD_TO_DEG);
-      oled.print(21+(strlen(line)-8)*8,55,line);
-      Serial.print("Longitude:\t");Serial.println(line); //
-
-/*
-      dtostrf(gps_data.latitude(), 8, 7, line);
-      oled.print(2,2,line);
-      Serial.print("LAT=");
-      Serial.println(line); //
-
-      dtostrf(gps_data.longitude(), 8, 7, line);
-      oled.print(2,3,line);
-      Serial.print("LON=");
-      Serial.println(line); //
-    */
-    
-    int c = rtc.temperature();
-    int celsius = (c >> 2);
-    //DEBUG_PORT.println(celsius);
-    sprintf(line,"%02d",celsius);
-    oled.print(127-16,44,line);
-    oled.print_PChar(6);
-    
-    drawBattery(drawBatteryIcon);
-    (SaveOK) ? oled.print_PChar(3) : oled.print_PChar(4);
-    if (bluetooth_connected) oled.print_PChar(5);
-    oled.print_promt();
-    //BLE();
-    oled.draw();
-}
-
-time32_t gps_time_rtc(){
-    time_gps.Year = gps_data.dateTime.full_year() - 1970;
-    time_gps.Month = gps_data.dateTime.month;
-    time_gps.Day = gps_data.dateTime.date;
-    time_gps.Hour = gps_data.dateTime.hours;
-    time_gps.Minute = gps_data.dateTime.minutes;
-    time_gps.Second = gps_data.dateTime.seconds;
-    return makeTime(time_gps);
-}
-
-time32_t gps_time(){
-  //static TimeElements time_gps;
-  if (gps_data.valid.time && gps_data.valid.date){
-    rtc.set(gps_time_rtc());
-    return gps_time_rtc();
-  } else return rtc.get();
-}
-
-inline void update_time(){
-  _localtime = TimeZone.toLocal(now(),&trc);
-}
-
-inline void sync_time(){
-  setTime(gps_time());
-  //Serial.println((long)gps_time());
-  //rtc.set(now());
-  //_localtime = TimeZone.toLocal(now(),&trc);
-  update_time();
-}
-
 void setup(void) {
-  delay(5000);
-  // join I2C bus (I2Cdev library doesn't do this automatically)
+  pinMode(CardDetect, INPUT_PULLDOWN);
+  CardInserted = digitalRead(CardDetect);
+  //attachInterrupt(digitalPinToInterrupt(CardDetect), CardDetectFunction, CHANGE);
+  
+  delay(10);
   #if I2CDEV_IMPLEMENTATION == I2CDEV_ARDUINO_WIRE
     Wire.begin();
   #elif I2CDEV_IMPLEMENTATION == I2CDEV_BUILTIN_FASTWIRE
     Fastwire::setup(400, true);
   #endif
 
-  DEBUG_PORT.begin(115200); //115200
+  delay(10);
+  Serial.begin(115200); //115200
 
 //---------------------------------------------------------------------------
 // Este código escanea las direcciones del bus I2C.
-//*
+/*
   byte error, address;
   int nDevices;
 
@@ -538,35 +608,128 @@ void setup(void) {
   else
     Serial.println("done\n");
 //-------------------------------------------------------------------------
-//*/
-
-  // initialize MPU6050 device
-  DEBUG_PORT.println("Initializing MPU6050 device...");
-  //byte status = mpu.begin();
-  DEBUG_PORT.print(F("MPU6050 status: "));
-  //DEBUG_PORT.println(status);
-
-  // Calibrando el sensor.
-  
-  DEBUG_PORT.println(F("Calculating offsets, do not move MPU6050"));
-  //delay(1000);
-  //mpu.calcOffsets(true,true); // gyro and accelero
-  DEBUG_PORT.println("Done!\n");
-  
-
-  // Datos de calibracion del sensor.
-  //mpu.setAccOffsets(0.03184131, 0.00907129, -1.92812943);
-  //mpu.setGyroOffsets(0.79480880, 0.70482421, -0.24815249);
-
-      //mpu.update();
+*/
 
   /* Inicialización del RTC DS3231 */
   rtc.begin();
-  //setSyncProvider(gps_time);
-  //setTime(rtc.get());
-  //rtc.set(_localtime);
+  setTime(rtc.get());
+  _prevtime = now();
 
-  BT.begin(9600);
+  if(timeStatus() != timeSet)
+    Serial.println("Unable to sync with the RTC");
+  else
+    Serial.println("RTC has set the system time");
+  Serial.println((long)now());
+
+  // Inicializacion del sensor de presión BMP180.
+  bool pressure_success = pressure.begin();
+  Serial.print("Initializing BMP180 device... ");
+  if (pressure_success) Serial.println("success!");
+  else Serial.println("FAULT!!!\nBMP180 init fail (disconnected?)\n\n");
+
+      // initialize MPU6050 device
+  Serial.println("Initializing MPU6050 device...");
+  byte status = mpu.begin();
+  Serial.print(F("MPU6050 status: "));
+  Serial.println(status);
+  
+  // Calibrando el sensor.
+  //Serial.println(F("Calculating offsets, do not move MPU6050"));
+  //delay(1000);
+  //mpu.calcOffsets(true,true); // gyro and accelero
+  //Serial.println("Done!\n");
+  
+  // Datos de calibracion del sensor.
+  mpu.setAccOffsets(0.03184131, 0.00907129, -1.92812943);
+  mpu.setGyroOffsets(0.79480880, 0.70482421, -0.24815249);
+
+  mpu.update();
+
+  compass.init();
+  compass.setCalibration(-1153082723, 999124224, -2111, 820, -1390, 1133314048);
+  //compass.setSmoothing(5, true);
+  compass.read();
+
+// Rutina para calibracion del magnetrometro.------------------------
+/*
+  Serial.println("This will provide calibration settings for your QMC5883L chip. When prompted, move the magnetometer in all directions until the calibration is complete.");
+  Serial.println("Calibration will begin in 5 seconds.");
+  delay(5000);
+  int x, y, z;
+  int calibrationData[3][2];
+  bool changed = false;
+  bool done = false;
+  int t = 0;
+  int c = 0;
+  do{  
+  // Read compass values
+  compass.read();
+
+  // Return XYZ readings
+  x = compass.getX();
+  y = compass.getY();
+  z = compass.getZ();
+
+  changed = false;
+
+  if(x < calibrationData[0][0]) {
+    calibrationData[0][0] = x;
+    changed = true;
+  }
+  if(x > calibrationData[0][1]) {
+    calibrationData[0][1] = x;
+    changed = true;
+  }
+
+  if(y < calibrationData[1][0]) {
+    calibrationData[1][0] = y;
+    changed = true;
+  }
+  if(y > calibrationData[1][1]) {
+    calibrationData[1][1] = y;
+    changed = true;
+  }
+
+  if(z < calibrationData[2][0]) {
+    calibrationData[2][0] = z;
+    changed = true;
+  }
+  if(z > calibrationData[2][1]) {
+    calibrationData[2][1] = z;
+    changed = true;
+  }
+
+  if (changed && !done) {
+    Serial.println("CALIBRATING... Keep moving your sensor around.");
+    c = millis();
+  }
+    t = millis();
+  
+  
+  if ( (t - c > 5000) && !done) {
+    done = true;
+    Serial.println("DONE. Copy the line below and paste it into your projects sketch.);");
+    Serial.println();
+      
+    Serial.print("compass.setCalibration(");
+    Serial.print(calibrationData[0][0]);
+    Serial.print(", ");
+    Serial.print(calibrationData[0][1]);
+    Serial.print(", ");
+    Serial.print(calibrationData[1][0]);
+    Serial.print(", ");
+    Serial.print(calibrationData[1][1]);
+    Serial.print(", ");
+    Serial.print(calibrationData[2][0]);
+    Serial.print(", ");
+    Serial.print(calibrationData[2][1]);
+    Serial.println(");");
+    }
+  }while(!done);
+*/
+//Rutina calibracion magnetrometro.----------------------------------------
+
+  //BT.begin(9600); 
   gpsPort.begin(9600); 
 
   /* Iniciaización del display oled u OLED */
@@ -574,57 +737,107 @@ void setup(void) {
   
   //pinMode(A0,INPUT); // Initialized in class SAMDBattery.
 
-  DEBUG_PORT.print(F("Initializing SD card...")); //
-
-  SDReady = card.begin(SDCARD_SS_PIN, SPI_SPEED);
+  Serial.print(F("Initializing SD card...")); //
+  SDReady = card.begin(SD_CONFIG);
   (SDReady) ? Serial.println(F("Done.")) : Serial.println(F("FAILED!")); //
   
   // Config TimeZone (_localtime) with 'Time.cfg' file on SD.
   loadConfigurationProgram();
-  //setTime(rtc.get());
-  //sync_time();
   
-  DEBUG_PORT.print(F("Waiting for GPS signal..."));
-  
-  unsigned int time = 0;
-
   vcc.analogRef(AR_DEFAULT);
-  //vcc.analogRef(AR_INTERNAL1V65);
   vcc.setADCres(12);
-  //vcc.setVref(3.3);
-  //for(uint8_t i = 8; i--;) charge_level();
-
-  bool config = false;
-  setTime(rtc.get());
-  if(timeStatus() != timeSet)
-    DEBUG_PORT.println("Unable to sync with the RTC");
-  else
-    DEBUG_PORT.println("RTC has set the system time");
-  DEBUG_PORT.println((long)now());
-  _prevtime = now();
 
   /* Iniciaización del display oled u OLED */
   oled.start();
 
-  do {
-    if(BT.isListening()) bluetooth_connected = true;
-
-    //delay(300);
-
-    if((charge_level() < 5) && !(charge_level() < 0)) {
+  if(vcc.GetChargeLevel() < 5) {
     oled.clear();
-    oled.drawbattery(charge_level());
+    oled.drawbattery(vcc.GetChargeLevel());
     oled.draw();
     do {
       delay(500);
       oled.clear();
       delay(500);
-      oled.drawbattery(charge_level());
+      oled.drawbattery(vcc.GetChargeLevel());
       oled.draw();
-      } while(!(charge_level() > 4)) ;
-    setup();
+      } while(vcc.GetChargeLevel() < 5);
+    //setup();
     }
 
+  STATE = STARTING;
+  
+  FusionOffsetInitialise(&offset, SAMPLE_RATE);
+  FusionAhrsInitialise(&ahrs);
+  FusionAhrsSetSettings(&ahrs, &settings);
+
+  Serial.print(F("Waiting for GPS signal..."));
+}
+
+void loop(void) {
+  static bool needcharge = false;
+  static uint8_t charge;
+  uint8_t errorSD;
+
+  if(timerdeltatime >= SAMPLE_MILIS){
+    timerdeltatime = 0;
+
+    // Read mpu and compass values
+    mpu.update();
+    compass.read();
+
+    // Acquire latest sensor data
+    const clock_t timestamp = micros(); // replace this with actual gyroscope timestamp
+    FusionVector gyroscope = {mpu.getGyroX(), mpu.getGyroY(), mpu.getGyroZ()}; // replace this with actual gyroscope data in degrees/s
+    FusionVector accelerometer = {mpu.getAccX(), mpu.getAccY(), mpu.getAccZ()}; // replace this with actual accelerometer data in g
+    FusionVector magnetometer = {(float)compass.getX(), (float)compass.getY(), (float)compass.getZ()}; // replace this with actual magnetometer data in arbitrary units
+
+    //FusionVector GPS = {gps_data.latitude(), gps_data.longitude(), gps_data.heading()};
+    //FusionVector GPS_err = {gps_data.lat_err(), gps_data.lon_err(), gps_data.hdg_err()};
+    //FusionVector velocity = {gps_data.velocity_north/100.0f, gps_data.velocity_east/100.0f, gps_data.speed()};
+
+    // Apply calibration
+    gyroscope = FusionCalibrationInertial(gyroscope, gyroscopeMisalignment, gyroscopeSensitivity, gyroscopeOffset);
+    accelerometer = FusionCalibrationInertial(accelerometer, accelerometerMisalignment, accelerometerSensitivity, accelerometerOffset);
+    magnetometer = FusionCalibrationMagnetic(magnetometer, softIronMatrix, hardIronOffset);
+
+    // Update gyroscope offset correction algorithm
+    gyroscope = FusionOffsetUpdate(&offset, gyroscope);
+
+    // Calculate delta time (in seconds) to account for gyroscope sample clock error
+    static clock_t previousTimestamp;
+    const float deltaTime = (float) (timestamp - previousTimestamp) / (/*(float) CLOCKS_PER_SEC */ 1000000.0);
+    previousTimestamp = timestamp;
+
+    // Update gyroscope AHRS algorithm
+    FusionAhrsUpdate(&ahrs, gyroscope, accelerometer, magnetometer, deltaTime);
+
+    // Print algorithm outputs
+    const FusionEuler euler = FusionQuaternionToEuler(FusionAhrsGetQuaternion(&ahrs));
+    const FusionVector earth = FusionAhrsGetEarthAcceleration(&ahrs);
+    //const FusionQuaternion quad = FusionAhrsGetQuaternion(&ahrs);
+    //const FusionVector accel = FusionAhrsGetLinearAcceleration(&ahrs);
+    Serial.print("Roll:  ");Serial.print(euler.angle.roll,2);Serial.print(",\t");
+    Serial.print("Pitch: ");Serial.print(euler.angle.pitch,2);Serial.print(",\t");
+    Serial.print("Yaw: ");Serial.print(euler.angle.yaw,2);Serial.print(",\t-> ");
+    Serial.print("X: ");Serial.print(earth.axis.x,2);Serial.print(", \t");
+    Serial.print("Y: ");Serial.print(earth.axis.y,2);Serial.print(", \t");
+    Serial.print("Z: ");Serial.print(earth.axis.z,2);Serial.print("\r");
+  }
+
+  //if(BT.isListening()) bluetooth_connected = true;
+
+  charge = charge_level();
+  (charge > 5) ? needcharge = false : needcharge = true;
+
+  if(CardChange()) CardDetectFunction();
+
+  while (gps.available(gpsPort)) {
+    gps_data = gps.read();
+    //Serial.println();
+    //trace_all( Serial, gps, gps_data );  // uncomment this line if you want to see the GPS data flowing
+  }
+
+  if(STATE == STARTING) {
     update_time();
     if(_prevtime < now()) {
       oled.clear();
@@ -632,259 +845,88 @@ void setup(void) {
       oled.print_time(trc->abbrev, _localtime);
       oled.drawbattery(charge_level());
       (SDReady) ? oled.print_PChar(3) : oled.print_PChar(4);
-      if (bluetooth_connected) oled.print_PChar(5);
+      //if (bluetooth_connected) oled.print_PChar(5);  // No tiene módulo Bluetooth.
       oled.draw();
       oled.DrawLogo();
-      oled.wait_anin(time++);
-      _prevtime = now();
-
-
-
-/*
-    Serial.print(F("TEMPERATURE: "));Serial.println(mpu.getTemp());
-    Serial.print(F("ACCELERO  X: "));Serial.print(mpu.getAccX());
-    Serial.print("\tY: ");Serial.print(mpu.getAccY());
-    Serial.print("\tZ: ");Serial.println(mpu.getAccZ());
-  
-    Serial.print(F("GYRO      X: "));Serial.print(mpu.getGyroX());
-    Serial.print("\tY: ");Serial.print(mpu.getGyroY());
-    Serial.print("\tZ: ");Serial.println(mpu.getGyroZ());
-  
-    Serial.print(F("ACC ANGLE X: "));Serial.print(mpu.getAccAngleX());
-    Serial.print("\tY: ");Serial.println(mpu.getAccAngleY());
-    
-    Serial.print(F("ANGLE     X: "));Serial.print(mpu.getAngleX());
-    Serial.print("\tY: ");Serial.print(mpu.getAngleY());
-    Serial.print("\tZ: ");Serial.println(mpu.getAngleZ());
-    Serial.println(F("=====================================================\n"));
-*/
-
+      oled.wait_anin(_prevtime);
+      _prevtime = now(); ///----------------
     }
-
-    //for (unsigned long start = millis(); millis() - start < 1000;) {
-      while (gps.available(gpsPort)) {
-        gps_data = gps.read();
-        trace_all( DEBUG_PORT, gps, gps_data );  // uncomment this line if you want to see the GPS data flowing
-        //Serial.write(c); 
-        if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
-          config = true;
-          last_velocity = gps_data.speed_kph() * KPH_TO_MPS;
-          setSyncProvider(gps_time);
-          rtc.set(gps_time_rtc());
-          //DEBUG_PORT.println((long)gps_time_rtc());
-          //delay(100);
-          //DEBUG_PORT.println((long)rtc.get());
-
-        } //else config = false;
-        //else setTime(rtc.get());
-      }
-    //}
-  }while(!config);
-
-  if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
-    TimeZoneMapper TimeZoneGPS;
-    UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
-    UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
-    TimeZone.setRules(UST, UT);
-    update_time();
-    //rtc.set(gps_time_rtc());
-    DEBUG_PORT.print(F("Time configured."));
-  }
-
-  _prevtime = now();
-  
-  //kalmanX.setAngle(mpu.getAccAngleX()); // Set starting angle
-  //kalmanY.setAngle(mpu.getAccAngleY());
-  
-  //DEBUG_PORT.println(F("Done."));
-  DEBUG_PORT.println(F("Configuration ended.")); //
-  oled.clear();
-  //if (calibrate) ScreenPrintTest();
-
-  //ti = micros();
-  trace_header( DEBUG_PORT );
-  DEBUG_PORT.flush();
-}
-
-void loop(void) {
-
-  static bool needcharge = false;
-  static uint8_t charge;
-  uint8_t errorSD;
-  //double X,Y;
-  //static double dist_x = 0.0, dist_y = 0.0, dist_z = 0.0;
-  //static double vel_x = 0.0, vel_y = 0.0, vel_z = 0.0;
-/*
-  double dT = (double)(micros() - ti) / 1000000; // Calculate delta time
-  ti = micros();
-
-  mpu.update();
-  X = kalmanX.getAngle(mpu.getAccAngleX(),mpu.getGyroX(),dT);
-  Y = kalmanY.getAngle(mpu.getAccAngleY(),mpu.getGyroY(),dT);
-
-  Serial.println(X);
-  Serial.println(Y);
-  Serial.println(dT,6);
-*/
-/*
-  mpu.fetchDataRaw();
-  int acc_mov_x = acc_avg_x.reading(mpu.getAccXRaw());
-  int acc_mov_y = acc_avg_y.reading(mpu.getAccYRaw());
-  int acc_mov_z = acc_avg_z.reading(mpu.getAccZRaw());
-  int gyro_mov_x = gyro_avg_x.reading(mpu.getGyroXRaw());
-  int gyro_mov_y = gyro_avg_y.reading(mpu.getGyroYRaw());
-  int gyro_mov_z = gyro_avg_z.reading(mpu.getGyroZRaw());
-
-  if(_prevtime < now()) {
-    
-    double aT = (float)(now() - _prevtime)/(float)((n_x + n_y + n_z) / 3.0);
-    int *acc_x = acc_avg_x.getReadings();  // returns a pointer to the readings
-    int n_x = acc_avg_x.getCount();
-    int *acc_y = acc_avg_y.getReadings();  // returns a pointer to the readings
-    int n_y = acc_avg_y.getCount(); 
-    int *acc_z = acc_avg_z.getReadings();  // returns a pointer to the readings
-    int n_z = acc_avg_z.getCount();
-    for(int i = 0; i < n_x; i++){
-      vel_x += (float)(*acc_x++) / mpu.getAccConfig() - mpu.getAccXoffset() * aT;
-      dist_x += vel_x * aT + 0.5 * ((float)(*acc_x++) / mpu.getAccConfig() - mpu.getAccXoffset()) * sq(aT);
-    }
-    for(int i = 0; i < n_y; i++){
-      vel_y += (float)(*acc_y++) / mpu.getAccConfig() - mpu.getAccYoffset() * aT;
-      dist_y += vel_y * aT + 0.5 * ((float)(*acc_y++) / mpu.getAccConfig() - mpu.getAccYoffset()) * sq(aT);
-    }
-    for(int i = 0; i < n_z; i++){
-      vel_z += (float)(*acc_z++) / mpu.getAccConfig() - mpu.getAccZoffset() * aT;
-      dist_z += vel_z * aT + 0.5 * ((float)(*acc_z++) / mpu.getAccConfig() - mpu.getAccZoffset()) * sq(aT);
-    }
-    
-    float acc_mov_xf = ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccXoffset())*(float)(now() - _prevtime);
-    float dist_mov_xf = acc_mov_xf * (float)(now() - _prevtime) + 0.5 * ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccYoffset())*sq((float)(now() - _prevtime));
-    float acc_mov_yf = ((float)acc_mov_y  / mpu.getAccConfig() - mpu.getAccYoffset())*(float)(now() - _prevtime);
-    float dist_mov_yf = acc_mov_yf * (float)(now() - _prevtime) + 0.5 * ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccYoffset())*sq((float)(now() - _prevtime));
-    float acc_mov_zf = ((float)acc_mov_z  / mpu.getAccConfig() - mpu.getAccZoffset())*(float)(now() - _prevtime);
-    float dist_mov_zf = acc_mov_zf * (float)(now() - _prevtime) + 0.5 * ((float)acc_mov_x  / mpu.getAccConfig() - mpu.getAccYoffset())*sq((float)(now() - _prevtime));
-*/
-    //BT.print("Distancia X = ");/*Serial.print(dist_x,2);*/BT.print("\t");BT.println(dist_mov_xf,2);
-    //BT.print("Distancia Y = ");/*Serial.print(dist_y,2);*/BT.print("\t");BT.println(dist_mov_yf,2);
-    //BT.print("Distancia Z = ");/*Serial.print(dist_z,2);*/BT.print("\t");BT.println(dist_mov_zf,2);
-/*
-    dist_x = 0.0;
-    dist_y = 0.0;
-    dist_z = 0.0;
-
-    acc_avg_x.reset();
-    acc_avg_y.reset();
-    acc_avg_z.reset();
-  }
-*/
-  //mpu.update();
-
-  if(BT.isListening()) bluetooth_connected = true;
-
-  while (gps.available(gpsPort)) {
-    gps_data = gps.read();
-    trace_all( DEBUG_PORT, gps, gps_data );
-    //trace_all(BT,gps,gps_data);
-    //Serial.write(c); // uncomment this line if you want to see the GPS data flowing
     if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
+      
+      setSyncProvider(gps_time);
+      gps_time(); // ---->  rtc.set(gps_time_rtc());
+      Serial.println((long)_time_gps);
+
+      if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
+        TimeZoneMapper TimeZoneGPS;
+        UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+        UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
+        TimeZone.setRules(UST, UT);
+        update_time();
+        Serial.print(F("Time configured."));
+      }
+      Serial.println(F("Done."));
+      Serial.println(F("Configuration ended.")); //
+      oled.clear();
+
+      trace_header( Serial );
+      Serial.flush();
+
+      STATE = GPS_WAITING;
+    }
+    _prevtime = now();
+  } else if(STATE == GPS_WAITING) {
+    if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
+      _time_gps = gps_time_rtc();
       update_time();
-      drawBattery.set();
+      //drawBattery.set();
       drawDisplay.set();
-      if(!SDReady) {
-        SDReady = card.begin(SDCARD_SS_PIN, SPI_SPEED);
-        if(SDReady) {
-          loadConfigurationProgram();
-          if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
-            TimeZoneMapper TimeZoneGPS;
-            UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
-            UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
-            TimeZone.setRules(UST, UT);
-            update_time();
-          }
-        }
+      utm.UTM(gps_data.latitudeL(),gps_data.longitudeL());
+      STATE = GPS_OK;
+    } else {
+      if (now() > _prevtime) {
+        calc_altitude();
+        _prevtime = now();
+        update_time();
+        //drawBattery.set();
+        drawDisplay.set();
+        drawDisplay(ScreenPrint);
       }
     }
-  }
-
-  //Serial.println(_utctime);
-  //Serial.println(_localtime);
-
-  charge = charge_level();
-
-  if (/*gps_data.valid.time && gps_data.valid.date && gps_data.valid.location &&*/ !(needcharge)) { 
-   
-
-    if (now() > _prevtime) {
-      (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
-      if (errorSD == 11) card.end();
-      //Serial.println(errorSD);
-      if (!errorSD) SaveOK = GPSData();
-      else SaveOK = false;
-      _prevtime = now();
-      update_time();
-      drawBattery.set();
-      drawDisplay.set();
-/*
-          Filter.update(gps_data.dateTime_us(),    // Marca de tiempo.
-                        gps_data.velocity_north/100.0, 
-                        gps_data.velocity_east/100.0, 
-                        gps_data.velocity_down/100.0, 
-                        gps_data.latitude()*DEG_TO_RAD,   // Radianes
-                        gps_data.longitude()*DEG_TO_RAD,  // Radianes
-                        gps_data.altitude_cm()/100L, 
-                        mpu.getGyroY()*DEG_TO_RAD, 
-                        -1*mpu.getGyroX()*DEG_TO_RAD, 
-                        mpu.getGyroZ()*DEG_TO_RAD, 
-                        mpu.getAccY()*9.807f, 
-                        -1*mpu.getAccX()*9.807f, 
-                        mpu.getAccZ()*9.807f,
-                        0.88,30.35,32.31); 
-                        //205.16,37.72,410.32);
-                        //Imu.getMagX_uT(), 
-                        //Imu.getMagY_uT(), 
-                        //Imu.getMagZ_uT());
-          */
-    //utm.UTM((long)(Filter.getLatitude_rad()*RAD_TO_DEG*10000000.0), (long)(Filter.getLongitude_rad()*RAD_TO_DEG*10000000.0));
-    utm.UTM(gps_data.latitudeL(),gps_data.longitudeL());
-    drawDisplay(ScreenPrint);
-    }
-  }
-  else if (charge==0){
-    while (charge < 5) {
-      oled.clear();
-      delay(500);
-      oled.print_date(_localtime);
-      oled.print_time(trc->abbrev, _localtime);
-      oled.drawbattery(charge_level());
-      charge = charge_level();
-    }
-      
+  } else if(STATE == GPS_OK) {
+    if (/*gps_data.valid.time && gps_data.valid.date && gps_data.valid.location &&*/ !(needcharge)) { 
+      if (now() > _prevtime) {
+        _prevtime = now();
+        update_time();
+        calc_altitude();
+        (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
+        if (errorSD == 11) card.end();
+        //Serial.println(errorSD);
+        SaveOK = (SDReady) ? GPSData() : false;
+        //drawBattery.set();
+        drawDisplay.set();
+        drawDisplay(ScreenPrint);
+      }
+      STATE = GPS_WAITING;
+    } else {
       needcharge = true;
-  }
-  else {
-    if (now() > _prevtime) {
-      _prevtime = now();
-      update_time();
-      drawBattery.set();
-      drawDisplay.set();
-      drawDisplay(ScreenPrint);
+      while (needcharge) {
+        _prevtime = now();
+        update_time();
+        oled.clear();
+        oled.print_date(_localtime);
+        oled.print_time(trc->abbrev, _localtime);
+        charge = charge_level();
+        oled.drawbattery(charge_level());
+        oled.draw();
+        delay(500);
+        oled.DrawLowBat();
+        oled.draw();
+        (charge_level() > 5 || charge_level() < 0) ? needcharge = false : needcharge = true;
+      }
+      needcharge = false;
+      STATE = GPS_WAITING;
     }
   }
 
-/*
-  if((charge==0) && bitRead(millis(),9))
-    drawBattery.set();
-  else if((millis()&0x1ff) == 0x1ff)
-    drawBattery.set();
-  */
-  //drawDisplay(ScreenPrint);
-
-  if(needcharge) (charge > 5) ? needcharge = false : needcharge = true;
-  /*
-  rtc.setAlarmTime(17, 00, 10);
-  rtc.enableAlarm(rtc.MATCH_HHMMSS);
-
-  rtc.attachInterrupt(alarmMatch);
-  rtc.standbyMode();
-  */
 }
