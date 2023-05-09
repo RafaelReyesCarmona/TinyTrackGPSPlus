@@ -22,6 +22,7 @@ extern "C" {
 #include "FusionConvention.h"
 #include "FusionMath.h"
 #include "FusionOffset.h"
+#include "FusionGPS.h"
 
 #ifdef __cplusplus
 }

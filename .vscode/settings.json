@@ -9,6 +9,13 @@
         "vector": "cpp",
         "string_view": "cpp",
         "memory": "cpp",
-        "initializer_list": "cpp"
+        "initializer_list": "cpp",
+        "core": "c",
+        "cstddef": "cpp",
+        "list": "cpp",
+        "optional": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "functional": "cpp"
     }
 }

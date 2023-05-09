@@ -42,7 +42,7 @@ static FusionVector HalfMagnetic(const FusionAhrs *const ahrs);
  */
 void FusionAhrsInitialise(FusionAhrs *const ahrs) {
     const FusionAhrsSettings settings = {
-            .convention = FusionConventionNwu,
+            .convention = FusionConventionNed,
             .gain = 0.5f,
             .accelerationRejection = 90.0f,
             .magneticRejection = 90.0f,
@@ -161,6 +161,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
         ahrs->magneticRejectionTimeout = false;
         if (ahrs->magneticRejectionTimer > ahrs->settings.rejectionTimeout) {
             FusionAhrsSetHeading(ahrs, FusionCompassCalculateHeading(ahrs->settings.convention, halfGravity, magnetometer));
+            //FusionAhrsSetHeading(ahrs, FusionCompassCalculateHeading2(magnetometer));
             ahrs->magneticRejectionTimer = 0;
             ahrs->magneticRejectionTimeout = true;
         }
@@ -182,7 +183,7 @@ void FusionAhrsUpdate(FusionAhrs *const ahrs, const FusionVector gyroscope, cons
     }
 
     // Convert gyroscope to radians per second scaled by 0.5
-    const FusionVector halfGyroscope = FusionVectorMultiplyScalar(gyroscope, FusionDegreesToRadians(0.5f));
+    const FusionVector halfGyroscope = FusionVectorMultiplyScalar(gyroscope, FusionDegreesToRadiansf(0.5f));
 
     // Apply feedback to gyroscope
     const FusionVector adjustedHalfGyroscope = FusionVectorAdd(halfGyroscope, FusionVectorMultiplyScalar(FusionVectorAdd(halfAccelerometerFeedback, halfMagnetometerFeedback), ahrs->rampedGain));
@@ -432,7 +433,7 @@ FusionAhrsFlags FusionAhrsGetFlags(const FusionAhrs *const ahrs) {
 void FusionAhrsSetHeading(FusionAhrs *const ahrs, const float heading) {
 #define Q ahrs->quaternion.element
     const float yaw = atan2f(Q.w * Q.z + Q.x * Q.y, 0.5f - Q.y * Q.y - Q.z * Q.z);
-    const float halfYawMinusHeading = 0.5f * (yaw - FusionDegreesToRadians(heading));
+    const float halfYawMinusHeading = 0.5f * (yaw - FusionDegreesToRadiansf(heading));
     const FusionQuaternion rotation = {.element = {
             .w = cosf(halfYawMinusHeading),
             .x = 0.0f,

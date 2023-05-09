@@ -19,6 +19,10 @@
 
 float FusionCompassCalculateHeading(const FusionConvention convention, const FusionVector accelerometer, const FusionVector magnetometer);
 
+float FusionCompassCalculateHeading2(const FusionVector magnetometer);
+
+float FusionCompassCalculateBearing(const FusionEuler euler, const FusionVector magnetometer);
+
 #endif
 
 //------------------------------------------------------------------------------

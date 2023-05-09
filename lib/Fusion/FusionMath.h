@@ -31,6 +31,19 @@ typedef union {
 } FusionVector;
 
 /**
+ * @brief 3D vector double precision.
+ */
+typedef union {
+    double array[3];
+
+    struct {
+        double x;
+        double y;
+        double z;
+    } axis;
+} FusionVectorDouble;
+
+/**
  * @brief Quaternion.
  */
 typedef union {
@@ -84,6 +97,11 @@ typedef union {
 #define FUSION_VECTOR_ZERO ((FusionVector){ .array = {0.0f, 0.0f, 0.0f} })
 
 /**
+ * @brief Vector of zeros.
+ */
+#define FUSION_VECTORDOUBLE_ZERO ((FusionVectorDouble){ .array = {0.0, 0.0, 0.0} })
+
+/**
  * @brief Vector of ones.
  */
 #define FUSION_VECTOR_ONES ((FusionVector){ .array = {1.0f, 1.0f, 1.0f} })
@@ -124,8 +142,17 @@ typedef union {
  * @param degrees Degrees.
  * @return Radians.
  */
-static inline float FusionDegreesToRadians(const float degrees) {
+static inline float FusionDegreesToRadiansf(const float degrees) {
     return degrees * ((float) M_PI / 180.0f);
+}
+
+/**
+ * @brief Converts degrees to radians.
+ * @param degrees Degrees.
+ * @return Radians.
+ */
+static inline double FusionDegreesToRadians(const double degrees) {
+    return degrees * ( M_PI / 180.0);
 }
 
 /**
@@ -133,8 +160,17 @@ static inline float FusionDegreesToRadians(const float degrees) {
  * @param radians Radians.
  * @return Degrees.
  */
-static inline float FusionRadiansToDegrees(const float radians) {
+static inline float FusionRadiansToDegreesf(const float radians) {
     return radians * (180.0f / (float) M_PI);
+}
+
+/**
+ * @brief Converts radians to degrees.
+ * @param radians Radians.
+ * @return Degrees.
+ */
+static inline double FusionRadiansToDegrees(const float radians) {
+    return radians * (180.0 / M_PI);
 }
 
 //------------------------------------------------------------------------------
@@ -416,6 +452,137 @@ static inline FusionVector FusionMatrixMultiplyVector(const FusionMatrix matrix,
 #undef R
 }
 
+/**
+ * @brief Returns the transpose of a matrix.
+ * @param matrix Matrix.
+ * @return Transpose of a matrix.
+ */
+static inline FusionMatrix FusionMatrixTranspose(const FusionMatrix matrix) {
+#define R matrix.element
+    const FusionMatrix result = { .element = {
+            .xx = R.xx,
+            .xy = R.yx,
+            .xz = R.zx,
+            .yx = R.xy,
+            .yy = R.yy,
+            .yz = R.zy,
+            .zx = R.xz,
+            .zy = R.yz, 
+            .zz = R.zz,
+    }};
+    return result;
+#undef R
+}
+
+/**
+ * @brief Returns the inverse of a matrix.
+ * @param matrix Matrix.
+ * @return Inverse of a matrix.
+ */
+static inline FusionMatrix FusionMatrixInverse(const FusionMatrix matrix) {
+#define R matrix.element
+    const FusionMatrix adjunt_T = { .element = {
+        .xx = (R.yy * R.zz)-(R.yz * R.zy),
+        .xy = (R.xz * R.zy)-(R.xy * R.zz), //-((R.xy * R.zz) - (R.xz * R.zy)),
+        .xz = (R.xy * R.yz)-(R.xz * R.yy),
+        .yx = (R.yz * R.zx)-(R.yx * R.zz), //-((R.yx * R.zz) - (R.yz * R.zx)),
+        .yy = (R.xx * R.zz)-(R.xz * R.zx),
+        .yz = (R.xz * R.yx)-(R.xx * R.yz), //-((R.xx * R.yz) - (R.xz * R.yx)),
+        .zx = (R.yx * R.zy)-(R.yy * R.zx),
+        .zy = (R.xy * R.zx)-(R.xx * R.zy), //-((R.xx * R.zy) - (R.xy * R.zx)),
+        .zz = (R.xx * R.yy)-(R.xy * R.yx),
+    }};
+    const double determinant = R.xx * adjunt_T.element.xx + R.xy * adjunt_T.element.yx + R.xz * adjunt_T.element.zx;
+    const FusionMatrix inverse = { .element = {
+        .xx = adjunt_T.element.xx / (float)determinant,
+        .xy = adjunt_T.element.xy / (float)determinant,
+        .xz = adjunt_T.element.xz / (float)determinant,
+        .yx = adjunt_T.element.yx / (float)determinant,
+        .yy = adjunt_T.element.yy / (float)determinant,
+        .yz = adjunt_T.element.yz / (float)determinant,
+        .zx = adjunt_T.element.zx / (float)determinant,
+        .zy = adjunt_T.element.zy / (float)determinant,
+        .zz = adjunt_T.element.zz / (float)determinant,
+    }};
+    return inverse;
+#undef R
+}
+
+/**
+ * @brief Returns the sum of twp matrixes.
+ * @param A_matrix Matrix.
+ * @param B_matrix Matrix.
+ * @return Sum of two matrixes.
+ */
+static inline FusionMatrix FusionMatrixSum(const FusionMatrix A_matrix, const FusionMatrix B_matrix) {
+#define A A_matrix.element
+#define B A_matrix.element
+    const FusionMatrix Sum = { .element = {
+        .xx = A.xx + B.xx,
+        .xy = A.xy + B.xy,
+        .xz = A.xz + B.xz,
+        .yx = A.yx + B.yx,
+        .yy = A.yy + B.yy,
+        .yz = A.yz + B.yz,
+        .zx = A.zx + B.zx,
+        .zy = A.zy + B.zy,
+        .zz = A.zz + B.zz,
+    }};
+    return Sum;
+#undef A
+#undef B
+}
+
+/**
+ * @brief Returns the subtract of two matrixes.
+ * @param A_matrix Matrix.
+ * @param B_matrix Matrix.
+ * @return A - B matrix.
+ */
+static inline FusionMatrix FusionMatrixSubtract(const FusionMatrix A_matrix, const FusionMatrix B_matrix) {
+#define A A_matrix.element
+#define B A_matrix.element
+    const FusionMatrix Sum = { .element = {
+        .xx = A.xx - B.xx,
+        .xy = A.xy - B.xy,
+        .xz = A.xz - B.xz,
+        .yx = A.yx - B.yx,
+        .yy = A.yy - B.yy,
+        .yz = A.yz - B.yz,
+        .zx = A.zx - B.zx,
+        .zy = A.zy - B.zy,
+        .zz = A.zz - B.zz,
+    }};
+    return Sum;
+#undef A
+#undef B
+}
+
+/**
+ * @brief Returns the sum of twp matrixes.
+ * @param A_matrix Matrix.
+ * @param B_matrix Matrix.
+ * @return Sum of two matrixes.
+ */
+static inline FusionMatrix FusionMatrixMult(const FusionMatrix A_matrix, const FusionMatrix B_matrix) {
+#define A A_matrix.element
+#define B A_matrix.element
+    const FusionMatrix Mult = { .element = {
+        .xx = A.xx * B.xx + A.xy * B.yx + A.xz * B.zx,
+        .xy = A.xx * B.xy + A.xy * B.yy + A.xz * B.zy,
+        .xz = A.xx * B.xz + A.xy * B.yz + A.xz * B.zz,
+        .yx = A.yx * B.xx + A.yy * B.yx + A.yz * B.zx,
+        .yy = A.yx * B.xy + A.yy * B.yy + A.yz * B.zy,
+        .yz = A.yx * B.xz + A.yy * B.yz + A.yz * B.zz,
+        .zx = A.zx * B.xx + A.zy * B.yx + A.zz * B.zx,
+        .zy = A.zx * B.xy + A.zy * B.yy + A.zz * B.zy,
+        .zz = A.zx * B.xz + A.zy * B.yz + A.zz * B.zz,
+    }};
+    return Mult;
+#undef A
+#undef B
+}
+
 //------------------------------------------------------------------------------
 // Inline functions - Conversion operations
 
@@ -457,9 +624,9 @@ static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion quatern
 #define Q quaternion.element
     const float halfMinusQySquared = 0.5f - Q.y * Q.y; // calculate common terms to avoid repeated operations
     const FusionEuler euler = {.angle = {
-            .roll = FusionRadiansToDegrees(atan2f(Q.w * Q.x + Q.y * Q.z, halfMinusQySquared - Q.x * Q.x)),
-            .pitch = FusionRadiansToDegrees(FusionAsin(2.0f * (Q.w * Q.y - Q.z * Q.x))),
-            .yaw = FusionRadiansToDegrees(atan2f(Q.w * Q.z + Q.x * Q.y, halfMinusQySquared - Q.z * Q.z)),
+            .roll = FusionRadiansToDegreesf(atan2f(Q.w * Q.x + Q.y * Q.z, halfMinusQySquared - Q.x * Q.x)),
+            .pitch = FusionRadiansToDegreesf(FusionAsin(2.0f * (Q.w * Q.y - Q.z * Q.x))),
+            .yaw = FusionRadiansToDegreesf(atan2f(Q.w * Q.z + Q.x * Q.y, halfMinusQySquared - Q.z * Q.z)),
     }};
     return euler;
 #undef Q
