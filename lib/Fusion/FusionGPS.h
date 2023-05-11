@@ -43,8 +43,8 @@ typedef struct {
     FusionVector P;
     FusionVector K_vel;
     FusionVector P_vel;
-    FusionVector dx;
-    FusionVector dxd;
+    FusionVectorDouble dx;
+    FusionVectorDouble dxd;
     bool locationIgnored;
     unsigned int locationRejectionTimer;
     bool locationRejectionTimeout;
@@ -95,7 +95,7 @@ FusionVectorDouble FusionGPSpos2ecef(const FusionVector pos);
 
 FusionVector FusionGPSecef2ned(FusionVectorDouble ecef,FusionVector pos_ref);
 
-FusionVector FusionGPSposrate(FusionVector vel,FusionVector pos);
+FusionVectorDouble FusionGPSposrate(FusionVector vel,FusionVector pos);
 
 #endif
 

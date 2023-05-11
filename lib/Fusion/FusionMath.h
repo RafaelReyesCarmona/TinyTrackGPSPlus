@@ -283,6 +283,21 @@ static inline FusionVector FusionVectorMultiplyScalar(const FusionVector vector,
 }
 
 /**
+ * @brief Returns the multiplication of a vector by a scalar.
+ * @param vector Vector.
+ * @param scalar Scalar.
+ * @return Multiplication of a vector by a scalar.
+ */
+static inline FusionVector FusionVectorMultiplyScalarDouble(const FusionVectorDouble vector, const float scalar) {
+    const FusionVector result = {.axis = {
+            .x = vector.axis.x * scalar,
+            .y = vector.axis.y * scalar,
+            .z = vector.axis.z * scalar,
+    }};
+    return result;
+}
+
+/**
  * @brief Calculates the Hadamard product (element-wise multiplication).
  * @param vectorA Vector A.
  * @param vectorB Vector B.
@@ -444,6 +459,23 @@ static inline FusionQuaternion FusionQuaternionNormalise(const FusionQuaternion 
 static inline FusionVector FusionMatrixMultiplyVector(const FusionMatrix matrix, const FusionVector vector) {
 #define R matrix.element
     const FusionVector result = {.axis = {
+            .x = R.xx * vector.axis.x + R.xy * vector.axis.y + R.xz * vector.axis.z,
+            .y = R.yx * vector.axis.x + R.yy * vector.axis.y + R.yz * vector.axis.z,
+            .z = R.zx * vector.axis.x + R.zy * vector.axis.y + R.zz * vector.axis.z,
+    }};
+    return result;
+#undef R
+}
+
+/**
+ * @brief Returns the multiplication of a matrix with a vector.
+ * @param matrix Matrix.
+ * @param vector Vector.
+ * @return Multiplication of a matrix with a vector.
+ */
+static inline FusionVectorDouble FusionMatrixMultiplyVectorDouble(const FusionMatrix matrix, const FusionVector vector) {
+#define R matrix.element
+    const FusionVectorDouble result = {.axis = {
             .x = R.xx * vector.axis.x + R.xy * vector.axis.y + R.xz * vector.axis.z,
             .y = R.yx * vector.axis.x + R.yy * vector.axis.y + R.yz * vector.axis.z,
             .z = R.zx * vector.axis.x + R.zy * vector.axis.y + R.zz * vector.axis.z,

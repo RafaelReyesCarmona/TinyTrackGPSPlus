@@ -485,6 +485,10 @@ void ScreenPrint(){
   sprintf(line,"%02d",celsius);
   oled.print(127-16,44,line);
   oled.print_PChar(6);
+
+  sprintf(line,"%02d",(int)(gps_data.speed_metersph()/3600));
+  oled.print(104,55,line);
+  oled.print_PChar(7);
     
   //drawBattery(drawBatteryIcon);
   oled.drawbattery(charge_level());
@@ -786,9 +790,12 @@ void loop(void) {
     //Serial.print("Vel ins: x:");Serial.print(GPS.velocity_ins.axis.x);Serial.print(" ");
     //Serial.print("y :");Serial.print(GPS.velocity_ins.axis.y);Serial.print(" ");
     //Serial.print("z:");Serial.print(GPS.velocity_ins.axis.z);Serial.print(". ");
-    //Serial.print("dxd: x:");Serial.print(GPS.dxd.axis.x,7);Serial.print(" ");
-    //Serial.print("y :");Serial.print(GPS.dxd.axis.y,7);Serial.print(" ");
-    //Serial.print("z:");Serial.print(GPS.dxd.axis.z,4);Serial.print(".      \r");
+    Serial.print("dx: x:");Serial.print(GPS.dx.axis.x,7);Serial.print(" ");
+    Serial.print("y :");Serial.print(GPS.dx.axis.y,7);Serial.print(" ");
+    Serial.print("z:");Serial.print(GPS.dx.axis.z,4);Serial.print(". - ");
+    Serial.print("dxd: x:");Serial.print(GPS.dxd.axis.x,7);Serial.print(" ");
+    Serial.print("y :");Serial.print(GPS.dxd.axis.y,7);Serial.print(" ");
+    Serial.print("z:");Serial.print(GPS.dxd.axis.z,4);Serial.print(".      \r");
     //Serial.print("\t\tRoll:  ");Serial.print(euler.angle.roll,2);Serial.print(",\t");
     //Serial.print("Pitch: ");Serial.print(euler.angle.pitch,2);Serial.print(",\t");
     //Serial.print("Yaw: ");Serial.print(euler.angle.yaw,2);Serial.print(",\t-> ");
@@ -866,15 +873,30 @@ void loop(void) {
       update_time();
       FusionVectorDouble GPS_loc = {(double)gps_data.latitudeL()/10e6, (double)gps_data.longitudeL()/10e6, (double)gps_data.altitude()};
       FusionVector velocity = calculateNEDVelocity(earth, magnetometer);
+      calc_altitude();
       //Serial.print("Vel X= ");Serial.print(velocity.axis.x);Serial.print(",");
       //Serial.print("Vel Y= ");Serial.print(velocity.axis.y);Serial.print(",");
       //Serial.print("Vel Z= ");Serial.print(velocity.axis.z);Serial.print("\r");
-      FusionAhrsSetHeading(&ahrs,FusionCompassCalculateHeading2(magnetometer));
-      FusionGPSUpdate(&GPS, GPS_loc, velocity,deltaTime);
-      Serial.print("P Vector:[ {");
-      Serial.print(GPS.P.axis.x,7);Serial.print(", ");Serial.print(GPS.P.axis.y,7);Serial.print(", ");Serial.print(GPS.P.axis.z,7);Serial.print("} ],");
-      Serial.print("P_vel :[ {");
-      Serial.print(GPS.P_vel.axis.x);Serial.print(", ");Serial.print(GPS.P_vel.axis.y);Serial.print(", ");Serial.print(GPS.P_vel.axis.z);Serial.print("} ]\r");
+      //FusionAhrsSetHeading(&ahrs,FusionCompassCalculateHeading2(magnetometer));
+      if(gps_data.speed_metersph() < 1080) { // 0,3 m/s
+        GPS.location_ins = {.axis = {
+          .x = GPS_loc.axis.x * 0.80 + GPS.location.axis.x * 0.20,
+          .y = GPS_loc.axis.y * 0.80 + GPS.location.axis.y * 0.20,
+          .z = GPS_loc.axis.z * 0.80 + GPS.location.axis.z * 0.20,          
+        }};
+        GPS.location = GPS_loc;
+      } else FusionGPSUpdate(&GPS, GPS_loc, velocity,deltaTime);
+      //Serial.print("P Vector:[ {");
+      //Serial.print(GPS.P.axis.x,7);Serial.print(", ");Serial.print(GPS.P.axis.y,7);Serial.print(", ");Serial.print(GPS.P.axis.z,7);Serial.print("} ],");
+      //Serial.print("P_vel :[ {");
+      //Serial.print(GPS.P_vel.axis.x);Serial.print(", ");Serial.print(GPS.P_vel.axis.y);Serial.print(", ");Serial.print(GPS.P_vel.axis.z);Serial.print("} ]\r");
+      //Serial.print("Speed: ");Serial.print(gps_data.speed_metersph()/3600);Serial.print("m/s ");
+      //Serial.print("Vel.X: ");Serial.print(GPS.velocity.axis.x);Serial.print(", ");
+      //Serial.print("Y: ");Serial.print(GPS.velocity.axis.y);Serial.print(", ");
+      //Serial.print("Z: ");Serial.print(GPS.velocity.axis.z);Serial.print(". ");
+      //Serial.print("VelIns.X: ");Serial.print(GPS.velocity_ins.axis.x);Serial.print(", ");
+      //Serial.print("Y: ");Serial.print(GPS.velocity_ins.axis.y);Serial.print(", ");
+      //Serial.print("Z: ");Serial.print(GPS.velocity_ins.axis.z);Serial.print(".\r");
       //Serial.print("Heading ");Serial.print(FusionCompassCalculateHeading2(magnetometer),2);Serial.print(", ");
       //Serial.print(compass.getAzimuth());Serial.print(". ");
       //Serial.print("Loc: Lat: "); Serial.print(GPS.location.axis.x,7);
@@ -906,7 +928,6 @@ void loop(void) {
       if (now() > _prevtime) {
         _prevtime = now();
         //update_time();
-        calc_altitude();
         (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
         if (errorSD == 11) card.end();
         //Serial.println(errorSD);
