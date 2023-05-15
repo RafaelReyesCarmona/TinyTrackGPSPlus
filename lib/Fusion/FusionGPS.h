@@ -45,6 +45,8 @@ typedef struct {
     FusionVector P_vel;
     FusionVectorDouble dx;
     FusionVectorDouble dxd;
+    FusionQuaternion quaternium;
+    FusionVector angular;
     bool locationIgnored;
     unsigned int locationRejectionTimer;
     bool locationRejectionTimeout;

@@ -1,9 +1,9 @@
 <img src="images/compass.png" width=48 height=48 align=right>
 
-# TinyTrackGPS
+# TinyTrackGPSPlus
 <img alt="Schema1." src="images/Logo.png" width="128">&nbsp;
 
-A simple track GPS to SD card logger. 
+A simple, and highly precise, track GPS to SD card logger with estimated position for better accuracy. 
 
 <img alt="Location example." src="images/IMG_20211130_103242_wide.jpg" width="480" align=center>&nbsp;
 
@@ -12,19 +12,17 @@ A simple track GPS to SD card logger.
 
 ## Features
 
-This program is written in C/C++ for Arduino © UNO R3 and other compatible microcontrollers based on Atmega328 and similar. News functions and fix are tested and implemented on LGT8F328P board.
+This program is written in C/C++ for SAMD21 and other compatible microcontrollers based on Atmega328 and similar.
 
 It is tested on:
-* UNO R3 board (Arduino UNO compatible board based on Atmega328). Tested until v0.11, v0.13 and v0.14
-* ProMini 5v 16MHz (Arduino ProMini compatible board based on Atmega328p). Tested until v0.11.
-* Lgt8f328p (a replacement Arduino Pro Mini).Tested v0.1, v0.2 and since v0.10. (default option)
+* Seeeduino XIAO, SAMD21.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
-When power on the first display shows version, logo, charge of battery and a waiting animation similar to hourglass. Device is waiting for GPS signal. When GPS signal is ready, it is showing the main display.
+When power on the first display shows date and time UTC, version, logo, charge of battery and a waiting animation similar to hourglass. Device is waiting for GPS signal. When GPS signal is ready, it is showing the main display.
 
 TinyTrackGPS features:
-* Show GPS coordenates in Grades and UTM (WG86) formats.
+* Show estimated GPS coordenates in Grades and UTM (WG86) formats, based on GPS info and other movements' sensors as gyroscope, accelerometer, magnetometer and barometer.
 * Save a tracklog in CSV format.
 * Save time in tracklog on local time.
 * Show battery charge.
@@ -38,20 +36,20 @@ TinyTrackGPS features:
 
 This project use components list above:
 
-  * Arduino © UNO board or equivalent AVR.
-  * NMEA 6,8 GPS module.
+  * Seeeduino XIAO, SAMD21 microcontroller.
+  * NMEA GPS module.
   * MicroSD module and card.
-  * LCD 16×2 char display module (wired or I2C), or OLED 0.96" I2C (SSD1306) (Optional).
+  * OLED 0.96" I2C (SSD1306).
 
   I use this components:
 
-  * LGT8F328P LQFP-32 MiniEVB 32MHz board.
-  * U-blox NEO-M8N GPS module. A concurrent reception module up to 3 GNSS (GPS, Galileo, GLONASS, BeiDou)
+  * Seeeduino XIAO board.
+  * ATGM336H dual GPS + BDS GNSS module.
   * MicroSD module with MicroSD 4Gb Card FAT32 formatted.
   * SSD1306 0.96" 128x64 OLED I2C display module.
 
   Additional:
-  * Lipo 3,7V 450mAh 403040 with protect.
+  * Lipo 3,7V 700mAh 603035 with protect.
   * MicroUsb charge module.
 
 Current on this configuration is 60mA average.

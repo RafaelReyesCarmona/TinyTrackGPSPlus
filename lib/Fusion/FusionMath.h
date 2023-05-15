@@ -290,9 +290,9 @@ static inline FusionVector FusionVectorMultiplyScalar(const FusionVector vector,
  */
 static inline FusionVector FusionVectorMultiplyScalarDouble(const FusionVectorDouble vector, const float scalar) {
     const FusionVector result = {.axis = {
-            .x = vector.axis.x * scalar,
-            .y = vector.axis.y * scalar,
-            .z = vector.axis.z * scalar,
+            .x = (float)vector.axis.x * scalar,
+            .y = (float)vector.axis.y * scalar,
+            .z = (float)vector.axis.z * scalar,
     }};
     return result;
 }
@@ -664,7 +664,15 @@ static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion quatern
 #undef Q
 }
 
-#endif
+static inline FusionVector FusionQuaternionAngularVelocity(const FusionQuaternion q1, const FusionQuaternion q2, const float deltaTime) {
+    FusionVector angular = { .axis = {
+        .x = (q1.array[0]*q2.array[1] - q1.array[1]*q2.array[0] - q1.array[2]*q2.array[3] + q1.array[3]*q2.array[2]) * (2.0f / deltaTime),
+        .y = (q1.array[0]*q2.array[2] + q1.array[1]*q2.array[3] - q1.array[2]*q2.array[0] - q1.array[3]*q2.array[1]) * (2.0f / deltaTime),
+        .z = (q1.array[0]*q2.array[3] - q1.array[1]*q2.array[2] + q1.array[2]*q2.array[1] - q1.array[3]*q2.array[0]) * (2.0f / deltaTime)
+    }};
+    return angular;
+}
 
+#endif
 //------------------------------------------------------------------------------
 // End of file

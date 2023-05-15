@@ -24,10 +24,10 @@ const double ECC2 = 673949675659e-14;//0.0066943799901;
 // earth semi-major axis radius (m)
 const double EARTH_RADIUS = 6378137.0;
 // GPS measurement noise std dev (m)
-const float SIG_GPS_P_NE = 1.35f;
-const float SIG_GPS_P_D = 4.0f;
+const float SIG_GPS_P_NE = 3.5f;
+const float SIG_GPS_P_D = 5.0f;
 // GPS measurement noise std dev (m/s)
-const float SIG_GPS_V = 0.5f;
+const float SIG_GPS_V = 0.7f;
 
 
 
@@ -107,7 +107,10 @@ void FusionGPSSetSettings(FusionGPS *const GPS, const FusionGPSSettings *const s
 void FusionGPSAHRSUpdate(FusionGPS *const GPS, const FusionQuaternion quaternium, const FusionVector accel, const float deltaTime) {
   if(GPS->initialising) {
     FusionVector GPS_pos_rad, GPS_pos_ins_rad;
+    GPS->angular = FusionQuaternionAngularVelocity(GPS->quaternium, quaternium, deltaTime);
+    if(sqrt(FusionVectorMagnitudeSquared(GPS->angular))>0.1f) {
     const FusionMatrix quad = FusionQuaternionToMatrix(quaternium);
+    GPS->quaternium = quaternium;
     //const FusionEuler euler = FusionQuaternionToEuler(quaternium);
     
     GPS_pos_ins_rad.axis.x = FusionDegreesToRadians(GPS->location_ins.axis.x);
@@ -128,6 +131,7 @@ void FusionGPSAHRSUpdate(FusionGPS *const GPS, const FusionQuaternion quaternium
     GPS->location_ins.axis.y = FusionRadiansToDegrees(GPS_pos_ins_rad.axis.y);
     GPS->location_ins.axis.z = GPS_pos_ins_rad.axis.z;
     GPS->location = GPS->location_ins;
+    }
   }
 }
 
@@ -159,7 +163,8 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
     GPS->location_ins = pos;
     GPS->velocity_ins = vel;
     GPS->initialising = true;
-  } else {
+  }
+    GPS->velocity = vel;
     //if(sqrt(powf(vel.axis.x,2.0)+powf(vel.axis.y,2.0)) < 0.1)
     //  GPS->location_ins = pos;
     //else {
@@ -225,10 +230,11 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
     GPS->location_ins.axis.z = GPS_pos_ins_rad.axis.z;
     GPS->location = pos;
 
-    GPS->velocity_ins = FusionVectorAdd(vel, VEL_kalman);
-    GPS->velocity = vel;
+    GPS->velocity_ins.axis.x += VEL_kalman.axis.x;
+    GPS->velocity_ins.axis.y += VEL_kalman.axis.y;
+    GPS->velocity_ins.axis.z += VEL_kalman.axis.z;
     //} 
-  }
+  
 }
 
 /**
