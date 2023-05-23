@@ -213,7 +213,22 @@ static inline float FusionFastInverseSqrt(const float x) {
     union32.i = 0x5F1F1412 - (union32.i >> 1);
     return union32.f * (1.69000231f - 0.714158168f * x * union32.f * union32.f);
 }
-
+// Test this code--------------------------------------------
+static inline float inv_sqrt(const float x)
+{ union { float f; uint32_t u; } y = {x};
+y.u = 0x5F1FFF77ul - (y.u >> 1);
+return 0.703974056f * y.f * (2.38919526f - x * y.f * y.f);
+}
+//-----------------------------------------------------------
+/**
+ * @brief Fast calculates the square root.
+ * See https://pizer.wordpress.com/2008/10/12/fast-inverse-square-root/
+ * @param x Operand.
+ * @return Square root of x.
+ */
+static inline float FusionFastSqrt(const float x) {
+    return 1.0f / inv_sqrt(x);
+}
 #endif
 
 //------------------------------------------------------------------------------

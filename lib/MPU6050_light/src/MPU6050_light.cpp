@@ -253,6 +253,10 @@ void MPU6050::update(){
   angleAccX = atan2(accY, sgZ*sqrt(accZ*accZ + accX*accX)) * RAD_2_DEG;
   angleAccY = - atan2(accX, sqrt(accZ*accZ + accY*accY)) * RAD_2_DEG;
 
+  //Calcular los angulos de inclinacion:
+  angleInclX = atan(accX/sqrt(pow(accY,2) + pow(accZ,2)))*(RAD_2_DEG);
+  angleInclY = atan(accY/sqrt(pow(accX,2) + pow(accZ,2)))*(RAD_2_DEG);
+
   unsigned long Tnew = millis();
   float dt = (Tnew - preInterval) * 1e-3;
   preInterval = Tnew;

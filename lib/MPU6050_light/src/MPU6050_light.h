@@ -96,6 +96,9 @@ class MPU6050{
 	
 	float getAccAngleX(){ return angleAccX; };
     float getAccAngleY(){ return angleAccY; };
+    
+	float getAngleInclX(){ return angleInclX; };
+    float getAngleInclY(){ return angleInclY; };
 
     float getAngleX(){ return angleX; };
     float getAngleY(){ return angleY; };
@@ -117,6 +120,7 @@ class MPU6050{
 	int16_t accXoffsetRaw, accYoffsetRaw, accZoffsetRaw;
     float temp, accX, accY, accZ, gyroX, gyroY, gyroZ;
     float angleAccX, angleAccY;
+    float angleInclX, angleInclY;
     float angleX, angleY, angleZ;
     long preInterval;
     float filterGyroCoef; // complementary filter coefficient to balance gyro vs accelero data to get angle

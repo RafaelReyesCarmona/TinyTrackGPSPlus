@@ -29,8 +29,8 @@ const float SIG_GPS_P_D = 5.0f;
 // GPS measurement noise std dev (m/s)
 const float SIG_GPS_V = 0.7f;
 
-
-
+#define     Rew     		6.359058719353925e+006      //earth radius
+#define     Rns     		6.386034030458164e+006      //earth radius
 
 //------------------------------------------------------------------------------
 // Function declarations
@@ -108,22 +108,19 @@ void FusionGPSAHRSUpdate(FusionGPS *const GPS, const FusionQuaternion quaternium
   if(GPS->initialising) {
     FusionVector GPS_pos_rad, GPS_pos_ins_rad;
     GPS->angular = FusionQuaternionAngularVelocity(GPS->quaternium, quaternium, deltaTime);
-    if(sqrt(FusionVectorMagnitudeSquared(GPS->angular))>0.1f) {
+    //if(sqrt(FusionVectorMagnitudeSquared(GPS->angular))>0.1f) {
     const FusionMatrix quad = FusionQuaternionToMatrix(quaternium);
+    float R = sqrt(GPS->quaternium.element.w * quaternium.element.w);
     GPS->quaternium = quaternium;
-    //const FusionEuler euler = FusionQuaternionToEuler(quaternium);
-    
-    GPS_pos_ins_rad.axis.x = FusionDegreesToRadians(GPS->location_ins.axis.x);
-    GPS_pos_ins_rad.axis.y = FusionDegreesToRadians(GPS->location_ins.axis.y);
-    GPS_pos_ins_rad.axis.z = GPS->location.axis.z;
-    
+    FusionVector velocity = FusionVectorMultiplyScalar(GPS->angular,R);
+
     GPS_pos_rad.axis.x = FusionDegreesToRadians(GPS->location.axis.x);
     GPS_pos_rad.axis.y = FusionDegreesToRadians(GPS->location.axis.y);
     GPS_pos_rad.axis.z = GPS->location.axis.z;
   
     GPS->dx = FusionMatrixMultiplyVectorDouble(quad, accel);
 
-    GPS->velocity_ins = FusionVectorAdd(GPS->velocity_ins ,FusionVectorMultiplyScalarDouble(GPS->dx,deltaTime));
+    GPS->velocity_ins = FusionVectorAdd(velocity ,FusionVectorMultiplyScalarDouble(GPS->dx,deltaTime));
     GPS->dxd = FusionGPSposrate(GPS->velocity_ins, GPS_pos_rad);
     GPS_pos_ins_rad = FusionVectorAdd(GPS_pos_rad ,FusionVectorMultiplyScalarDouble(GPS->dxd,deltaTime));
 
@@ -131,7 +128,7 @@ void FusionGPSAHRSUpdate(FusionGPS *const GPS, const FusionQuaternion quaternium
     GPS->location_ins.axis.y = FusionRadiansToDegrees(GPS_pos_ins_rad.axis.y);
     GPS->location_ins.axis.z = GPS_pos_ins_rad.axis.z;
     GPS->location = GPS->location_ins;
-    }
+    //}
   }
 }
 
@@ -180,8 +177,8 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
 
     pos_ecef_gps = FusionGPSpos2ecef(GPS_pos_rad);
     pos_ned_gps = FusionGPSecef2ned(pos_ecef_gps, GPS_pos_rad);
-    pos_ecef_ins = FusionGPSpos2ecef(GPS_pos_prev_rad);
-    pos_ned_ins = FusionGPSecef2ned(pos_ecef_ins, GPS_pos_prev_rad);
+    pos_ecef_ins = FusionGPSpos2ecef(GPS_pos_ins_rad);
+    pos_ned_ins = FusionGPSecef2ned(pos_ecef_ins, GPS_pos_ins_rad);
     location_y = FusionVectorSubtract(pos_ned_gps, pos_ned_ins);
     velocity_y = FusionVectorSubtract(vel, GPS->velocity_ins);
 
@@ -216,14 +213,17 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
     }};
     FusionVector VEL_kalman = FusionVectorHadamardProduct(GPS->K_vel, velocity_y); //x = K *y
 
-    double denom = (1.0 - (ECC2 * pow(sin(GPS_kalman_rad.axis.x),2.0)));
-    denom = sqrt(denom*denom);
-    double Re = EARTH_RADIUS / sqrt(denom);
-    double Rn = EARTH_RADIUS*(1.0-ECC2) / denom*sqrt(denom);
+    //double denom = (1.0 - (ECC2 * pow(sin(GPS_kalman_rad.axis.x),2.0)));
+    //denom = sqrt(denom*denom);
+    //double Re = EARTH_RADIUS / sqrt(denom);
+    //double Rn = EARTH_RADIUS*(1.0-ECC2) / denom*sqrt(denom);
 
-    GPS_pos_ins_rad.axis.z = GPS_pos_rad.axis.z - GPS_kalman_rad.axis.z; 
-    GPS_pos_ins_rad.axis.x = GPS_pos_rad.axis.x + GPS_kalman_rad.axis.x / (Re + GPS_pos_ins_rad.axis.z);
-    GPS_pos_ins_rad.axis.y = GPS_pos_rad.axis.y + GPS_kalman_rad.axis.y / ((Rn + GPS_pos_ins_rad.axis.z) * cos(GPS_pos_ins_rad.axis.x));
+    //GPS_pos_ins_rad.axis.z = GPS_pos_rad.axis.z - GPS_kalman_rad.axis.z; 
+    //GPS_pos_ins_rad.axis.x = GPS_pos_rad.axis.x + GPS_kalman_rad.axis.x / (Rew + GPS_pos_ins_rad.axis.z);
+    //GPS_pos_ins_rad.axis.y = GPS_pos_rad.axis.y + GPS_kalman_rad.axis.y / ((Rns + GPS_pos_ins_rad.axis.z) / cos(GPS_pos_ins_rad.axis.x));
+    GPS_pos_ins_rad.axis.z -= GPS_kalman_rad.axis.z; 
+    GPS_pos_ins_rad.axis.x += GPS_kalman_rad.axis.x / (Rew + GPS_pos_ins_rad.axis.z);
+    GPS_pos_ins_rad.axis.y += GPS_kalman_rad.axis.y / ((Rns + GPS_pos_ins_rad.axis.z) / cos(GPS_pos_ins_rad.axis.x));
 
     GPS->location_ins.axis.x = FusionRadiansToDegrees(GPS_pos_ins_rad.axis.x);
     GPS->location_ins.axis.y = FusionRadiansToDegrees(GPS_pos_ins_rad.axis.y);
@@ -261,12 +261,12 @@ FusionGPSFlags FusionGPSGetFlags(const FusionGPS *const GPS) {
  */
 FusionVectorDouble FusionGPSpos2ecef(const FusionVector pos) {
 #define P pos.axis
-  double Rew, denom;
+  //double Rew, denom;
 
-  denom = (1.0 - (ECC2 * pow(sin(P.x),2.0)));
-  denom = sqrt(denom*denom);
+  //denom = (1.0 - (ECC2 * pow(sin(P.x),2.0)));
+  //denom = sqrt(denom*denom);
 
-  Rew = EARTH_RADIUS / sqrt(denom);
+  //Rew = EARTH_RADIUS / sqrt(denom);
 
   const FusionVectorDouble ecef = {.axis = {
     .x = (Rew + P.z) * cos(P.x) * cos(P.y),
@@ -305,13 +305,13 @@ FusionVector FusionGPSecef2ned(FusionVectorDouble ecef,FusionVector pos_ref) {
 FusionVectorDouble FusionGPSposrate(FusionVector vel,FusionVector pos) {
 #define V vel.axis
 #define P pos.axis
-  double Rew, Rns, denom;
+  //double Rew, Rns, denom;
   
-  denom = (1.0 - (ECC2 * pow(sin(P.x),2.0)));
-  denom = sqrt(denom*denom);
+  //denom = (1.0 - (ECC2 * pow(sin(P.x),2.0)));
+  //denom = sqrt(denom*denom);
 
-  Rew = EARTH_RADIUS / sqrt(denom);
-  Rns = EARTH_RADIUS*(1.0-ECC2) / denom*sqrt(denom);
+  //Rew = EARTH_RADIUS / sqrt(denom);
+  //Rns = EARTH_RADIUS*(1.0-ECC2) / denom*sqrt(denom);
 
   const FusionVectorDouble pos_dot = {.axis = {
     .x = V.x/(Rns + P.z),

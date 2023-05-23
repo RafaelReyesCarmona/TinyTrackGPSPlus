@@ -1,21 +1,25 @@
-<img src="images/compass.png" width=48 height=48 align=right>
+<img src="images/brujula.png" width=48 height=48 align=right>
 
-# TinyTrackGPSPlus
-<img alt="Schema1." src="images/Logo.png" width="128">&nbsp;
+# TinyTrackGPS+
+[![TinyTrackGPS+](https://img.shields.io/badge/TinyTrackGPS+-red?style=for-the-badge&logo=data:image/png;base64,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t+3vY9tungD+Z+BKa/urDWD2k/R6W4scAf3bwMV1W5P3gMsdYOhJlwzJkfw0hUIBeD+jb8oBoVugd83trbWP0wcgQ10t3wAHh8BYkbLXPd7d09nbv2da/f0AKoByip7pN6UAAA0YaVRYdFhNTDpjb20uYWRvYmUueG1wAAAAAAA8P3hwYWNrZXQgYmVnaW49Iu+7vyIgaWQ9Ilc1TTBNcENlaGlIenJlU3pOVGN6a2M5ZCI/Pgo8eDp4bXBtZXRhIHhtbG5zOng9ImFkb2JlOm5zOm1ldGEvIiB4OnhtcHRrPSJYTVAgQ29yZSA0LjQuMC1FeGl2MiI+CiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogIDxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PSIiCiAgICB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIKICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICB4bWxuczpHSU1QPSJodHRwOi8vd3d3LmdpbXAub3JnL3htcC8iCiAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyIKICAgIHhtbG5zOnhtcD0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyIKICAgeG1wTU06RG9jdW1lbnRJRD0iZ2ltcDpkb2NpZDpnaW1wOmVmYTA4ZGFhLTEyMzctNDU0Zi1hZjcyLWIxNzYzMzcwYWFmMiIKICAgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDoyZDJjZTE0My05MGMwLTRhMzUtOWZmNS0zMmMwYzY5YjczNTQiCiAgIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo4MGZlZTRiNi0yMGUxLTRkM2ItYTA2Ny0zMzYyYTM1ZDQxODMiCiAgIEdJTVA6QVBJPSIyLjAiCiAgIEdJTVA6UGxhdGZvcm09IldpbmRvd3MiCiAgIEdJTVA6VGltZVN0YW1wPSIxNjg0Njk1ODA5ODE0OTYyIgogICBHSU1QOlZlcnNpb249IjIuMTAuMjgiCiAgIGRjOkZvcm1hdD0iaW1hZ2UvcG5nIgogICB0aWZmOk9yaWVudGF0aW9uPSIxIgogICB4bXA6Q3JlYXRvclRvb2w9IkdJTVAgMi4xMCI+CiAgIDx4bXBNTTpIaXN0b3J5PgogICAgPHJkZjpTZXE+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249InNhdmVkIgogICAgICBzdEV2dDpjaGFuZ2VkPSIvIgogICAgICBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmVhOTg2OTMzLTk1NDktNDY4NC1iZGM5LTEyMWJhMDJkNDRhZCIKICAgICAgc3RFdnQ6c29mdHdhcmVBZ2VudD0iR2ltcCAyLjEwIChXaW5kb3dzKSIKICAgICAgc3RFdnQ6d2hlbj0iMjAyMy0wNS0yMVQyMTowMzoyOSIvPgogICAgPC9yZGY6U2VxPgogICA8L3htcE1NOkhpc3Rvcnk+CiAgPC9yZGY6RGVzY3JpcHRpb24+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9InciPz7g4YtpAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAA3XAAAN1wFCKJt4AAAAB3RJTUUH5wUVEwMdPvmLdAAAA2JJREFUWMPNl09IVFEUxn9HJZiZcCZ0Y2GBEDmiFIQVRX9AN0EmSEStJCE0clmB0M5N/wQXgRAxC9tUo4uIamOLpuUE2sIKikldKEKLpMCNw23zTb2e88Y3Y5AHHu/y7rnfd+49555znhFSzCzhnDsNdAAHgL3Adk3/BD4DM8BrM3vlnPvOP5J9QApYAsaBC0CytrbWCgoaJzU3Lt2U1lYmZhYFRoAFYMDMIkAjMCiSLPBeT1bfBoFG6Q5o7YiwikpVwPcm51wWqDazZuCjc+458BbYA0wCfWZ2wsxOAH3AhObeSvej1lYLqyns5g8C80CPmdUBafm2y6sUi8UMeAJc19grXVrzVBg9wjy4EXmTFI8DrUAOGIrH434CIpGI6YjfaPyXJBIJA4aE0SrM+cCTkJ9mZW2rwDuDLBXpLeBDMQM80iGsNmHPBsXECDBqZvWyugM4AxwpAd4A7Coxf0QYHUBO2KPiWnfVFmRZWkdXAFg2s1gFtygGLHs2MASkxbHgv6IpXZuTwHQ0GjUfUC/QXaER3qCdAU6JK/U7wwFLurtT/miXdANO169hE0mtC5gS15K4uagk0gh8LbF4UkG6CPRvwoiv4hoHLlYpQF5ql+kSCweBHUq3Z4EM0FyBAWlxvRQ375THHwm4lPQDLzQeAFaB4cJRhpRucSXFzYqKSVZ39bQqHcoDLT6AjMhzwJie3AZGXANuAvvFkRXnCkBeSkf13gncAJ4Bt2tqaqp9YM3a+Zjn2xgwXMKA+0pCBTmkd95bjLbpvQgcBuqAqrW1tbwP7BNwL2CXpWLii+eUIt4JvwsA2pUo9gU1J34XyC2ZEgXukly7zgXeIOwuI8kkdOyrIkcB2l9OEBrwUAmoHtgt/5cjzcAD4AdwG3isHS8F6N9RKv5WKHZhExEhruiiktVk2EQUNhWHlQaRuwB3Fk3F64qRt8OppBKKvLdIMZoWx59itFXKcaUNyRXg6r9oSMpuySQTwLENdDqF1bpRSxbYlKrBLCYtStnrRI1s+Ka03LZcchk4HxDtM/J5WW259yRmFRNRRe4UMAfcVdluM7O4mcWVXs8qycxJ96TWjgqrqZw/o5yZtQN559wnIGlmXZ5jPAeknHMZ51xGV+qcfH1cukmtzQsrtyV/Tu1//57/AvMCDVWGl+6dAAAAAElFTkSuQmCC)](README.md)
+[![Version: v1.0.4](https://img.shields.io/badge/Version-v1.0.4-blue?style=for-the-badge&logo=v)]()&nbsp;
 
-A simple, and highly precise, track GPS to SD card logger with estimated position for better accuracy. 
+A simple, and highly precise, portable track GPS to SD card logger with estimated position for better accuracy. 
 
-<img alt="Location example." src="images/IMG_20211130_103242_wide.jpg" width="480" align=center>&nbsp;
+<img alt="Location example." src="images/IMG_20230521_225719.jpg" width="480" align=center>&nbsp;
 
-<img alt="Location example." src="images/IMG_20220121_215427.jpg" width="240" align=center>&nbsp;
-<img alt="Location example." src="images/IMG_20220130_233038.jpg" width="240" align=center>&nbsp;
+<img alt="Location example." src="images/IMG_20230512_072414.png" width="240" align=center>&nbsp;
 
 ## Features
+TinyTrackGPS+ is an evolution of old TinyTrackGPS. But you can find some similar projects like [Arduino GPS Tracker](https://makersportal.com/blog/portable-gps-tracker-with-arduino) (or [Github](https://github.com/makerportal/arduino-gps-tracker)) of 
+[Maker Portal](https://makersportal.com/), which uses similar hardware.
 
-This program is written in C/C++ for SAMD21 and other compatible microcontrollers based on Atmega328 and similar.
+TinyTrackGPS+ uses the information from GNSS and 10 DOF sensors to estimate the position and save that information into a log file.
 
-It is tested on:
-* Seeeduino XIAO, SAMD21.
+This program is written in C/C++ for CPU-ARM® Cortex®-M0+(SAMD21G18), SAMD21, and compatible microcontrollers.
+
+XIAO SAMD21 powered by SAMD21G18 chip is an ultra-small, high-performance universal development board. It supports Arduino / Micropython / CircuitPython development. TinyTrackGPS+ is developed on PlatformIO with Arduino enviroment.
+
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
@@ -30,23 +34,20 @@ TinyTrackGPS features:
 * Without memory card, it works as a simple GPS device.
 ### Main Display Parts
 
-<img alt="Location example." src="images/Display_parts.jpg" width="480" align=center>&nbsp;
+<img alt="Display parts." src="images/Display_parts.jpg" width="480" align=center>&nbsp;
 
 ## List of componets
 
 This project use components list above:
 
   * Seeeduino XIAO, SAMD21 microcontroller.
-  * NMEA GPS module.
-  * MicroSD module and card.
-  * OLED 0.96" I2C (SSD1306).
-
-  I use this components:
-
-  * Seeeduino XIAO board.
   * ATGM336H dual GPS + BDS GNSS module.
-  * MicroSD module with MicroSD 4Gb Card FAT32 formatted.
-  * SSD1306 0.96" 128x64 OLED I2C display module.
+  * MicroSD module and card.
+  * OLED 0.96" I2C (SSD1306) 128x64 px.
+  * MPU6050 gyroscope and accelerometer.
+  * QMC5883L magnetometer.
+  * BMP180 barometer.
+  * DS3231 RTC.
 
   Additional:
   * Lipo 3,7V 700mAh 603035 with protect.
@@ -56,48 +57,32 @@ Current on this configuration is 60mA average.
 
 <img alt="Current" src="images/IMG_20220201_123759.jpg" width="480" align=center>&nbsp;
 
-### NO DISPLAY
-Now you can use a minimal hardware to track GPS location. When no display use MicroSD module and card are mandatory. Comment all lines in 'config.h' file:
-```C++
-//#define DISPLAY_TYPE_SDD1306_128X64     // Para usar pantalla OLED 0.96" I2C 128x64 pixels
-//#define DISPLAY_TYPE_SDD1306_128X64_lcdgfx // Para usar pantalla OLED 0.96" I2C 128x64 pixels (lcdgfx library)
-//#define DISPLAY_TYPE_LCD_16X2           // Para usar LCD 16 x 2 carateres.
-//#define DISPLAY_TYPE_LCD_16X2_I2C       // Para usar LCD 16 x 2 carateres. I2C.
-```
-<img alt="Schema1." src="images/schema0.jpg" width="240">&nbsp;
+### Seeeduino XIAO
+Seeed Studio XIAO SAMD21 carries the powerful CPU-ARM® Cortex®-M0+(SAMD21G18) running at up to 48Hz. In addition to the powerful CPU, it has 256KB Flash and 32KB SRAM on board and supports the USB Type-C interface which can supply power and download code.
 
-### LCD 16x2
+	
+|**Item**|**Descripion**|
+|:-------:|:--------:|
+|CPU      | ARM Cortex-M0+ CPU(SAMD21G18) running at up to 48MHz Storage 256KB Flash,32KB SRAM|
+|I/O PINs | 14 GPIO PINs,11 analog PINs, 11 digital PINs,10 PWM interfaces (d1-d10),  1 DAC output Pin |
+|Interface| 1 I2C interface,1 UART interface, 1 SPI interface, 1 UART interface, USB Type-C interface |
+|LEDS     | Serial communication indicator (T/R), Blink light (L) through pin multiplexing. The colors of LEDs(Power,L,RX,TX) are green, yellow, blue and blue.|
 
-If you use LCD 16x2 char wired (6-wires), uncomment line like this in 'config.h' file:
-```C++
-#define DISPLAY_TYPE_LCD_16X2
-```
-<img alt="Schema1." src="images/schema1.jpg" width="240">&nbsp;
+For more information see at :https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-Microcontroller-SAMD21-Cortex-M0+-p-4426.html
 
-### LCD 16x2 I2C
+### ATGM336H
+ATGM366H-5N-31 is a GPS module that works with UART (TX and RX) signals. Works with GPS, BDS and operates with a range of 5.0v to 3.3v. It is an small module (16.2x13.8x5.3mm)
 
-If you use LCD 16x2 char I2C (4-wires), uncomment line like this in 'config.h' file:
-```C++
-#define DISPLAY_TYPE_LCD_16X2_I2C
-```
-<img alt="Schema1." src="images/InShot_20211018_000644613.jpg" width="240">&nbsp;
+Specifications:
 
-### OLED 0'96" 128x64 I2C
+Voltage range (VCC): 5V DC
+I/O Voltage: 3.3V
+Standard baud rate: 9600
+Uses the 
 
-If you use OLED 0'96" 128X64 I2C (4-wires), uncomment line like this in 'config.h' file:
-```C++
-#define DISPLAY_TYPE_SDD1306_128X64 // Uses u8g2 library.
-```
--- or --
-```C++
-#define DISPLAY_TYPE_SDD1306_128X64_lcdgfx // Uses lcdgfx library.
-```
+### U8g2 library.
 
-<img alt="Schema1." src="images/InShot_20211018_000545242.jpg" width="240">&nbsp;
-
-### Lcdgfx library.
-
-TinyTrackGPS uses this library by default. Use less flash memory and RAM. Fast running and no display flickering. For more information see at https://github.com/lexus2k/lcdgfx.
+TinyTrackGPS+ uses this library by default. Use less flash memory and RAM. Fast running and no display flickering. For more information see at https://github.com/lexus2k/lcdgfx.
 
 <img alt="TinyTrackGPS_font" src="images/IMG_20211130_132157.jpg" width="240">&nbsp;
 
@@ -114,15 +99,14 @@ The project define a new font (TinyTrackGPS_font8x16), a modified version of ssd
 ### UST/UT Time.
 _(Universal Summer Timer/Universal Standard Time)_
 
-Now TinyTrackGPS record the info in local time. It is used Timezone library for that. See [Coding TimeChangeRules] section for information how to config.
+TinyTrackGPS+ record the info in local time. It is used Timezone library for that. See [Coding TimeChangeRules] section for information how to config.
 
 ## Source
 
-TinyTrackGPS is free software, see **License** section for more information. The code is based and get parts of the libraries above:
+TinyTrackGPS+ is free software, see **License** section for more information. The code is based and get parts of the libraries above:
 
   * TinyGPS library fork, Paul Stoffregen (https://github.com/PaulStoffregen/TinyGPS). Fork version to add NMEA Data Protocol v3.x and GLONASS support. Fixed version on 'lib'.
   * SdFat library, Bill Greiman (https://github.com/greiman/SdFat). Fixed version on 'lib'.
-  * Lcdgfx library, Aleksei (https://github.com/lexus2k/lcdgfx).
   * U8g2 library, oliver (https://github.com/olikraus/u8g2).
   * Low-Power library, Rocket Scream Electronics (https://github.com/rocketscream/Low-Power).
   * LiquidCrystal library, Arduino Standard Libraries (Arduino IDE).
