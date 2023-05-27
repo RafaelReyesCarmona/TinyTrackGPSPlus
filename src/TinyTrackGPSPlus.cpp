@@ -680,11 +680,11 @@ FusionVector calculateNEDVelocity(const FusionVector accelerometer, const Fusion
   //Serial.print("Course: ");Serial.print(courseIMU);Serial.print("\t");
   //float course = (courseGPS + courseIMU) / 2;
   //float course = FusionDegreesToRadiansf((float)compass.readHeading());
-  float speed_m_per_s = gps_data.speed_metersph() / 3600.0;
+  float speed_m_per_s = (float)(gps_data.speed_metersph()) / 3600.0f;
   const FusionVector NED = { .axis = {
     .x = round( speed_m_per_s * cos( course ) ),
     .y = round( speed_m_per_s * sin( course ) ),
-    .z = (barometer_Alt - barometer_Alt_prev) / deltatime // calcular la velocidad con el barometro.
+    .z = (float)(barometer_Alt - barometer_Alt_prev) / deltatime // calcular la velocidad con el barometro.
   }};
   return NED;
 }
