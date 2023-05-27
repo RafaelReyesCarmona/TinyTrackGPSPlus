@@ -132,7 +132,7 @@ typedef union {
  * @brief Include this definition or add as a preprocessor definition to use
  * normal square root operations.
  */
-//#define FUSION_USE_NORMAL_SQRT
+#define FUSION_USE_NORMAL_SQRT
 
 //------------------------------------------------------------------------------
 // Inline functions - Degrees and radians conversion

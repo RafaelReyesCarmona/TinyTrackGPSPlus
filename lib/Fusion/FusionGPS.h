@@ -36,6 +36,7 @@ typedef struct {
     FusionGPSSettings settings;
     bool initialising;
     FusionVectorDouble location_ins;
+    FusionVectorDouble location_ahrs;
     FusionVectorDouble location;
     FusionVector velocity_ins;
     FusionVector velocity;
@@ -89,7 +90,7 @@ void FusionGPSSetSettings(FusionGPS *const GPS, const FusionGPSSettings *const s
 
 void FusionGPSAHRSUpdate(FusionGPS *const GPS, const FusionQuaternion quaternium, const FusionVector accel, const float deltaTime);
 
-void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const FusionVector vel, const float deltaTime);
+void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const FusionVector vel, const FusionVector GPS_error);
 
 FusionGPSFlags FusionGPSGetFlags(const FusionGPS *const GPS);
 
