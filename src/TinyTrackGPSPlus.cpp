@@ -443,8 +443,8 @@ bool GPSData() {
     //utm.UTM((long)(GPS.location_ins.axis.x*10000000L), (long)(GPS.location_ins.axis.y*10000000L));
 
     sprintf(str, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
-    file.print(str);
-    file.print("\n");
+    file.println(str);
+    //file.print("\r\n");
     file.close();
     save = true;
     //Serial.println(F("Done."));
