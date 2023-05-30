@@ -65,6 +65,7 @@ void FusionGPSReset(FusionGPS *const GPS) {
     GPS->velocity = FUSION_VECTOR_ZERO;
     GPS->K = FUSION_VECTOR_ZERO;
     GPS->P = FUSION_VECTOR_ONES;
+    GPS->Kalman = FUSION_VECTOR_ZERO;
     GPS->K_vel = FUSION_VECTOR_ZERO;
     GPS->P_vel = FUSION_VECTOR_ONES;
     GPS->initialising = false;
@@ -177,6 +178,15 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
     GPS->location_ahrs = pos;
     GPS->initialising = true;
   } else {
+    if ((pos.axis.x == GPS->location.axis.x) && (pos.axis.y == GPS->location.axis.y) && (FusionVectorMagnitude(vel) > 0.0f)) {
+      GPS_pos_ins_rad.axis.z = pos.axis.z - GPS->Kalman.axis.z; 
+      GPS_pos_ins_rad.axis.x = pos.axis.x + (GPS->Kalman.axis.x + GPS->K.axis.x*GPS_error.axis.x)/ (Rew + GPS_pos_ins_rad.axis.z);
+      GPS_pos_ins_rad.axis.y = pos.axis.y + ((GPS->Kalman.axis.y + GPS->K.axis.y*GPS_error.axis.y) / (Rns + GPS_pos_ins_rad.axis.z)) / cos(GPS_pos_ins_rad.axis.x);
+      GPS->location.axis.x = FusionRadiansToDegrees(GPS_pos_ins_rad.axis.x);
+      GPS->location.axis.y = FusionRadiansToDegrees(GPS_pos_ins_rad.axis.y);
+      GPS->location.axis.z = GPS_pos_ins_rad.axis.z;
+    }
+      
     GPS->velocity = vel;
 
     GPS_pos_rad.axis.x = FusionDegreesToRadians(pos.axis.x);
@@ -224,9 +234,9 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
     location_y = FusionVectorMultiplyScalar(location_y,alfa);
     location_prev_y = FusionVectorMultiplyScalar(location_prev_y,(1.0f-alfa));
     
-    FusionVector location_y_filtered;
-    location_y_filtered = FusionVectorAdd(location_y,location_prev_y);
-    FusionVector GPS_kalman_rad = FusionVectorHadamardProduct(GPS->K, location_y_filtered); //x = K *y
+    FusionVector location_y_filtered = FusionVectorAdd(location_y,location_prev_y);
+     GPS->Kalman = FusionVectorHadamardProduct(GPS->K, location_y_filtered); //x = K *y
+
 /*
     FusionVector P_vel_AB = FusionVectorSubtract(FUSION_VECTOR_ONES, GPS->K_vel);
     FusionVector P_vel_C = FusionVectorHadamardProduct(P_vel_AB,GPS->K_vel);
@@ -242,9 +252,9 @@ void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const F
     //double Re = EARTH_RADIUS / sqrt(denom);
     //double Rn = EARTH_RADIUS*(1.0-ECC2) / denom*sqrt(denom);
 
-    GPS_pos_ins_rad.axis.z = GPS_pos_rad.axis.z - GPS_kalman_rad.axis.z; 
-    GPS_pos_ins_rad.axis.x = GPS_pos_rad.axis.x + (GPS_kalman_rad.axis.x + GPS->K.axis.x*GPS_error.axis.x)/ (Rew + GPS_pos_ins_rad.axis.z);
-    GPS_pos_ins_rad.axis.y = GPS_pos_rad.axis.y + ((GPS_kalman_rad.axis.y + GPS->K.axis.y*GPS_error.axis.y) / (Rns + GPS_pos_ins_rad.axis.z)) / cos(GPS_pos_ins_rad.axis.x);
+    GPS_pos_ins_rad.axis.z = GPS_pos_rad.axis.z - GPS->Kalman.axis.z; 
+    GPS_pos_ins_rad.axis.x = GPS_pos_rad.axis.x + (GPS->Kalman.axis.x + GPS->K.axis.x*GPS_error.axis.x)/ (Rew + GPS_pos_ins_rad.axis.z);
+    GPS_pos_ins_rad.axis.y = GPS_pos_rad.axis.y + ((GPS->Kalman.axis.y + GPS->K.axis.y*GPS_error.axis.y) / (Rns + GPS_pos_ins_rad.axis.z)) / cos(GPS_pos_ins_rad.axis.x);
     //GPS_pos_ins_rad.axis.z -= GPS_kalman_rad.axis.z; 
     //GPS_pos_ins_rad.axis.x += (GPS_kalman_rad.axis.x + GPS->K.axis.x*GPS_error.axis.x)/ (Rew + GPS_pos_ins_rad.axis.z);
     //GPS_pos_ins_rad.axis.y += ((GPS_kalman_rad.axis.y + GPS->K.axis.y*GPS_error.axis.y) / (Rns + GPS_pos_ins_rad.axis.z)) / cos(GPS_pos_ins_rad.axis.x);

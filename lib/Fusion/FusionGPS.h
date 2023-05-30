@@ -42,6 +42,7 @@ typedef struct {
     FusionVector velocity;
     FusionVector K;
     FusionVector P;
+    FusionVector Kalman;
     FusionVector K_vel;
     FusionVector P_vel;
     FusionVectorDouble dx;

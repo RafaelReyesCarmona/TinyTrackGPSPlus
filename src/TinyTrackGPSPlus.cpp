@@ -55,21 +55,23 @@ rafael.reyes.carmona@gmail.com
 #define USE_UINT64_T 1
 
 #define SD_FAT_TYPE 3
-#define SPI_SPEED SD_SCK_MHZ(24)
+#define SPI_SPEED SD_SCK_MHZ(50)
 #define SDCARD_SS_PIN (uint8_t)3U
 //#define SPI_DRIVER_SELECT 2
+#include <BufferedPrint.h>
 #include <SDFat.h>
 #include <sdios.h>
 #define SD_CONFIG SdSpiConfig(SDCARD_SS_PIN, DEDICATED_SPI, SPI_SPEED)
 const uint8_t CardDetect = 1U;
 bool CardInserted;
+char GPSLogFile[14];
 
 #include "SAMDBattery.h"
 #include <UTMConversion.h>
 #include <TimeLib32.h>
 #include <Timezone32.h>
 #include "ConfigFile.h"
-#include "Semphr.h"
+//#include "Semphr.h"
 #include "TimeZoneMapper.h"
 #include <elapsedMillis.h>
 
@@ -141,7 +143,7 @@ double barometer_Alt_prev;
 //SoftwareSerial BT(2,1);  // RX - 2, TX - 1 BT(recivePin,transmitPin)
 //bool bluetooth_connected = false;
 
-SPISettings SPI_settings = SPISettings(250000,MSBFIRST,SPI_MODE0);
+//SPISettings SPI_settings = SPISettings(250000,MSBFIRST,SPI_MODE0);
 SdFat card;   //SdFat.h library.
 File32 file;
 bool SDReady;
@@ -165,7 +167,7 @@ static TimeChangeRule *trc;
 int TimeZoneConfig;
 
 //Semphr drawBattery;
-Semphr drawDisplay;
+//Semphr drawDisplay;
 
 // Loads the configuration from a file
 bool loadConfiguration(TimeChangeRule *UST,TimeChangeRule *UT) {
@@ -365,21 +367,43 @@ time32_t gps_time(){
 }
 
 inline void update_time(){
-  _localtime = TimeZone.toLocal(now(),&trc);
+  if(now() > _prevtime) {
+    timemillis = 0;
+    _prevtime = now();
+    _localtime = TimeZone.toLocal(now(),&trc);
+  }
+  
 }
 
 inline void sync_time(){
   setTime(gps_time());
   //Serial.println((long)gps_time());
-  update_time();
+  _localtime = TimeZone.toLocal(now(),&trc);
+  _prevtime = now();
+  //update_time();
+}
+
+String zeroPadded(uint8_t num) {
+  String N = "";
+  if(num < 10) N += "0";
+  N += String(num);
+
+  return N;
+
+}String zeroPadded_millis(uint8_t num) {
+  String N = "";
+  if (num < 10) N += "00";
+  else if (num < 100) N += "0";
+  N += String(num);
+
+  return N;
 }
 
 bool GPSData() {
   static bool save = false;
-  char GPSLogFile[14];
   uint8_t errorSD;
 
-  sprintf(GPSLogFile, "%04d%02d%02d.csv", year(_localtime), month(_localtime), day(_localtime));
+  //sprintf(GPSLogFile, "%04d%02d%02d.csv", year(_localtime), month(_localtime), day(_localtime));
 
   //SdFile::dateTimeCallback(dateTime);
   FsDateTime::setCallback(dateTime);
@@ -398,53 +422,105 @@ bool GPSData() {
   }
   if (SDReady && (save=file.open(GPSLogFile, O_APPEND | O_WRITE))) {
     //Serial.print(F("Open GPSLogFile to write..."));
-    char str[25];
-    char comma = 0X2c;
+    //String line;
+    time32_t time = TimeZone.toLocal(now(),&trc);
+    //uint8_t time_millis = timemillis;
+    BufferedPrint<File32, 64> bp;
+    bp.begin(&file);
+    //char str[30];
+    //char str_utm[25];
+    //char comma = 0X2c;
+    //char space = 0X20;
 
     //Ajuste de la hora antes de grabar en SDCard.
-    if(timemillis >= 1000) {
-      update_time();
-      timemillis -= 1000;
+    //if(time_millis >= 1000) {
+      //time++;
+    //  time_millis -=  1000U;
+    //}
+
+    if(timemillis + 10 >= 1000) {
+      time--;
+      //timemillis -= 1000;
     }
 
-    sprintf(str, "%02d:%02d:%02d.%03d", hour(_localtime), minute(_localtime), second(_localtime),(int)timemillis);
+    //sprintf(str, "%02d:%02d:%02d.%03d,", hour(_localtime), minute(_localtime), second(_localtime),(int)timemillis);
     //time32_t save_time_gps = _time_gps; // ------>  gps_time_rtc();
     //time32_t save_time_local = TimeZone.toLocal(save_time_gps);
     //sprintf(str, "%02d:%02d:%02d.%03d", hour(save_time_local), minute(save_time_local), second(save_time_local),gps_data.dateTime_cs);
-    file.print(str);
-    file.print(comma);
+    //file.print(str);
+    if (hour(time) < 10) bp.print('0');
+    bp.print(hour(time));
+    bp.print(':');
+    if (minute(time) < 10) bp.print('0');
+    bp.print(minute(time));
+    bp.print(':');
+    if (second(time) < 10) bp.print('0');
+    bp.print(second(time));
+    bp.print('.');    
+    if (timemillis < 100) bp.print('0');
+    if (timemillis < 10) bp.print('0');
+    bp.print((long)timemillis);
+    bp.print(',');
+    //file.print(comma);
 
-    int int_lat = GPS.location_ins.axis.x;
-    long f_lat = (GPS.location_ins.axis.x - int_lat)*10000000L ;
-    sprintf(str, "%d.%07ld",int_lat, (int_lat > 0) ? f_lat : -(f_lat));
+    //int int_lat = GPS.location_ins.axis.x;
+    //long f_lat = (GPS.location_ins.axis.x - int_lat)*10000000L ;
+    //int int_lon = GPS.location_ins.axis.y;
+    //long f_lon = (GPS.location_ins.axis.y - int_lon)*10000000L ;
+    //sprintf(str, "%d.%07ld,%d.%07ld,",int_lat, (int_lat > 0) ? f_lat : -(f_lat), int_lon, (int_lon > 0) ? f_lon : -(f_lon));
     //int int_lat = gps_data.latitudeL() / 10000000L;
     //sprintf(str, "%d.%07ld",int_lat, (int_lat > 0) ? gps_data.latitudeL()-(long)int_lat*10000000L : -(gps_data.latitudeL()-(long)int_lat*10000000L));
-    file.print(str);
-    file.print(comma);
+    bp.printField(GPS.location_ins.axis.x,',',7);
+    bp.printField(GPS.location_ins.axis.y,',',7);
+    //file.print(str);
+    //file.print(comma);
 
-    int int_lon = GPS.location_ins.axis.y;
-    long f_lon = (GPS.location_ins.axis.y - int_lon)*10000000L ;
-    sprintf(str, "%d.%07ld",int_lon, (int_lon > 0) ? f_lon : -(f_lon));    
+
+    //sprintf(str, "%d.%07ld,",int_lon, (int_lon > 0) ? f_lon : -(f_lon));    
     //int int_lon = gps_data.longitudeL() / 10000000L;
     //sprintf(str, "%d.%07ld",int_lon, (int_lon > 0) ? gps_data.longitudeL()-(long)int_lon*10000000L : -(gps_data.longitudeL()-(long)int_lon*10000000L));
-    file.print(str);
-    file.print(comma);
+    //file.print(str);
+    //file.print(comma);
     
     //file.print((gps_data.altitude_cm()/100));
 
     float altitude = GPS.location_ins.axis.z + (barometer_Alt - barometer_Alt_prev)/2.0;
-    file.print(altitude,2);
-    file.print(comma);
+    //int int_altitude = altitude;
+    //int f_altitude = (altitude - int_altitude)*100U;
+    //file.print(altitude,2);
+    //file.print(comma);
 
-    float speed_ms = FusionVectorMagnitude(GPS.velocity_ins); //(float)gps_data.speed_metersph()/3600.0f; sqrt(FusionVectorMagnitudeSquared(GPS.velocity_ins));
-    file.print(speed_ms,2);
-    file.print(comma);
+    float speed_ms = (float)gps_data.speed_metersph()/3600.0f; //FusionVectorMagnitude(GPS.velocity_ins); // sqrt(FusionVectorMagnitudeSquared(GPS.velocity_ins));
+    //int int_speed_ms = speed_ms;
+    //int f_speed_ms = (speed_ms - int_speed_ms)*100U;
+    //file.print(speed_ms,2);
+    //file.print(comma);
+
+    //sprintf(str, "%d.%02d,%d.%02d,",int_altitude,(int_altitude > 0) ? f_altitude : -(f_altitude), int_speed_ms,(int_speed_ms > 0) ? f_speed_ms : -(f_speed_ms) );
+    bp.printField(altitude,',',2);
+    bp.printField(speed_ms,',',2);
+    
+    //file.print(str);
 
     //utm.UTM((long)(GPS.location_ins.axis.x*10000000L), (long)(GPS.location_ins.axis.y*10000000L));
 
-    sprintf(str, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
-    file.println(str);
+    //sprintf(str, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
+    if (utm.zone() < 10) bp.print('0');
+    bp.print(utm.zone());
+    bp.print(utm.band());
+    bp.print(' ');
+    bp.printField(utm.X(),' ');
+    bp.printField(utm.Y(),'\n');
+    bp.sync();
+    //file.println(str);
     //file.print("\r\n");
+    
+    //line = zeroPadded(hour(time)) + ":" + zeroPadded(minute(time)) + ":" + zeroPadded(second(time)) + "." + zeroPadded_millis(time_millis);
+    //line += comma + String((double)GPS.location_ins.axis.x, 7U) + comma + String(GPS.location_ins.axis.y,7U) +
+    //      comma + String(altitude,2) + comma + String(speed_ms,2) + comma;
+    //line += zeroPadded(utm.zone()) + utm.band() + space + utm.X() + space + utm.Y();
+
+    //file.println(line);
     file.close();
     save = true;
     //Serial.println(F("Done."));
@@ -579,7 +655,7 @@ void ScreenPrint(){
   oled.print(127-16,44,line);
   oled.print_PChar(6);
 
-  float speed_ms = FusionVectorMagnitude(GPS.velocity_ins);
+  float speed_ms = (float)gps_data.speed_metersph()/3600.0f;  //FusionVectorMagnitude(GPS.velocity_ins);
   sprintf(line,"%02d",(int)(speed_ms));
   //sprintf(line,"%02d",(int)(gps_data.speed_metersph()/3600));
   oled.print(104,55,line);
@@ -795,28 +871,28 @@ void setup(void) {
   while(!compass.readHeading());
 
   //BT.begin(9600); 
-  gpsPort.begin(9600);
+  gpsPort.begin(19200);
   
   //gpsPort.print("$PCAS10,3*1F\r\n");  // Reboot Factory reset.
   //gpsPort.print("$PCAS02,1000*2E\r\n"); // Set gps to 1Hz.
-  gpsPort.print("$PCAS02,500*1A\r\n");  // Set gps to 2Hz. <-----------------
+  //gpsPort.print("$PCAS02,500*1A\r\n");  // Set gps to 2Hz. <-----------------
   //gpsPort.print("$PCAS02,250*18\r\n");  // Set gps to 4Hz.
   //gpsPort.print("$PCAS02,200*1D\r\n");  // Set gps to 5Hz.
   
-  delay(10);
+  //delay(10);
   //gpsPort.print("$PCAS04,9,9,9*10\r\n");    // GPS+GALILEO
   //gpsPort.print("$PCAS04,1F,1F,19*21\r\n");    // GPS+BDS+GLONASS+GALILEO
 
-  delay(10);
+  //delay(10);
   //gpsPort.print("$PCAS01,1*1D\r\n");    // Set baudrate to 9600.
-  gpsPort.print("$PCAS01,2*1E\r\n");    // Set baudrate to 19200. <----------------
+  //gpsPort.print("$PCAS01,2*1E\r\n");    // Set baudrate to 19200. <----------------
   //gpsPort.print("$PCAS01,3*1F\r\n");    // Set baudrate to 38400.
   //gpsPort.print("$PCAS01,4*18\r\n");    // Set baudrate to 57600.
   //gpsPort.print("$PCAS10,0*1C\r\n");    // Hot reset
 
   //gpsPort.end();
-  delay(200);
-  gpsPort.begin(19200);
+  //delay(200);
+  //gpsPort.begin(19200);
 
   /* Iniciaización del display oled u OLED */
   oled.start();
@@ -907,6 +983,7 @@ void loop(void) {
     earth = FusionAhrsGetEarthAcceleration(&ahrs);
     FusionQuaternion quad = FusionAhrsGetQuaternion(&ahrs);
     //const FusionVector accel = FusionAhrsGetLinearAcceleration(&ahrs);
+    //FusionEuler euler = FusionQuaternionToEuler(quad);
     FusionGPSAHRSUpdate(&GPS, quad, earth, deltaTime);
 
     // Print algorithm outputs
@@ -914,7 +991,7 @@ void loop(void) {
     //Serial.print("Quad: w: ");Serial.print(quad.element.w,3);Serial.print(", ");
     //Serial.print("x: ");Serial.print(quad.element.x,3);Serial.print(", ");
     //Serial.print("y: ");Serial.print(quad.element.y,3);Serial.print(", ");
-    //Serial.print("z: ");Serial.print(quad.element.z,3);Serial.print(". ");
+    //Serial.print("z: ");Serial.print(quad.element.z,3);Serial.print(". - ");
     //Serial.print("Vel ins: x:");Serial.print(GPS.velocity_ins.axis.x);Serial.print(" ");
     //Serial.print("y :");Serial.print(GPS.velocity_ins.axis.y);Serial.print(" ");
     //Serial.print("z:");Serial.print(GPS.velocity_ins.axis.z);Serial.print(". \r");
@@ -924,10 +1001,10 @@ void loop(void) {
     //Serial.print("dxd: x:");Serial.print(GPS.dxd.axis.x,7);Serial.print(" ");
     //Serial.print("y :");Serial.print(GPS.dxd.axis.y,7);Serial.print(" ");
     //Serial.print("z:");Serial.print(GPS.dxd.axis.z,4);Serial.print(".      \r");
-    //Serial.print("\t\tRoll:  ");Serial.print(euler.angle.roll,2);Serial.print(",\t");
+    //Serial.print("Roll:  ");Serial.print(euler.angle.roll,2);Serial.print(",\t");
     //Serial.print("Pitch: ");Serial.print(euler.angle.pitch,2);Serial.print(",\t");
-    //Serial.print("Yaw: ");Serial.print(euler.angle.yaw,2);Serial.print(",\t-> ");
-    //Serial.print("HEAD: ");Serial.print(heading);Serial.print("º ,");
+    //Serial.print("Yaw: ");Serial.print(euler.angle.yaw,2);Serial.print("\r");
+    //Serial.print("HEAD: ");Serial.print(heading);Serial.print("º\r");
     //Serial.print("Bead: ");Serial.print(bearing);Serial.print("º -");
     //Serial.print("G X: ");Serial.print(gyroscope.axis.x,2);Serial.print(", ");
     //Serial.print("Y: ");Serial.print(gyroscope.axis.y,2);Serial.print(", ");
@@ -962,14 +1039,10 @@ void loop(void) {
     //trace_all( Serial, gps, gps_data );  // uncomment this line if you want to see the GPS data flowing
   }
 
-  if (now() > _prevtime) {
-    _prevtime = now();
-    timemillis = 0; 
-  }
-
   if(STATE == STARTING) {
     update_time();
-    if(_prevtime < now()) {
+    //if(_prevtime < now()) {
+    if(timemillis == 0){
       oled.clear();
       oled.print_date(_localtime);
       oled.print_time(trc->abbrev, _localtime);
@@ -980,7 +1053,7 @@ void loop(void) {
       oled.DrawLogo();
       oled.draw();
       oled.wait_anin(_prevtime);
-      _prevtime = now(); ///----------------
+      //_prevtime = now(); ///----------------
     }
     if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
       setSyncProvider(gps_time);
@@ -997,6 +1070,8 @@ void loop(void) {
       Serial.println(F("Done."));
       Serial.println(F("Configuration ended.")); //
       oled.clear();
+
+      sprintf(GPSLogFile, "%04d%02d%02d.csv", year(_localtime), month(_localtime), day(_localtime));
 
       FusionVectorDouble GPS_loc = {(double)gps_data.latitudeL()/10e6, (double)gps_data.longitudeL()/10e6, (double)gps_data.altitude()};
       FusionVector velocity = calculateNEDVelocityGPS();
@@ -1043,6 +1118,8 @@ void loop(void) {
         .z = 0.0f
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
+      //utm.UTM((long)(GPS.location_ins.axis.x*10000000L), (long)(GPS.location_ins.axis.y*10000000L));
+      //ScreenPrint();
       //}
       //Serial.print("P Vector:[ {");
       //Serial.print(GPS.P.axis.x,7);Serial.print(", ");Serial.print(GPS.P.axis.y,7);Serial.print(", ");Serial.print(GPS.P.axis.z,7);Serial.print("} ],");
@@ -1067,7 +1144,7 @@ void loop(void) {
       //Serial.print("Y: ");Serial.print(GPS.angular.axis.y,2);Serial.print(", ");
       //Serial.print("Z: ");Serial.print(GPS.angular.axis.z,2);Serial.print("\r");
       //drawBattery.set();
-      drawDisplay.set();
+      //drawDisplay.set();
       //utm.UTM(GPS.location_ins.axis.x, GPS.location_ins.axis.y);
       
       //STATE = GPS_OK;
@@ -1077,20 +1154,21 @@ void loop(void) {
         //FusionQuaternion quad = FusionAhrsGetQuaternion(&ahrs);
         //FusionGPSAHRSUpdate(&GPS, quad, earth, deltaTime);
     }
-    STATE = (needcharge) ? LOW_BATTERY : (timersave >= 500) ? GPS_SAVE : GPS_WAITING;
+    STATE = (needcharge) ? LOW_BATTERY : (timersave >= 500) ? GPS_SAVE : GPS_WAITING; //563-560
   } else if(STATE == GPS_SAVE) {
     //if (/*gps_data.valid.time && gps_data.valid.date && gps_data.valid.location &&*/ !(needcharge)) {
       //if (now() > _prevtime) {
         //_prevtime = now();
         //update_time();
+        timersave = 0;
         (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
         if (errorSD == 11) card.end();
         //Serial.println(errorSD);
         utm.UTM((long)(GPS.location_ins.axis.x*10000000L), (long)(GPS.location_ins.axis.y*10000000L));
         SaveOK = (SDReady) ? GPSData() : false;
-        timersave = 0;
-        drawDisplay.set();
-        drawDisplay(ScreenPrint);
+        //drawDisplay.set();
+        //drawDisplay(ScreenPrint);
+        ScreenPrint();
         //drawBattery.set();
         STATE = GPS_WAITING;
       //}

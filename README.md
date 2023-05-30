@@ -343,68 +343,34 @@ Las tareas reutilizarán el terminal, presione cualquier tecla para cerrarlo.
 ```
 For upload to Arduino use Platformio enviroment or use `platformio.exe run --target upload` command on terminal. This project use LGT_ISP enviroment by default. To burn it use an LGTISP device as describe in [LGTISP](LGTISP.md).
 
-## Changelog
-### V0.14
-  * Fixed error when display longitudes in grades for numbers grather than 99.999999 o slower than -9.999999.
-  * Better performance showing battery level.
-  * Fixed error no save data when battery is low.
-  * Device not start when battery is low.
-  * When the battery is low, the battery level indicator will flash, with no other information displayed on the screen.
+## Changeloge
+### V1.0.15
+  * Fixed duplicate coordenates in log file.
+  * Fixed time disadjustment in log file.
+  * New implemention of 'update_time()' function.
 
-### V0.13
-  * Recode the function to save datalog information on SD card. Better performance. Used in v0.5.
-  * Added functionality to config Timezone with 'Time.cfg' file on SD card or defined in the sketch.
+### V1.0.14
+  * New save routine for better performance using BufferedPrint (Fast buffered print class of SDFat library).
+  * Remove semph library.
 
-### V0.12
-  * Added Vcc measure support and display battery level in percent (%), using Vcc library to read VCC supply level without external components.
-  * Use of EMA filter to calculate VCC supply level to prevent minimal deviations in measure.
-  * Change splash screen.
-  * It set minimal VCC level to prevent SD card damage. (3.25V)
-  * Change TinyTrackGPS_font8x16[] with new characters to draw battery icon, 'Charge%' text and logo.
-  * Fixed "SD" indicator when microSD card is extracted or data is no saved.
-  * Added support for "plug & play" (PnP) functionality of SD Card. 
+### V1.0.13
+  * Fixed error GPS log file with CRLF characters.
 
-### V0.11
-  * TinyGPS upgrade for NMEA Data Protocol v3.x and GLONASS. Library from https://github.com/fmgomes/TinyGPS (fixed as describe in _TinyGPS library_ section.)
+### V1.0.12
+  * Added A-GPS support.
 
-### V0.10.4
-  * Fixed SDCard not save.
+### V 1.0.2-11
+  * Changes in code for better estimation of position.
+  * Change frecuency of track log info to 0,5s.
 
-### V0.10
-  * LowPower library only when no display is defined, to reduce flash memory.
-  * Connect NMEA 6 GPS module to digital pins 0, 1 (hardware serial). SoftwareSerial library don't use now. So reduce flash memory. 
-  * Fixed TinyGPS library to decode  GPRMC _and_ GPGGA sentence at same time.
-  * Better support for LGT8F328P.
-  * Use [LGTISP](LGTISP.md) when use LGT8F328P to burn TinyTrackGPS into board. No bootloader.
-  * Added lcdgfx library from https://github.com/lexus2k/lcdgfx.
-  * New logo for splash at start.
+### V1.0.1
+  * Fixed states for improve control of device.
+  * Track log info into two files (estimated and RAW coordinates)
+  * Added libraries for AHRS and Kalman Uncentered Filter. 
 
-<img alt="Schema1." src="images/LogoScreenshot.jpg" width="240">&nbsp;
-
-### V0.9
-  * Added Timezone library for local time log.
-
-### V0.8
-  * Added UTMConversion library for conversion to UTM coordinates. It has been implemented From library UTMconversion.h (TinyTrackGPS V0.7). Now it is an independent library.
-
-### V0.7
-  * Use Low-Power library to reduce power consumption and gain greater autonomy implementing the project portably using lithium batteries.
-  * No display support for minimal implementation.
-  * Fixed some errors when displays on LCD 16x2.
-  * Fixed error when save log on SD. Sometimes data didn't save correctly.
-
-### V0.6
-  * Fixed error GPS log file when compiling for OLED 0'96".
-  * Added wait animation for OLED 0'96" 128x64.
-  * Written new procedure to save data in GPS log file.
-  * Less global variables, so code with less size when compile it.
-
-### V0.5
-  * Added wait animation for LCD 16x2 on "Waitting for GPS signal..." screen.
-  * Added support for OLED 0'96" 128x64. 
-  * GPS log file set time for create and modify.
-  * Use SdFat library, Bill Greiman, for better performance.
-  * Remove switch for select visual data on LCD 16x2. Now data change automatically every 8 seconds between UTM and grades coordenates.
+### V1.0.0
+  * First version. Code adapted form old project [TinyTrackGPS](https://rafaelreyescarmona.github.io/TinyTrackGPS/) for ATMega328 microcontroler and compatibles.
+  * Implement states for control device performance.
 
 ## Working
 
@@ -800,25 +766,26 @@ When VCC level is 3,25 V, stop to read GPS data and only display battery level.
 
 <img alt="Low Batt." src="images/IMG_20211221_174421.jpg" width="240">&nbsp;
 
-This video [TinyTRackGPS video](https://www.tiktok.com/@rafaelreyescarmona/video/7045623715593243909?is_from_webapp=1&sender_device=pc&web_id7047961867420141061) show shortly how to make the first prototipe.
+This video [TinyTRackGPS+ video](https://www.tiktok.com/@rafaelreyescarmona/video/7045623715593243909?is_from_webapp=1&sender_device=pc&web_id7047961867420141061) show shortly how to make the first prototipe.
 ## License
 
-This file is part of TinyTrackGPS.
+This file is part of TinyTrackGPS+.
 
-TinyTrackGPS is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+TinyTrackGPS+ is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-TinyTrackGPS is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+TinyTrackGPS+ is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License along with TinyTrackGPS.  If not, see <https://www.gnu.org/licenses/>.
+You should have received a copy of the GNU General Public License along with TinyTrackGPS+.  If not, see <https://www.gnu.org/licenses/>.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 ## Authors
 
-Copyright © 2019-2021 Francisco Rafael Reyes Carmona.
+Copyright © 2023 Francisco Rafael Reyes Carmona.
 Contact me: rafael.reyes.carmona@gmail.com
 
 ## Credits
 
-Compass icon at the beginning is from [Flaticon.es](https://www.flaticon.es) designed by [DinosoftLabs](https://www.flaticon.es/autores/DinosoftLabs)
-and licensed by [free license](images/license-37862535_compass.pdf).
+Brujula icon at the beginning is from [Flaticon.es](https://www.flaticon.es/iconos-gratis/brujula) created by [Freepik - Flaticon](https://www.flaticon.es/autores/freepik) and licensed by [free license](images/license.pdf).
+
+Icono de Ubicación Del Mapa is from [Flaticon.es](https://www.flaticon.es/iconos-gratis/brujula) created by [Flat Icons - Flaticon](https://www.flaticon.es/autores/flat-icons) and licensed by [free license](images/license.pdf).
