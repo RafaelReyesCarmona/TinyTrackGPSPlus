@@ -343,11 +343,17 @@ Las tareas reutilizarán el terminal, presione cualquier tecla para cerrarlo.
 ```
 For upload to Arduino use Platformio enviroment or use `platformio.exe run --target upload` command on terminal. This project use LGT_ISP enviroment by default. To burn it use an LGTISP device as describe in [LGTISP](LGTISP.md).
 
-## Changeloge
+## Changelog
+### V1.0.16
+ * 
+
 ### V1.0.15
-  * Fixed duplicate coordenates in log file.
+  * Fixed duplicate coordenates in log file when moving.
   * Fixed time disadjustment in log file.
   * New implemention of 'update_time()' function.
+  * Fixed error recording log info into incorrect file when insert card after init.
+  * Use 'Seeeduino Arduino RTC' library.
+  * Fixed time error when insert sd card after lost gps signal. 
 
 ### V1.0.14
   * New save routine for better performance using BufferedPrint (Fast buffered print class of SDFat library).

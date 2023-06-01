@@ -299,3 +299,312 @@
   }
 
   if(needcharge) (charge > 5) ? needcharge = false : needcharge = true;
+
+
+    // Print algorithm outputs
+    //int bearing = FusionCompassCalculateBearing(euler,magnetometer);
+    //Serial.print("Quad: w: ");Serial.print(quad.element.w,3);Serial.print(", ");
+    //Serial.print("x: ");Serial.print(quad.element.x,3);Serial.print(", ");
+    //Serial.print("y: ");Serial.print(quad.element.y,3);Serial.print(", ");
+    //Serial.print("z: ");Serial.print(quad.element.z,3);Serial.print(". - ");
+    //Serial.print("Vel ins: x:");Serial.print(GPS.velocity_ins.axis.x);Serial.print(" ");
+    //Serial.print("y :");Serial.print(GPS.velocity_ins.axis.y);Serial.print(" ");
+    //Serial.print("z:");Serial.print(GPS.velocity_ins.axis.z);Serial.print(". \r");
+    //Serial.print("dx: x:");Serial.print(GPS.dx.axis.x,7);Serial.print(" ");
+    //Serial.print("y :");Serial.print(GPS.dx.axis.y,7);Serial.print(" ");
+    //Serial.print("z:");Serial.print(GPS.dx.axis.z,4);Serial.print(". - ");
+    //Serial.print("dxd: x:");Serial.print(GPS.dxd.axis.x,7);Serial.print(" ");
+    //Serial.print("y :");Serial.print(GPS.dxd.axis.y,7);Serial.print(" ");
+    //Serial.print("z:");Serial.print(GPS.dxd.axis.z,4);Serial.print(".      \r");
+    //Serial.print("Roll:  ");Serial.print(euler.angle.roll,2);Serial.print(",\t");
+    //Serial.print("Pitch: ");Serial.print(euler.angle.pitch,2);Serial.print(",\t");
+    //Serial.print("Yaw: ");Serial.print(euler.angle.yaw,2);Serial.print("\r");
+    //Serial.print("HEAD: ");Serial.print(heading);Serial.print("º\r");
+    //Serial.print("Bead: ");Serial.print(bearing);Serial.print("º -");
+    //Serial.print("G X: ");Serial.print(gyroscope.axis.x,2);Serial.print(", ");
+    //Serial.print("Y: ");Serial.print(gyroscope.axis.y,2);Serial.print(", ");
+    //Serial.print("Z: ");Serial.print(gyroscope.axis.z,2);Serial.print(" -");
+    //Serial.print("Ac X: ");Serial.print(accelerometer.axis.x,2);Serial.print(", ");
+    //Serial.print("Y: ");Serial.print(accelerometer.axis.y,2);Serial.print(", ");
+    //Serial.print("Z: ");Serial.print(accelerometer.axis.z,2);Serial.print(" -");
+    //Serial.print("Mg X: ");Serial.print(magnetometer.axis.x,2);Serial.print(", ");
+    //Serial.print("Y: ");Serial.print(magnetometer.axis.y,2);Serial.print(", ");
+    //Serial.print("Z: ");Serial.print(magnetometer.axis.z,2);Serial.print("\r");
+    //Serial.print("Loc: Lat: "); Serial.print(GPS.location.axis.x,7);
+    //Serial.print("º, Lon: ");Serial.print(GPS.location.axis.y,7);
+    //Serial.print("º, Alt: ");Serial.print(GPS.location.axis.z,2);Serial.print("m\t");
+    //Serial.print("Ins: Lat: "); Serial.print(GPS.location_ins.axis.x,7);
+    //Serial.print("º, Lon: ");Serial.print(GPS.location_ins.axis.y,7);
+    //Serial.print("º, Alt: ");Serial.print(GPS.location_ins.axis.z,2);Serial.print("m\r");
+    //Serial.print("V.angular X: ");Serial.print(GPS.angular.axis.x,2);Serial.print(", ");
+    //Serial.print("Y: ");Serial.print(GPS.angular.axis.y,2);Serial.print(", ");
+    //Serial.print("Z: ");Serial.print(GPS.angular.axis.z,2);Serial.print("\r");
+
+      if (gps_data.valid.time && gps_data.valid.date && gps_data.valid.location) {// Did a new valid sentence come in?
+      _time_gps = gps_time_rtc();
+    
+      //utm.UTM((long)(GPS.location_ins.axis.x*10000000L), (long)(GPS.location_ins.axis.y*10000000L));
+      //ScreenPrint();
+      //}
+      //Serial.print("P Vector:[ {");
+      //Serial.print(GPS.P.axis.x,7);Serial.print(", ");Serial.print(GPS.P.axis.y,7);Serial.print(", ");Serial.print(GPS.P.axis.z,7);Serial.print("} ],");
+      //Serial.print("P_vel :[ {");
+      //Serial.print(GPS.P_vel.axis.x);Serial.print(", ");Serial.print(GPS.P_vel.axis.y);Serial.print(", ");Serial.print(GPS.P_vel.axis.z);Serial.print("} ]\r");
+      //Serial.print("Speed: ");Serial.print(gps_data.speed_metersph()/3600);Serial.print("m/s ");
+      //Serial.print("Vel.X: ");Serial.print(GPS.velocity.axis.x);Serial.print(", ");
+      //Serial.print("Y: ");Serial.print(GPS.velocity.axis.y);Serial.print(", ");
+      //Serial.print("Z: ");Serial.print(GPS.velocity.axis.z);Serial.print(". ");
+      //Serial.print("VelIns.X: ");Serial.print(GPS.velocity_ins.axis.x);Serial.print(", ");
+      //Serial.print("Y: ");Serial.print(GPS.velocity_ins.axis.y);Serial.print(", ");
+      //Serial.print("Z: ");Serial.print(GPS.velocity_ins.axis.z);Serial.print(".\r");
+      //Serial.print("Heading ");Serial.print(FusionCompassCalculateHeading2(magnetometer),2);Serial.print(", ");
+      //Serial.print(compass.getAzimuth());Serial.print(". ");
+      //Serial.print("Loc: Lat: "); Serial.print(GPS.location.axis.x,7);
+      //Serial.print("º, Lon: ");Serial.print(GPS.location.axis.y,7);
+      //Serial.print("º, Alt: ");Serial.print(GPS.location.axis.z,2);Serial.print("m\t");
+      //Serial.print("Ins: Lat: "); Serial.print(GPS.location_ins.axis.x,7);
+      //Serial.print("º, Lon: ");Serial.print(GPS.location_ins.axis.y,7);
+      //Serial.print("º, Alt: ");Serial.print(GPS.location_ins.axis.z,2);Serial.print("m\r");
+      //Serial.print("V.angular X: ");Serial.print(GPS.angular.axis.x,2);Serial.print(", ");
+      //Serial.print("Y: ");Serial.print(GPS.angular.axis.y,2);Serial.print(", ");
+      //Serial.print("Z: ");Serial.print(GPS.angular.axis.z,2);Serial.print("\r");
+      //drawBattery.set();
+      //drawDisplay.set();
+      //utm.UTM(GPS.location_ins.axis.x, GPS.location_ins.axis.y);
+      
+      //STATE = GPS_OK;
+      //STATE = (needcharge) ? LOW_BATTERY : (now() > _prevtime) ? GPS_SAVE : GPS_WAITING;
+    //} else {
+        //earth = FusionAhrsGetEarthAcceleration(&ahrs);
+        //FusionQuaternion quad = FusionAhrsGetQuaternion(&ahrs);
+        //FusionGPSAHRSUpdate(&GPS, quad, earth, deltaTime);
+    }
+    STATE = (needcharge) ? LOW_BATTERY : (timersave >= 500) ? GPS_SAVE : GPS_WAITING; //563-560
+
+          //Serial.print("Vel X= ");Serial.print(velocity.axis.x);Serial.print(",");
+      //Serial.print("Vel Y= ");Serial.print(velocity.axis.y);Serial.print(",");
+      //Serial.print("Vel Z= ");Serial.print(velocity.axis.z);Serial.print("\r");
+      //FusionAhrsSetHeading(&ahrs,FusionCompassCalculateHeading2(magnetometer));
+
+            //if(gps_data.speed_metersph() < 1080) { // 0,3 m/s
+      //  GPS.location_ins = {.axis = {
+      //    .x = GPS_loc.axis.x * 0.80 + GPS.location.axis.x * 0.20,
+      //    .y = GPS_loc.axis.y * 0.80 + GPS.location.axis.y * 0.20,
+      //    .z = GPS_loc.axis.z * 0.80 + GPS.location.axis.z * 0.20,          
+      //  }};
+      //  GPS.location = GPS_loc;
+      //  velocity = FUSION_VECTOR_ZERO;
+      //  GPS.velocity = FUSION_VECTOR_ZERO;
+      //  GPS.velocity_ins = FUSION_VECTOR_ZERO;
+      //} //else {
+
+bool GPSData() {
+  static bool save = false;
+  uint8_t errorSD;
+
+  //sprintf(GPSLogFile, "%04d%02d%02d.csv", year(_localtime), month(_localtime), day(_localtime));
+
+  //SdFile::dateTimeCallback(dateTime);
+  FsDateTime::setCallback(dateTime);
+  
+  // Si no existe el fichero lo crea y añade las cabeceras.
+  if (SDReady && !card.exists(GPSLogFile)) {
+    if (file.open(GPSLogFile, O_CREAT | O_APPEND | O_WRITE)) {
+      //Serial.print(F("New GPSLogFile, adding heads..."));
+      file.println(F("Time,Latitude,Longitude,Elevation,Speed,UTM Coords(WGS84)"));
+      //Serial.println(F("Done."));
+      file.close();
+      }
+      //else {
+      //Serial.println(F("** Error creating GPSLogFile. **"));
+      //}
+  }
+  if (SDReady && (save=file.open(GPSLogFile, O_APPEND | O_WRITE))) {
+    //Serial.print(F("Open GPSLogFile to write..."));
+    //String line;
+    //update_time();
+    DateTime time = TimeZone.toLocal(_prevtime.unixtime(),&trc);
+    //uint8_t time_millis = timemillis;
+    BufferedPrint<File32, 64> bp;
+    bp.begin(&file);
+    //char str[30];
+    //char str_utm[25];
+    //char comma = 0X2c;
+    //char space = 0X20;
+
+    //Ajuste de la hora antes de grabar en SDCard.
+    //if(time_millis >= 1000) {
+      //time++;
+    //  time_millis -=  1000U;
+    //}
+
+    //if(timemillis >= 1000) {
+      //time--;
+      //timemillis -= 1000;
+    //}
+
+    //sprintf(str, "%02d:%02d:%02d.%03d,", hour(_localtime), minute(_localtime), second(_localtime),(int)timemillis);
+    //time32_t save_time_gps = _time_gps; // ------>  gps_time_rtc();
+    //time32_t save_time_local = TimeZone.toLocal(save_time_gps);
+    //sprintf(str, "%02d:%02d:%02d.%03d", hour(save_time_local), minute(save_time_local), second(save_time_local),gps_data.dateTime_cs);
+    //file.print(str);
+    if (time.hour() < 10) bp.print('0');
+    bp.print(time.hour());
+    bp.print(':');
+    if (time.minute() < 10) bp.print('0');
+    bp.print(time.minute());
+    bp.print(':');
+    if (time.second() < 10) bp.print('0');
+    bp.print(time.second());
+    bp.print('.');
+    if (timemillis < 100) bp.print('0');
+    if (timemillis < 10) bp.print('0');
+    bp.print((long)timemillis);
+    bp.print(',');
+    //file.print(comma);
+
+    //int int_lat = GPS.location_ins.axis.x;
+    //long f_lat = (GPS.location_ins.axis.x - int_lat)*10000000L ;
+    //int int_lon = GPS.location_ins.axis.y;
+    //long f_lon = (GPS.location_ins.axis.y - int_lon)*10000000L ;
+    //sprintf(str, "%d.%07ld,%d.%07ld,",int_lat, (int_lat > 0) ? f_lat : -(f_lat), int_lon, (int_lon > 0) ? f_lon : -(f_lon));
+    //int int_lat = gps_data.latitudeL() / 10000000L;
+    //sprintf(str, "%d.%07ld",int_lat, (int_lat > 0) ? gps_data.latitudeL()-(long)int_lat*10000000L : -(gps_data.latitudeL()-(long)int_lat*10000000L));
+    bp.printField(GPS.location_ins.axis.x,',',7);
+    bp.printField(GPS.location_ins.axis.y,',',7);
+    //file.print(str);
+    //file.print(comma);
+
+
+    //sprintf(str, "%d.%07ld,",int_lon, (int_lon > 0) ? f_lon : -(f_lon));    
+    //int int_lon = gps_data.longitudeL() / 10000000L;
+    //sprintf(str, "%d.%07ld",int_lon, (int_lon > 0) ? gps_data.longitudeL()-(long)int_lon*10000000L : -(gps_data.longitudeL()-(long)int_lon*10000000L));
+    //file.print(str);
+    //file.print(comma);
+    
+    //file.print((gps_data.altitude_cm()/100));
+
+    float altitude = GPS.location_ins.axis.z + (barometer_Alt - barometer_Alt_prev)/2.0;
+    //int int_altitude = altitude;
+    //int f_altitude = (altitude - int_altitude)*100U;
+    //file.print(altitude,2);
+    //file.print(comma);
+
+    float speed_ms = (float)gps_data.speed_metersph()/3600.0f; //FusionVectorMagnitude(GPS.velocity_ins); // sqrt(FusionVectorMagnitudeSquared(GPS.velocity_ins));
+    //int int_speed_ms = speed_ms;
+    //int f_speed_ms = (speed_ms - int_speed_ms)*100U;
+    //file.print(speed_ms,2);
+    //file.print(comma);
+
+    //sprintf(str, "%d.%02d,%d.%02d,",int_altitude,(int_altitude > 0) ? f_altitude : -(f_altitude), int_speed_ms,(int_speed_ms > 0) ? f_speed_ms : -(f_speed_ms) );
+    bp.printField(altitude,',',2);
+    bp.printField(speed_ms,',',2);
+    
+    //file.print(str);
+
+    //utm.UTM((long)(GPS.location_ins.axis.x*10000000L), (long)(GPS.location_ins.axis.y*10000000L));
+
+    //sprintf(str, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
+    if (utm.zone() < 10) bp.print('0');
+    bp.print(utm.zone());
+    bp.print(utm.band());
+    bp.print(' ');
+    bp.printField(utm.X(),' ');
+    bp.printField(utm.Y(),'\n');
+    bp.sync();
+    //file.println(str);
+    //file.print("\r\n");
+    
+    //line = zeroPadded(hour(time)) + ":" + zeroPadded(minute(time)) + ":" + zeroPadded(second(time)) + "." + zeroPadded_millis(time_millis);
+    //line += comma + String((double)GPS.location_ins.axis.x, 7U) + comma + String(GPS.location_ins.axis.y,7U) +
+    //      comma + String(altitude,2) + comma + String(speed_ms,2) + comma;
+    //line += zeroPadded(utm.zone()) + utm.band() + space + utm.X() + space + utm.Y();
+
+    //file.println(line);
+    file.close();
+    save = true;
+    //Serial.println(F("Done."));
+  } //else {
+    //Serial.println(F("** Error opening GPSLogFile. **"));
+
+  // Fichero con coordenadas sin estimar-------------------------------------------------------
+  //char GPSLogFile_orig[19];
+  //sprintf(GPSLogFile_orig, "%04d%02d%02d.orig.csv", year(_localtime), month(_localtime), day(_localtime));
+  //
+  //if (SDReady && !card.exists(GPSLogFile_orig)) {
+  //  if (file.open(GPSLogFile_orig, O_CREAT | O_APPEND | O_WRITE)) {
+  //    //Serial.print(F("New GPSLogFile_orig, adding heads..."));
+  //    file.println(F("Time,Latitude,Longitude,Elevation,UTM Coords(WGS84)"));
+  //    //Serial.println(F("Done."));
+  //    file.close();
+  //    }
+  //    //else {
+  //    //Serial.println(F("** Error creating GPSLogFile_orig. **"));
+  //    //}
+  //}
+  //if (SDReady && (save=file.open(GPSLogFile_orig, O_APPEND | O_WRITE))) {
+  //  //Serial.print(F("Open GPSLogFile_orig to write..."));
+  //  char str[25];
+  //  char comma = 0X2c;
+  //
+  //  sprintf(str, "%02d:%02d:%02d.%03d", hour(_localtime), minute(_localtime), second(_localtime),(int)timemillis);
+  //  //time32_t save_time_gps = _time_gps; // ------>  gps_time_rtc();
+  //  //time32_t save_time_local = TimeZone.toLocal(save_time_gps);
+  //  //sprintf(str, "%02d:%02d:%02d.%03d", hour(save_time_local), minute(save_time_local), second(save_time_local),gps_data.dateTime_cs);
+  //  file.print(str);
+  //  file.print(comma);
+  //
+  //  //int int_lat = GPS.location.axis.x;
+  //  //long f_lat = (GPS.location.axis.x - int_lat)*10000000L ;
+  //  //sprintf(str, "%d.%07ld",int_lat, (int_lat > 0) ? f_lat : -(f_lat));
+  //  int int_lat = gps_data.latitudeL() / 10000000L;
+  //  sprintf(str, "%d.%07ld",int_lat, (int_lat > 0) ? gps_data.latitudeL()-(long)int_lat*10000000L : -(gps_data.latitudeL()-(long)int_lat*10000000L));
+  //  file.print(str);
+  //  file.print(comma);
+  //
+  //  //int int_lon = GPS.location.axis.y;
+  //  //long f_lon = (GPS.location.axis.y - int_lon)*10000000L ;
+  //  //sprintf(str, "%d.%07ld",int_lon, (int_lon > 0) ? f_lon : -(f_lon));    
+  //  int int_lon = gps_data.longitudeL() / 10000000L;
+  //  sprintf(str, "%d.%07ld",int_lon, (int_lon > 0) ? gps_data.longitudeL()-(long)int_lon*10000000L : -(gps_data.longitudeL()-(long)int_lon*10000000L));
+  //  file.print(str);
+  //  file.print(comma);
+  //  
+  //  file.print((gps_data.altitude_cm()/100));
+  //  //float altitude = GPS.location.axis.z + (barometer_Alt - barometer_Alt_prev)/2.0;
+  //  //file.print(altitude,2);
+  //  //file.print(comma);
+  //
+  //  //utm.UTM((long)(gps_data.latitudeL()), (long)(gps_data.longitudeL()));
+  //
+  //  //sprintf(str, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
+  //  //file.print(str);
+  //  file.print("\n");
+  //  file.close();
+  //  save = true;
+  //  //Serial.println(F("Done."));
+  //} //else {
+  //  //Serial.println(F("** Error opening GPSLogFile_orig. **"));
+  // -------------------------------------------------------------------------------------------------
+  
+  (!(errorSD = card.sdErrorCode())) ? SDReady = true : SDReady = false;
+  if (errorSD == 11) card.end();
+  return (save && SDReady);
+}
+
+String zeroPadded(uint8_t num) {
+  String N = "";
+  if(num < 10) N += "0";
+  N += String(num);
+
+  return N;
+
+}String zeroPadded_millis(uint8_t num) {
+  String N = "";
+  if (num < 10) N += "00";
+  else if (num < 100) N += "0";
+  N += String(num);
+
+  return N;
+}
+
