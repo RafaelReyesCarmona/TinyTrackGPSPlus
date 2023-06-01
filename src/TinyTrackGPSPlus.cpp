@@ -594,8 +594,8 @@ inline void CardDetectFunction() {
     loadConfigurationProgram();
     if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
       TimeZoneMapper TimeZoneGPS;
-      UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
-      UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+      UT = TimeZoneGPS.latLongToTimezone((float)GPS.location_ins.axis.x, (float)GPS.location_ins.axis.y);
+      UST = TimeZoneGPS.latLongToTimezone_summer((float)GPS.location_ins.axis.x, (float)GPS.location_ins.axis.y);
       TimeZone.setRules(UST, UT);
       update_time();
     }
@@ -886,8 +886,8 @@ void loop(void) {
       Serial.println((long)_time_gps);
       if(TimeZoneConfig == TIMEZONE_ZONEMAPPER) {
         TimeZoneMapper TimeZoneGPS;
-        UST = TimeZoneGPS.latLongToTimezone_summer((float)GPS.location_ins.axis.x, (float)GPS.location_ins.axis.y);
-        UT = TimeZoneGPS.latLongToTimezone((float)GPS.location_ins.axis.x, (float)GPS.location_ins.axis.y);
+        UST = TimeZoneGPS.latLongToTimezone_summer(gps_data.latitude(), gps_data.longitude());
+        UT = TimeZoneGPS.latLongToTimezone(gps_data.latitude(), gps_data.longitude());
         TimeZone.setRules(UST, UT);
         update_time();
         Serial.print(F("Time configured."));
