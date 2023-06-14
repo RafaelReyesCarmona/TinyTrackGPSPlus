@@ -1,0 +1,29 @@
+FYI: I was able to obtain the quantities in the North-East-Down NED (or rather East-North-Up ENU, see below, but that is the same for all practical matters) frame of reference. The method I used was:
+
+get the quaternion orientation data (I like better to work with quaternions than Euler angles, more straightforward mathematically, but of course only my taste, Euler angles could certainly be used too :) ). According to the datasheet (reading a bit between the lines, or maybe I did not find the right paragraph in the datasheet), the orientation quaternion produced describes the transformation from IMU to ENU frame of reference.
+
+get the accelerometer data in the IMU frame of reference
+
+apply the quaternion rotation to the acceleration to get it in the ENU frame of reference.
+
+All the code is available here: https://github.com/jerabaul29/Artemis_MbedOS_recipes/tree/main/recipes/recipe_IMU_quaternions .
+
+You can find:
+
+the quaternion utilities (sorry for possibly bad programming style, if you have any feedback let me know, I am not a software engineer at the core :) ): https://github.com/jerabaul29/Artemis_MbedOS_recipes/blob/main/recipes/recipe_IMU_quaternions/vector_and_quaternion.h and the .cpp
+
+an example script: https://github.com/jerabaul29/Artemis_MbedOS_recipes/blob/main/recipes/recipe_IMU_quaternions/recipe_IMU_quaternions.ino
+
+I tested with an Artemis RedBoard + Qwiic BNO080 Sf breakout + Qwiic cables. Works fine (module the issues #68 and #69 ).
+
+I have validated that:
+
+I well get around 9.81 acceleration Up independently of the breakout orientation from this line of output:
+https://github.com/jerabaul29/Artemis_MbedOS_recipes/blob/b93aaef5978ed483c4ac5b72b01d37c98484e66a/recipes/recipe_IMU_quaternions/recipe_IMU_quaternions.ino#L135
+
+the direction pointed to by the X-axis of the breakout IMU corresponds with the magnetic reading of my watch, from this line of output:
+https://github.com/jerabaul29/Artemis_MbedOS_recipes/blob/b93aaef5978ed483c4ac5b72b01d37c98484e66a/recipes/recipe_IMU_quaternions/recipe_IMU_quaternions.ino#L142
+
+I think this may be useful to other users too. Would you consider either writing some small tools that do a similar work, or would you consider a pull request with a few tools that add these functionalities to the library?
+
+If you would consider taking a pull request about that, may you re-open the issue, and may we discuss here some specification / conventions / format stuff? :)

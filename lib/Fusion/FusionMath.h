@@ -13,6 +13,7 @@
 #include <math.h> // M_PI, sqrtf, atan2f, asinf
 #include <stdbool.h>
 #include <stdint.h>
+#include "FusionConvention.h"
 
 //------------------------------------------------------------------------------
 // Definitions
@@ -697,6 +698,70 @@ static inline FusionVector FusionQuaternionAngularVelocity(const FusionQuaternio
     }};
     return angular;
 }
+
+// using Rodriguez method: faster, see https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion
+static inline FusionVector FusionVectorRotatebyQuaternion(const FusionVector vect_in, const FusionQuaternion quat_in, FusionConvention convention) {
+  FusionVector vect_out;
+  FusionVector quat_vect_part = FUSION_VECTOR_ZERO;
+  quat_vect_part = (FusionVector){.axis = {
+    .x = quat_in.element.x,
+    .y = quat_in.element.y,
+    .z = quat_in.element.z
+  }};  
+
+  float quat_scalar_part = quat_in.element.w;
+
+  // compute each term in our working vector
+  FusionVector working_vector = FUSION_VECTOR_ZERO;
+
+  // reset vect out
+  vect_out = (FusionVector){.axis = {
+    .x = working_vector.axis.x,
+    .y = working_vector.axis.y,
+    .z = working_vector.axis.z,    
+  }};
+
+  // part 1
+  float scale = 2.0f * FusionVectorSum(FusionVectorHadamardProduct(quat_vect_part, vect_in));
+  working_vector = FusionVectorMultiplyScalar(quat_vect_part, scale);
+  vect_out = FusionVectorAdd(working_vector,vect_out);
+
+  // part 2
+  float scale_2 = quat_scalar_part*quat_scalar_part - FusionVectorMagnitudeSquared(quat_vect_part);
+  working_vector = FusionVectorMultiplyScalar(vect_in,scale_2);
+  vect_out = FusionVectorAdd(working_vector,vect_out);
+
+  // part 3
+  working_vector = FusionVectorMultiplyScalar(FusionVectorCrossProduct(quat_vect_part, vect_in),2.0f * quat_scalar_part);
+  vect_out = FusionVectorAdd(working_vector,vect_out);
+
+  FusionVector rotated;
+    switch (convention) {
+        case FusionConventionNwu:
+            rotated = (FusionVector){ .axis = {
+                .x = vect_out.axis.y,
+                .y = -vect_out.axis.x,
+                .z = -vect_out.axis.z
+            }};
+            break;
+        case FusionConventionEnu:
+            rotated = (FusionVector){ .axis = {
+                .x = vect_out.axis.x,
+                .y = vect_out.axis.y,
+                .z = vect_out.axis.z
+            }};
+            break;
+        case FusionConventionNed:
+            rotated = (FusionVector){ .axis = {
+                .x = vect_out.axis.y,
+                .y = vect_out.axis.x,
+                .z = -vect_out.axis.z
+            }};
+            break;
+    }
+  return rotated;
+}
+
 
 #endif
 //------------------------------------------------------------------------------

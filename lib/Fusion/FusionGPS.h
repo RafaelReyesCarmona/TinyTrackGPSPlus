@@ -91,6 +91,8 @@ void FusionGPSSetSettings(FusionGPS *const GPS, const FusionGPSSettings *const s
 
 void FusionGPSAHRSUpdate(FusionGPS *const GPS, const FusionQuaternion quaternium, const FusionVector accel, const float deltaTime);
 
+void FusionGPSPredict(FusionGPS *const GPS);
+
 void FusionGPSUpdate(FusionGPS *const GPS, const FusionVectorDouble pos, const FusionVector vel, const FusionVector GPS_error);
 
 FusionGPSFlags FusionGPSGetFlags(const FusionGPS *const GPS);

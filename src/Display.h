@@ -82,6 +82,7 @@ class Display {
         void print_promt();
         void DrawLogo();
         void DrawLowBat();
+        void DrawCalibrate();
         void drawbattery(int8_t);
         Display_Type display_type(){return _screen;};
 };

@@ -10,7 +10,7 @@
 
    Serial.print("X ");Serial.print(gyroX,1);
    Serial.print(" Y ");Serial.print(gyroY,1);
-   Serial.print(" Y ");Serial.println(gyroZ,1);
+   Serial.print(" Z ");Serial.println(gyroZ,1);
    Serial.printf("\nX %0.1f Y %0.1f Z %0.1f\n", gyroX, gyroY,gyroZ);
 
 /*
@@ -608,3 +608,5 @@ String zeroPadded(uint8_t num) {
   return N;
 }
 
+
+09:04:33.061,38.0201592,-4.7798769,9500.55,101.14,30S 34376823 420954665     

@@ -77,79 +77,225 @@ For more information see at :https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-
 ### ATGM336H
 ATGM366H-5N-31 is a GPS module that works with UART (TX and RX) signals. Works with GPS, BDS and operates with a range of 5.0v to 3.3v. It is an small module (16.2x13.8x5.3mm)
 
+### MPU6050 gyroscope and accelerometer
 
-### U8g2 library.
+### QMC5883L magnetometer
 
-TinyTrackGPS+ uses this library by default. Use less flash memory and RAM. Fast running and no display flickering. For more information see at https://github.com/lexus2k/lcdgfx.
+### BMP180 barometer
 
-<img alt="TinyTrackGPS_font" src="images/IMG_20211130_132157.jpg" width="240">&nbsp;
-
-The project define a new font (TinyTrackGPS_font8x16), a modified version of ssd1306xled_font8x16 of lcdgfx fonts (canvas/fonts/fonts.c). For information about create a new font visit: https://github.com/lexus2k/lcdgfx/wiki/How-to-create-new-font-for-the-library. 
-
-<img alt="TinyTrackGPS_font" src="images/GLCD Font Creator.jpg" width="370">&nbsp;
-
-<img alt="TinyTrackGPS_font" src="images/GLCD new font.jpg" width="240">&nbsp;
-
-<img alt="TinyTrackGPS_font" src="images/GLCD icons.jpg" width="370">&nbsp; <img alt="TinyTrackGPS_font" src="images/GLCD wait char.jpg" width="370">&nbsp;
-
-<img alt="TinyTrackGPS_font" src="images/TinyTrackGPS_font.png" width="760">&nbsp;
-
-### UST/UT Time.
-_(Universal Summer Timer/Universal Standard Time)_
-
-TinyTrackGPS+ record the info in local time. It is used Timezone library for that. See [Coding TimeChangeRules] section for information how to config.
+### DS3231 RTC
 
 ## Source
 
 TinyTrackGPS+ is free software, see **License** section for more information. The code is based and get parts of the libraries above:
 
-  * TinyGPS library fork, Paul Stoffregen (https://github.com/PaulStoffregen/TinyGPS). Fork version to add NMEA Data Protocol v3.x and GLONASS support. Fixed version on 'lib'.
-  * SdFat library, Bill Greiman (https://github.com/greiman/SdFat). Fixed version on 'lib'.
+  * NeoGPS library, Paul Stoffregen (https://github.com/PaulStoffregen/TinyGPS).
+  * SdFat library, Bill Greiman (https://github.com/greiman/SdFat).
   * U8g2 library, oliver (https://github.com/olikraus/u8g2).
-  * UTMConversion library, Rafael Reyes (https://github.com/RafaelReyesCarmona/UTMConversion).
-  * Timezone library, Jack Christensen (https://github.com/JChristensen/Timezone).
-  * Time library, Paul Stoffregen (https://github.com/PaulStoffregen/Time).
-  * Vcc library fork, LaZsolt (https://github.com/LaZsolt/Arduino_Vcc). Fork version to add support to LGT8F328P board and EMA implementation, more info about EMA (https://tttapa.github.io/Pages/Mathematics/Systems-and-Control-Theory/Digital-filters/Exponential%20Moving%20Average/C++Implementation.html). Source on 'lib'.
+  * UTMConversion library v1.2, Rafael Reyes (https://github.com/RafaelReyesCarmona/UTMConversion). Modified version for greater precision. Source in 'lib'.
+  * Timezone32 library, Rafael Reyes (https://github.com/RafaelReyesCarmona/Timezone32).
+  * Time32 library, Rafael Reyes (https://github.com/RafaelReyesCarmona/Time32).
+  * Seeed Arduino RTC library, Seeed Studio (https://github.com/Seeed-Studio/Seeed_Arduino_RTC). RTC library for SAMD21 and SAMD51.
+  * TimeZoneMapper library, Rafael Reyes. Fork from Andrew Giblin's TimeZone, MIT licensed (https://github.com/AndrewGiblin/LatLongToTimezone). Source in 'lib'.
+  * SAMDBattery library, Rafael Reyes. Source on 'lib'.
+  * ATSAMD21_ADC library, Blake Felt (https://github.com/Molorius/ATSAMD21-ADC). Source on 'lib'. Adds some extra functions to the ADC.
   * ConfigFile library fork, Rafael Reyes. It is based on SDConfig library fork, Claus Mancini [Fuzzer11] (https://github.com/Fuzzer11/SDconfig). The fork version uses templates to allocate space at compile time to prevent the sketch from crashing and it is modificated to support SdFat library.
-  * EMA library fork, Rafael Reyes. It is based on EMA library v0.1, Rafael Reyes (https://github.com/RafaelReyesCarmona/EMA).
-  * Semphr library, Rafael Reyes. It is a basic implementation of a control structure semaphore.
+  * EMA library, Rafael Reyes (ttps://github.com/RafaelReyesCarmona/EMA). Exponential Moving Average filter (EMA)
+  * Semphr library, Rafael Reyes. It is a basic implementation of a control structure semaphore. Source on 'lib'.
+  * elapsedMillis library, Peter Feerick <peter.feerick@gmail.com> (http://github.com/pfeerick/elapsedMillis/wiki)
+  * SFE_BMP180 library, Mike Grusin (https://github.com/LowPowerLab/SFE_BMP180). Source in 'lib'.
+  * DS3232RTC library, Jack Christensen (https://github.com/JChristensen/DS3232RTC). Source in 'lib'.
+  * MPU6050_light library, rfetick (https://github.com/rfetick/MPU6050_light). Source in 'lib'.
+  * QMC5883L library, Douglas Thain (https://github.com/dthain/QMC5883L). Source in 'lib'.
+  * Fusion library, modified version of Seb Madgwick' Fusion library (https://github.com/xioTechnologies/Fusion/). Added functions to fuse GPS data with AHRS. Source in 'lib'.
 
+### Fusion library
+Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems. But I get the source and added some functions to estimate the Latitude, longitude, and altitude from IMU and GPS data. I used AHRS algorithm from Fusion and a free implementation of The uNav Inertial Navigation System (INS) that it is a 15 state Extended Kalman Filter (EKF). 
+* Fusion: https://github.com/xioTechnologies/Fusion/
+* uNavINS: https://github.com/FlyTheThings/uNavINS
+
+
+
+#### AHRS algorithm
+The Attitude And Heading Reference System (AHRS) algorithm combines gyroscope, accelerometer, and magnetometer data into a single measurement of orientation relative to the Earth. 
+
+The algorithm is based on the revised AHRS algorithm presented in chapter 7 of Madgwick's PhD thesis. This is a different algorithm to the better-known initial AHRS algorithm presented in chapter 3, commonly referred to as the Madgwick algorithm.
+
+The algorithm calculates the orientation as the integration of the gyroscope summed with a feedback term. The feedback term is equal to the error in the current measurement of orientation as determined by the other sensors, multiplied by a gain. The algorithm therefore functions as a complementary filter that combines high-pass filtered gyroscope measurements with low-pass filtered measurements from other sensors with a corner frequency determined by the gain. A low gain will 'trust' the gyroscope more and so be more susceptible to drift. A high gain will increase the influence of other sensors and the errors that result from accelerations and magnetic distortions. A gain of zero will ignore the other sensors so that the measurement of orientation is determined by only the gyroscope.
+
+#### uNavINS 
+The uNav Inertial Navigation System (INS) is a 15 state Extended Kalman Filter (EKF) to estimate the following from IMU and GPS data:
+  * Attitude
+  * Latitude, longitude, and altitude (LLA)
+  * North, east, down (NED) inertial velocity
+  * Ground track
+
+The 15 states comprise the inertial position, inertial velocity, a quaternion, accelerometer biases, and gyro biases. This algorithm was developed by Adhika Lie at the University of Minnesota UAS Research Labs, where it has been used since 2006 as a baseline navigation algorithm to gauge the performance of other algorithms in simulation studies and flight tests. uNav INS provides excellent estimates of attitude, inertial position, and inertial velocity once it has converged on a solution.
+
+This library requires Eigen to compile. So I don't use this, I get the source code and write my own solution using Fusion library as base.
+
+#### Other libraries
+There are a lot of information about AHRS and INS using EKF and others filters on the web. 
+ * Adafruit AHRS: 
+ * OpenFlight: https://github.com/hamid-m/OpenFlight/tree/master/FlightCode/navigation. I get part of code from this file:
+```C++
+/*! \file nav_functions.c
+ *	\brief Auxiliary functions for nav filter
+ *
+ *	\details
+ *     Module:          Navfuncs.c
+ *     Modified:        Adhika Lie (revamp all functions)
+ * 						Gokhan Inalhan (remaining)
+ *                      Demoz Gebre (first three functions)
+ *                      Jung Soon Jang
+ *
+ *     Description:     navfunc.c contains the listing for all the
+ *                      real-time inertial navigation software.
+ *
+ *		Note: all the functions here do not create memory without
+ *			  clearing it.
+ *	\ingroup nav_fcns
+ *
+ * \author University of Minnesota
+ * \author Aerospace Engineering and Mechanics
+ * \copyright Copyright 2011 Regents of the University of Minnesota. All rights reserved.
+ *
+ * $Id: nav_functions.c 922 2012-10-17 19:14:09Z joh07594 $
+ */
+
+/*     Include Pertinent Header Files */
+
+#include <math.h>
+#include "../utils/matrix.h"
+#include "nav_functions.h"
+
+/*=================================================================*/
+MATRIX eul2dcm(MATRIX euler, MATRIX dcm)
+{
+	/* Function:     MATRIX eul2dcm(MATRIX euler, MATRIX dcm)
+	 * ----------------------------------------------------------------
+	 * This function creates the direction cosine matrix (DCM) that
+	 * transforms a vector from navigation frame to the body frame given 
+	 * a set of Euler Angle in the form of [phi theta psi] for a 3-2-1 
+	 * rotation sequence
+	 */
+  double cPHI,sPHI,cTHE,sTHE,cPSI,sPSI;
+
+  cPHI = cos(euler[0][0]); sPHI = sin(euler[0][0]);
+  cTHE = cos(euler[1][0]); sTHE = sin(euler[1][0]);
+  cPSI = cos(euler[2][0]); sPSI = sin(euler[2][0]);
+
+  dcm[0][0] = cTHE*cPSI; 				dcm[0][1] = cTHE*sPSI; 					dcm[0][2] = -sTHE;
+  dcm[1][0] = sPHI*sTHE*cPSI-cPHI*sPSI;	dcm[1][1] = sPHI*sTHE*sPSI+cPHI*cPSI;	dcm[1][2] = sPHI*cTHE;
+  dcm[2][0] = cPHI*sTHE*cPSI+sPHI*sPSI;	dcm[2][1] = cPHI*sTHE*sPSI-sPHI*cPSI;	dcm[2][2] = cPHI*cTHE;
+
+  return(dcm);
+}
+
+/*=================================================================*/
+MATRIX dcm2eul(MATRIX euler, MATRIX dcm) 
+{
+	/*
+	* Function:     MATRIX dcm2eul(MATRIX euler, MATRIX dcm)
+	*-----------------------------------------------------------------
+	* Convert *any* DCM into its Euler Angle equivalent. For navigatin, 
+	* use DCM from NED to Body-fixed as input to get the conevntional 
+	* euler angles.
+	* The output argument 'euler' is a vector containing the
+	* the three euler angles in radians given in [phi; theta; psi] format.
+	* Modified: Adhika Lie, 09/13/2011.
+	*/
+
+	euler[0][0] = atan2(dcm[1][2],dcm[2][2]);
+	euler[1][0] = -asin(dcm[0][2]);
+	euler[2][0] = atan2(dcm[0][1],dcm[0][0]);
+	
+	return euler;
+}
+
+MATRIX create_R(MATRIX e, MATRIX R)
+{
+	/* This function is used to create the transformation matrix to get
+	 * phi_dot, the_dot and psi_dot from given pqr (body rate).
+	 */
+	double ph, th, ps;
+	
+	ph = e[0][0]; th = e[1][0]; ps = e[2][0];
+	
+	R[0][0] = 1.0;
+	R[0][1] = sin(ph)*tan(th);
+	R[0][2] = cos(ph)*tan(th);
+	
+	R[1][0] = 0.0;
+	R[1][1] = cos(ph);
+	R[1][2] = -sin(ph);
+	
+	R[2][0] = 0.0;
+	R[2][1] = sin(ph)/cos(th);
+	R[2][2] = cos(ph)/cos(th);
+	
+	return R;
+}
+
+MATRIX llarate(MATRIX V, MATRIX lla, MATRIX lla_dot) 
+{
+	/* This function calculates the rate of change of latitude, longitude,
+	 * and altitude.
+	 * Using WGS-84.
+	 */
+	double lat, h, Rew, Rns, denom;
+	
+	lat = lla[0][0]; h = lla[2][0];
+	
+	denom = (1.0 - (ECC2 * sin(lat) * sin(lat)));
+	denom = sqrt(denom*denom);
+
+	Rew = EARTH_RADIUS / sqrt(denom);
+	Rns = EARTH_RADIUS*(1-ECC2) / denom*sqrt(denom);
+	
+	lla_dot[0][0] = V[0][0]/(Rns + h);
+	lla_dot[1][0] = V[1][0]/((Rew + h)*cos(lat));
+	lla_dot[2][0] = -V[2][0];
+	
+	return lla_dot;
+}
+```
 
 ## How to compile
 ### Config
 Edit 'config.h' file before, to configure display type uncommenting the proper line:
 ```C++
-// Descomentar solo uno de los displays utilizados.
-//#define DISPLAY_TYPE_SDD1306_128X64     // Para usar pantalla OLED 0.96" I2C 128x64 pixels
-#define DISPLAY_TYPE_SDD1306_128X64_lcdgfx // Para usar pantalla OLED 0.96" I2C 128x64 pixels (lcdgfx library)
+// Descomentar solo uno de los displays utilizados. Comentar todas las líneas para uso NO DISPLAY.
+#define DISPLAY_TYPE_SDD1306_128X64 // Para usar pantalla OLED 0.96" I2C 128x64 pixels
 //#define DISPLAY_TYPE_SH1106_128X64         // Define para usar pantalla OLED 1.30" I2C 128x64 pixels (SH1106)
-//#define DISPLAY_TYPE_LCD_16X2             // Para usar LCD 16 x 2 carateres.
-//#define DISPLAY_TYPE_LCD_16X2_I2C       // Para usar LCD 16 x 2 carateres. I2C.
 ```
-Modify Arduino pin where you connect the LCD 16x2 char:
-```C++
-// Definiciones para display LCD 16x2 caracteres.
-#define RS 2
-#define ENABLE 3
-#define D0 4
-#define D1 5
-#define D2 6
-#define D3 7
-```
-Modify I2C port for LCD 16x2 I2C: (connect in SCL and SDA pins)
-```C++
-// Define direccion I2C para LCD16x2 char.
-#define I2C 0x27
-```
-Comment the line below for define Timezone in sketch, uncomment for configure with 'Time.cfg' file.
-```C++
-// Define para establecer localtime en tiempo de ejecución o de compilación.
-#define TIMEZONE_FILE   // Comentar para establecer TimeZone (localtime) en tiempo de ejecución (Time.cfg)
-```
+
+### UST/UT Time.
+_(Universal Summer Timer/Universal Standard Time)_
+
+TinyTrackGPS+ record the info in local time. It is used Timezone32 library for that. See [Coding TimeChangeRules] section for information how to config.
+
 ### Coding TimeChangeRules
 Normally these will be coded in pairs for a given time zone: One rule to describe when daylight (summer) time starts, and one to describe when standard time starts.
 
 New feature is implemented to configure Timezone. It can be defined in the sketch or by a config file saved on SD card (Time.cfg).
+
+#### Set Auto Time Zone based on location
+
+TinyTrackGPS+ use `TimeZoneMapper` library for get local time information based on latitude and longitude.
+
+`TimeZonerMapper` is a modified version of Andrew Giblin's TimeZone, MIT licensed. (https://github.com/AndrewGiblin/LatLongToTimezone)
+
+Example file 'ConfProg.cfg' for auto config based on location given from GNSS module.
+**File format: ```TIMEZONE=<value>```** 
+```conf
+#Conf. Prog.
+TIMEZONE=1
+```
+
+`<value>` = `0`, for UTC time. `1`, for TimeZoneMapper configuration. and `2`, for 'Time.cfg' file configuration.
+
+**Delete `ConfProg.cfg` to define time zone on compiler time.**
 
 #### Set the Time Zone in the sketch
 
@@ -174,24 +320,26 @@ For convenience, the following symbolic names can be used:
 For the Eastern US time zone, the TimeChangeRules could be defined as follows:
 
 ```C++
-TimeChangeRule usEDT = {"EDT", Second, Sun, Mar, 2, -240};  //UTC - 4 hours
-TimeChangeRule usEST = {"EST", First, Sun, Nov, 2, -300};   //UTC - 5 hours
+static TimeChangeRule usEDT = {"EDT", Second, Sun, Mar, 2, -240};  //UTC - 4 hours
+static TimeChangeRule usEST = {"EST", First, Sun, Nov, 2, -300};   //UTC - 5 hours
+static Timezone TimeZone(usEDT,usEST);
 ```
 For Central European time zone (Frankfurt, Paris), TimeChangeRules could be as:
 ```C++
-TimeChangeRule CEST = {"CEST", Last, Sun, Mar, 2, 120};     // Central European Summer Time
-TimeChangeRule CET = {"CET ", Last, Sun, Oct, 3, 60};       // Central European Standard Time
+static TimeChangeRule CEST = {"CEST", Last, Sun, Mar, 2, 120};     // Central European Summer Time
+static TimeChangeRule CET = {"CET ", Last, Sun, Oct, 3, 60};       // Central European Standard Time
+static Timezone TimeZone(CEST, CET);
 ```
 
 For more information see Timezone info at: https://github.com/JChristensen/Timezone#readme
 
-Change lines like above in `TinyTrackGPS.cpp` file, at line **111**, with appropriate definition for your time zone.
-
-<img alt="Log File." src="images/Timezone CE - code.png" width="760">&nbsp;
-
-If your time zone is Australia, you can use this lines:
-
-<img alt="Log File." src="images/Timezone ausET - code.png" width="760">&nbsp;
+Change lines like above in `TinyTrackGPSPlus.cpp` file, at line **164**, with appropriate definition for your time zone.
+```C++
+// Variables para configurar Timezone.
+static TimeChangeRule UT = {"UTC", Last, Sun, Mar, 1, 0};     // UTC
+static TimeChangeRule UST;
+static Timezone TimeZone(UT);
+```
 
 There are some info for time zone:
 ```C++
@@ -242,9 +390,8 @@ TimeChangeRule usPST = {"PST", First, Sun, Nov, 2, -480};
 Timezone usPT(usPDT, usPST);
 ```
 
-Timezone uses Time library so time is based on the standard Unix time_t.
-The value is the number of seconds since Jan 1, 1970. And store in unsigned long variable. Arduino
-Reference describe unsigned long as : ```Unsigned long variables are extended size variables for number storage, and store 32 bits (4 bytes). Unlike standard longs unsigned longs won’t store negative numbers, making their range from 0 to 4,294,967,295 (2^32 - 1).``` It is predict to not be afected with 2038 effect. For more information see [Unix Time](https://en.wikipedia.org/wiki/Unix_time) at Wikipedia, and [Year 2038 problem](https://en.wikipedia.org/wiki/Year_2038_problem). Assuming that timestamp is 4,294,967,295 (maximal value of unsigned long in Arduino, 2^32 - 1), it wil be in: **GMT: Sunday, 7 February 2106 6:28:15** when time_t overflow. Then time_t reset to 0 and date will be **GMT: Thursday, 1 January 1970 0:00:00**. Visit https://www.epochconverter.com/, an utility for Epoch & Unix Timestamp Conversion.
+Timezone32 uses Time32 library that extend the standard Unix `time_t` defining `time32_t`. `time32_t` is defined as 'unsigned long' or 'unsigned long long' depend on platform. For this project `time32_t` is 'unsigned long long' as 64bits.
+The value is the number of seconds since Jan 1, 1970. And store in time32_t variable. Unlike standard longs unsigned long longs won’t store negative numbers, making their range from 0 to 18.446.744.073.709.551.615 (2^64 - 1). It is predict to not be afected with 2038 effect. For more information see [Unix Time](https://en.wikipedia.org/wiki/Unix_time) at Wikipedia, and [Year 2038 problem](https://en.wikipedia.org/wiki/Year_2038_problem). Assuming that timestamp is 18.446.744.073.709.551.615 (maximal value of unsigned long long, 2^64 - 1), it will be at: **584.554.530.872 years and 6,5 mounths from 1th January 1970**, when time32_t will overflow, time32_t will reset to 0 and date will start at **GMT: Thursday, 1 January 1970 0:00:00**. Visit https://www.epochconverter.com/, an utility for Epoch & Unix Timestamp Conversion.
 
 #### Set the Time Zone in the 'Time.cfg' file
 
@@ -289,63 +436,98 @@ enum month_t {Jan=1, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec};
 ### Platformio
 Run command `pio.exe run`.
 ```
-Processing LGT_ISP (board: LGT8F328P; framework: arduino; platform: lgt8f)
----------------------------------------------------------------------------------------------------
+Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
+--------------------------------------------------------------------------------------------------------------
 Verbose mode can be enabled via `-v, --verbose` option
-CONFIGURATION: https://docs.platformio.org/page/boards/lgt8f/LGT8F328P.html
-PLATFORM: Logic Green boards (1.0.1) > LGT8F328P
-HARDWARE: ATMEGA328P 32MHz, 2KB RAM, 32KB Flash
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
+PLATFORM: Atmel SAM (8.1.0) > Seeeduino XIAO
+HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
+DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
 PACKAGES:
- - framework-lgt8fx 1.0.6
- - toolchain-atmelavr 3.70300.0 (7.3.0)
+ - framework-arduino-samd-seeed @ 1.8.1
+ - framework-cmsis @ 2.50400.181126 (5.4.0)
+ - framework-cmsis-atmel @ 1.2.2
+ - tool-bossac @ 1.10700.190624 (1.7.0)
+ - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
 LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
 LDF Modes: Finder ~ chain, Compatibility ~ soft
-Found 28 compatible libraries
+Found 33 compatible libraries
 Scanning dependencies...
 Dependency Graph
-|-- <LiquidCrystal> 1.0.7
-|-- <U8g2> 2.32.10
-|   |-- <SPI> 1.0
-|   |-- <Wire> 1.0
-|-- <LiquidCrystal_I2C> 1.1.4
-|   |-- <Wire> 1.0
-|-- <Low-Power> 1.81.0
-|-- <UTMConversion> 1.1.0
-|-- <Timezone> 1.2.4
-|   |-- <Time> 1.6.1
-|-- <lcdgfx> 1.1.2
-|   |-- <SPI> 1.0
-|   |-- <Wire> 1.0
-|-- <ConfigFile>
-|   |-- <SdFat> 2.1.2
-|   |   |-- <SPI> 1.0
-|-- <SdFat> 2.1.2
-|   |-- <SPI> 1.0
-|-- <Semphr>
-|-- <TinyGPS_GLONASS_fixed>
-|-- <Vcc>
-|   |-- <EMA>
+|-- U8g2 @ 2.34.17
+|-- EMA @ 0.1.1
+|-- Timezone32 @ 1.1.0
+|-- Time32 @ 1.1.3
+|-- NeoGPS @ 4.2.9
+|-- SdFat @ 2.2.2
+|-- Seeed Arduino RTC @ 2.0.0
+|-- ConfigFile
+|-- Fusion
+|-- SAMDBattery
+|-- Semphr
+|-- TimeZoneMapper
+|-- DS3232RTC @ 2.0.1
+|-- elapsedMillis @ 1.0.6
+|-- MPU6050_light @ 1.1.0
+|-- QMC5883L @ 1.0.9
+|-- BMP180 @ 0.0.0-alpha+sha.efac46bd8d
+|-- SoftwareSerial
+|-- SPI @ 1.0
+|-- UTMConversion @ 1.1
+|-- Wire @ 1.0
 Building in release mode
-Compiling .pio\build\LGT_ISP\src\Display.cpp.o
-Linking .pio\build\LGT_ISP\firmware.elf
-Checking size .pio\build\LGT_ISP\firmware.elf
+Compiling .pio\build\seeed_xiao\src\TinyTrackGPSPlus.cpp.o
+Linking .pio\build\seeed_xiao\firmware.elf
+Checking size .pio\build\seeed_xiao\firmware.elf
 Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
-RAM:   [========  ]  82.6% (used 1692 bytes from 2048 bytes)
-Flash: [==========]  97.5% (used 31950 bytes from 32768 bytes)
-=================================== [SUCCESS] Took 7.37 seconds ===================================
-
-Environment    Status    Duration
--------------  --------  ------------
-LGT_ISP        SUCCESS   00:00:07.369
-=================================== 1 succeeded in 00:00:07.369 ===================================
-
-Las tareas reutilizarán el terminal, presione cualquier tecla para cerrarlo.
+RAM:   [==        ]  21.7% (used 7096 bytes from 32768 bytes)
+Flash: [========= ]  88.3% (used 231396 bytes from 262144 bytes)
+Building .pio\build\seeed_xiao\firmware.bin
 ```
-For upload to Arduino use Platformio enviroment or use `platformio.exe run --target upload` command on terminal. This project use LGT_ISP enviroment by default. To burn it use an LGTISP device as describe in [LGTISP](LGTISP.md).
+For upload to Seeeduino Xiao use Platformio enviroment or use `platformio.exe run --target upload` command on terminal.
 
 ## Changelog
+### V1.0.22
+  * Updated 'FusionGPSUpdate' for better accuracy.
+  * Changes on 'loop' secuence.
+### V1.0.21
+  * Fixed `while(gps.available(gpsPort))` https://github.com/SlashDevin/NeoGPS/issues/111
+  * Added 'FusionVectorRotatebyQuaternion' function using Rodriguez method: faster, see https://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion
+  * Fixed error in log file name, time and date adjustment for local time.
+  * Fixed error convention in Latitude and Longitude.
+  * Set 2Hz sampling and 19200 baud rates of GNSS module again. But log info is 1Hz, so only a position per second.
+
+### V1.0.20
+  * Changes in log file `Date,Time,Latitude,Longitude,Elevation,Speed,UTM Zone,X,Y`.
+  * Log file rename to `YYYYMMDDTHHMMSS.csv` ex.: "20230506T134400.csv" 
+  * New log file when power on or every time to insert a card.
+  * Set 4Hz sampling and 38400 baud rates of GNSS module. Now runnig stable every 500 milliseconds, but
+  I don`t recomend it because location became freeze when GNSS module loss signal.
+  ```
+  $PCAS02,250*18
+  $PCAS01,3*1F
+  ```
+  * Automatic magnetic calibration. Picture introducing this function when turn on.
+### V1.0.19
+  * Changes in loop secuence. 
+  * Fixed FusionGPS library `FusionGPSAHRSUpdate` function.
+### V1.0.18
+  * Fixed time to prevent error lines in log file.
+  ```
+  19:28:39.344,37.8850000,-4.8049092,158.21,0.35,30S 34128015 419459110
+  19:28:39.1041,37.8850000,-4.8048451,85.84,0.45,30S 34128578 419459099
+  ```
+  * Set 2Hz sampling and 19200 baud rates of GNSS module. Now runnig stable every 500 milliseconds.
+  ```
+  $PCAS02,500*1A
+  $PCAS01,2*1E
+  ```
+  * Improve loop secuence for more stability. Now log file save location every 0,5s.
+### V1.0.17
+  * Adjust several parameters for improve performance changing loop secuence and sampling rating of compass.
 ### V1.0.16
- * 
+  * Added sempr library again to control display.
+  * Restore default sample rating and baud rate of GNSS module because to lost information.
 
 ### V1.0.15
   * Fixed duplicate coordenates in log file when moving.
@@ -380,50 +562,71 @@ For upload to Arduino use Platformio enviroment or use `platformio.exe run --tar
 
 ## Working
 
-It works getting info from NMEA module every second and save it into de log file. 
+It works getting info from NMEA module every second and save it into de log file. It is the original feature 
+of TinyTrackGPS, but with more accuracy. Log file is created every time the card is inserted or when the device is turning on with card inserted. At device powered, log file will be created is card is removed and inserted again. Log file is named as above, based on date and time configured at location (local time):
+
+`YYYYMMDDTHHMMSS.csv` Example: `20230610T185945.csv`
+
+Where:
+  * YYYY - Year 4 digits format.
+  * MM - Mouth.
+  * DD - Day.
+  * T - 'T' character .
+  * HH - Hour.
+  * MM - Minute.
+  * SS - Second.
 
 
 Log file Format is:
 ```
-HH:MM:SS,YY.YYYYYY,XX.XXXXXX,ALT,UTM (WGS86)
+Date,Time,Latitude,Longitude,Elevation,Speed,UTM Zone,X,Y
+YYYY-MM-DD,HH:MM:SS.mmm,YY.YYYYYYY,XX.XXXXXXX,ALT,SPEED,UTM ZONE,UTM X,UTM Y 
 ```
-Like this:
+First line in every file is the header, for fields information.
+This is an example lines:
 ```
-12:42:47,37.990493,-4.785790,571,30S 343186 4206265
-12:42:48,37.990276,-4.785741,571,30S 343190 4206240
-12:42:49,37.990062,-4.785705,571,30S 343193 4206216
-12:42:50,37.989860,-4.785694,571,30S 343193 4206194
+2023-06-10,18:59:52.719,37.8850308,-4.8044707,208.83,0.02,30S,341318.77,4194593.76
+2023-06-10,18:59:53.099,37.8850410,-4.8044754,134.69,0.00,30S,341318.38,4194594.91
+2023-06-10,18:59:54.099,37.8850513,-4.8044776,134.57,0.00,30S,341318.22,4194596.05
+2023-06-10,18:59:55.100,37.8850581,-4.8044784,134.22,0.00,30S,341318.15,4194596.80
 ...
 ```
 Where:
-  * HH - Hours from GPS UTC.
+  * YYYY - Year.
+  * MM - Mounth.
+  * DD - Day.
+  * HH - Hours.
   * MM - Minutes.
   * SS - Seconds.
-  * YY.YYYYYY - Degree of latitude.
-  * XX.XXXXXX - Degree of longitude.
-  * ALT - Altitude in meters.
-  * UTM - Coordenates in UTM format(WGS84): Zone Band X Y (00A XXXXXX YYYYYYY)
+  * mmm - Milliseconds
+  * YY.YYYYYYY - Degree of latitude (7 decimals precission).
+  * XX.XXXXXXX - Degree of longitude. (7 decimals precission).
+  * ALT - Elevation in meters. (2 decimal presission).
+  * SPEED - Speed from ground in m/s. (2 decimal precission).
+  * UTM ZONE- Zone and Band of coordenates in UTM format(WGS84).
+  * UTM X - X coordenate of UTM in meters (2 decimal precission). 
+  * UTM Y - Y coordenate of UTM in meters (2 decimal precission). 
 
 <img alt="Log File." src="images/image2.png" width="480">&nbsp;
 
-For conversion to UTM coordinates use UTMConversion library. (https://github.com/RafaelReyesCarmona/UTMConversion)
+For conversion to UTM coordinates use a modified version of UTMConversion library, getting precision in cm's (https://github.com/RafaelReyesCarmona/UTMConversion) 
 
-Example of use:
+For more accuracy, use `long` type for latitude and longitude. Example of use:
 
 ```C++
 #include "UTMconversion.h"
 
-float flat = 37.8959210;
-float flon = -4.7478210;
+long lat = 378959210;  // 37.8959210 * 10000000L
+long lon = -47478210;  // -4.7478210 * 10000000L
 
 GPS_UTM utm;
 
 void setup() {
-  char utmstr[] = "30S 123456 1234567";
+  char utmstr[] = "30S 12345678 123456789";
 
   Serial.begin(9600);  
 
-  utm.UTM(flat, flon);
+  utm.UTM(lat, lon);
   sprintf(utmstr, "%02d%c %ld %ld", utm.zone(), utm.band(), utm.X(), utm.Y());
   Serial.println(utmstr);
 }
@@ -433,18 +636,9 @@ void loop() {
 }
 ```
 
-File is named as:
-
-`YYYYMMDD.csv` Example: `20210216.csv`
-
-Where:
-  * YYYY - Year 4 digits format.
-  * MM - Mouth.
-  * DD - Day.
-
 ### NMEA Secuence from GPS Module.
 
-I am using a Ublox NEO-6MV2 module for get possition and time from GPS System. When GPS signal is ok, the module send the above information through serial:
+Ublox NEO-6MV2 module give possition and time from GPS System. When GPS signal is ok, the module send the above information through serial:
 ```
 $GPRMC,091620.00,A,3753.16481,N,00447.76212,W,9.209,273.97,201021,,,A*75
 $GPVTG,273.97,T,,M,9.209,N,17.064,K,A*03
@@ -457,9 +651,7 @@ $GPGLL,3753.16481,N,00447.76212,W,091620.00,A,A*78
 
 This [page](https://www.electroschematics.com/neo-6m-gps-module/) have all about NEO-6v2 and v3 modules information. 
 
-It is very important how to program for get GPS information correctly. (Fixed since V0.10) 
-
-With updated GPS module to Ublox NMEA-8M we recibe more information, now the module uses GPS+GLONASS+GALILEO systems. Information through serial port is like above:
+On the other hand, Ublox NMEA-8M give recibe more information. The module uses GPS+GLONASS+GALILEO systems. Information through serial port is like above:
 ```
 $GNRMC,102140.00,A,3801.27758,N,00446.88703,W,0.561,,011221,,,A*7E
 $GNVTG,,T,,M,0.561,N,1.038,K,A*35
@@ -473,6 +665,10 @@ $GLGSV,2,1,06,69,24,069,,71,24,294,16,79,30,049,25,80,40,123,*65
 $GLGSV,2,2,06,84,06,193,,85,37,245,*68
 $GNGLL,3801.27758,N,00446.88703,W,102140.00,A,A*64
 ```
+
+Other modules will give similar information, and the library used may determine the simplicity of the project.
+It is important to select a GNSS module that gives accurate and appropriate information for the use of the given information. Typically, GNSS modules give such information in NMEA sentences.
+
 ### Information on GPS NMEA sentences
 
 You can get more information about [GPS - NMEA sentence information](http://aprs.gids.nl/nmea/) in the web page. Or [RF Wireless World](https://www.rfwireless-world.com/Terminology/GPS-sentences-or-NMEA-sentences.html) page. And [SatSleuth Electronic circuits page](http://www.satsleuth.com/GPS_NMEA_sentences.aspx).
@@ -614,61 +810,8 @@ Format is:
     A            Mode Autonomous
     *78          Checksum
 
-### Low Energy Comsuption
-`Low-Power` - the library is used to reduce power consumption and gain greater autonomy implementing the project portably using lithium batteries. Use only when no display configuration.
-Implemented in v0.4 first time and from v0.7. 
-
-## TinyGPS library
-
-### Versions prior V0.10
-
-TinyGPS library works getting information from GPRMC and GPGGA sentences. It extract time, date, latitude, longitude, speed and course information from GPRMC sentence. And altitude, time, latitude, longitude, numbers of satellites in use and hdop information from GPGGA sentence.
-
-The function ```bool TinyGPS::encode(char c)``` call to ```bool TinyGPS::term_complete()``` and return `true` when GPRMC or GPGGA sentence is decoded correctly. The above code on TinyTrackGPS:
-
-<img alt="Log File." src="images/code_GPS_setup.png" width="760">&nbsp;
-
-It is in ```setup()``` section. This code wait until GPRMC sentence is correctly recieved. Then config time and date whith the code: 
-
-```C++
-  utctime = makeTime(time_gps);
-  localtime = TimeZone.toLocal(utctime);
-```
-
-Usually NEO6 module is config to 9600 bauds and with 1 Hz for transmit information. So, rest of sentences are ignored in ```setup()```.
-
-In ```loop()``` the while loop get the first sentence from NEO6 module, it is GPRMC sentence.
-
-<img alt="Log File." src="images/code_GPS_loop1.png" width="760">&nbsp;
-
-To get altitude information is needed to decode GPGAA sentence, so call ```GPSRefresh()``` to do that.
-
-<img alt="Log File." src="images/code_GPS_loop2.png" width="760">&nbsp;
-
-### Fixed TinyGPS on V0.10
-
-Now the function ```bool TinyGPS::encode(char c)``` call to ```bool TinyGPS::term_complete()``` and return `true` when GPRMC _and_ GPGGA sentence is decoded correctly. So all information is decoded at same time. Now ```GPSRefresh()``` is no neccessary.
-
-Original code TinyGPS:
-<img alt="TinyGPS" src="images/code_TinyGPS.png" width="760">&nbsp;
-
-Fixed code TinyGPS (change return and break at the end):
-<img alt="TinyGPS fix" src="images/code_TinyGPS_fixed.png" width="760">&nbsp;
-
-### Fixed TinyGPS on V0.11
-
-In TinyTrackGPS V0.11, TinyGPS library is a modified version from https://github.com/fmgomes/TinyGPS to adds support for newer NMEA-capable GPS devices that implement the [v3.x GNSS spec](http://geostar-navi.com/files/docs/geos3/geos_nmea_protocol_v3_0_eng.pdf) as well as devices that support [GLONASS](https://en.wikipedia.org/wiki/GLONASS). This version is fixed to add support to GNGGA sentence and decode G_RMC _and_ G_GGA sentences at same time.
-
-Fixed version is placed in 'lib/TinyGPS_GLONASS_fixed'. 
-<img alt="TinyGPS Glonass Fix" src="images/code_TinyGPS_GLONASS_fixed.png" width="760">&nbsp;
-
-### Fixed TinyGPS on V0.12
-
-In TinyTrackGPS V0.12, TinyGPS library is modificated to saved flash memory and make run faster. The are sentences as GSA and GSV that there are no decodified, so 'encode()' function run faster.
-
-This are the modifications on 'term_complete()' function:
-<img alt="TinyGPS Glonass Fix" src="images/code_TinyGPS_GLONASS_fixed-2.png" width="760">&nbsp;
-<img alt="TinyGPS Glonass Fix" src="images/code_TinyGPS_GLONASS_fixed-3.png" width="760">&nbsp;
+## NeoGPS library
+------------------------------------------------------------------------------------------
 
 ## Accuracy
 
