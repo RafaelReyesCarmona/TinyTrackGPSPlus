@@ -18,7 +18,7 @@ TinyTrackGPS+ uses the information from GNSS and 10 DOF sensors to estimate the 
 
 This program is written in C/C++ for CPU-ARM® Cortex®-M0+(SAMD21G18), SAMD21, and compatible microcontrollers.
 
-XIAO SAMD21 powered by SAMD21G18 chip is an ultra-small, high-performance universal development board. It supports Arduino / Micropython / CircuitPython development. TinyTrackGPS+ is developed on PlatformIO with Arduino enviroment.
+XIAO SAMD21 powered by (SAMD21G18)[https://files.seeedstudio.com/wiki/Seeeduino-XIAO/res/ATSAMD21G18A-MU-Datasheet.pdf] chip is an ultra-small, high-performance universal development board. It supports Arduino / Micropython / CircuitPython development. TinyTrackGPS+ is developed on PlatformIO with Arduino enviroment.
 
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
@@ -76,6 +76,45 @@ For more information see at :https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-
 
 ### ATGM336H
 ATGM366H-5N-31 is a GPS module that works with UART (TX and RX) signals. Works with GPS, BDS and operates with a range of 5.0v to 3.3v. It is an small module (16.2x13.8x5.3mm)
+
+Features:
+ * 
+
+#### AGPS
+  * Example to write a Assist GPS data downloaded from de u-blox server to out GPS Module.: https://github.com/gokuhs/ublox-agps
+  * https://forum.espruino.com/conversations/371360/
+
+This function send agps data to AT6558: 
+```C++
+// dowload agps data from https://www.espruino.com/agps/casic.base64
+// 6 hours valid data.
+bool AGPS() {
+  char AGPS[]="casic.base64";
+  if (card.exists(AGPS)) {
+    if(file.open(AGPS,O_READ)){
+      uint16_t date_AGPS, time_AGPS;
+      file.getModifyDateTime(&date_AGPS, &time_AGPS);
+      time32_t time = (clock_rtc.now().unixtime() - (SECS_PER_HOUR * 6));
+      uint16_t date = (year(time)-1980) << 9 | month(time) << 5 | day(time);
+      if (date <= date_AGPS) {
+        String data = file.readString();
+        gpsPort.print(data);
+      }
+      file.close();
+      return (date <= date_AGPS) ? true : false;
+    }
+  }
+  return false;
+}
+```
+Visit the manufacturer page for more information about AT6558 GNSS chip:
+https://www-icofchina-com.translate.goog/xiazai/?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB#
+
+In this web you can download (GnssToolkitv3)[https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/26ac3f347aca9fc6c3a23db296b0dec0.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB] and (AGPS.zip (example code))[https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/1108f8726fa725d78a3d2aa928b221d4.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB].
+
+Bangle.js 2 has AT6558 GNSS chip, so the agps app could give some information about how to do it.
+https://banglejs.com/apps/
+https://github.com/espruino/BangleApps/tree/master/apps/assistedgps
 
 ### MPU6050 gyroscope and accelerometer
 
@@ -136,6 +175,7 @@ This library requires Eigen to compile. So I don't use this, I get the source co
 
 #### Other libraries
 There are a lot of information about AHRS and INS using EKF and others filters on the web. 
+ * Arduino AHRS System: https://github.com/pronenewbits/Arduino_AHRS_System
  * Adafruit AHRS: 
  * OpenFlight: https://github.com/hamid-m/OpenFlight/tree/master/FlightCode/navigation. I get part of code from this file:
 ```C++
@@ -261,6 +301,18 @@ MATRIX llarate(MATRIX V, MATRIX lla, MATRIX lla_dot)
 }
 ```
 
+## Utilities and resources:
+ * https://www.redcrab-software.com/en/calculator/Ecef-Coordinates
+ * https://www.latlong.net/lat-long-utm.html
+ * https://www.gpsvisualizer.com/map_input?form=leaflet
+ * https://naylampmechatronics.com/blog/45_tutorial-mpu6050-acelerometro-y-giroscopio.html
+ * http://imgbiblio.vaneduc.edu.ar/fulltext/files/TC119400.pdf
+ * https://estudyando.com/como-convertir-velocidad-angular-a-velocidad-lineal/
+ * https://es.khanacademy.org/science/physics/one-dimensional-motion/kinematic-formulas/a/what-are-the-kinematic-formulas
+ * https://github.com/sparkfun/SparkFun_BNO080_Arduino_Library/issues/65
+ * https://es.wikipedia.org/wiki/Filtro_de_Kalman_extendido
+
+ #### 
 ## How to compile
 ### Config
 Edit 'config.h' file before, to configure display type uncommenting the proper line:
@@ -814,18 +866,30 @@ Format is:
 ------------------------------------------------------------------------------------------
 
 ## Accuracy
+GNSS module error measured is less than ± 1'5m. In these pictures, you can see the difference between real and TinyTrackGPS+ location on stationary position.
 
-NMEA 6 GPS module accuracy is similar to others GPS devices. In the picture can see it.
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_065853_psyberia.alpinequest.full.jpg" width="240">
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_070543_psyberia.alpinequest.full.jpg" width="240">&nbsp;
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_193634_psyberia.alpinequest.full.jpg" width="240">
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_194128_psyberia.alpinequest.full.jpg" width="240">&nbsp;
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_195025_psyberia.alpinequest.full.jpg" width="240">&nbsp;
 
-<img alt="GPS accuracy" src="images/InShot_20211018_001600256.jpg" width="480">&nbsp;
+On route, GNSS module error measured is less than ± 2'5m.
 
-  * `Ref` was at _(30S 341554 4194119)_ location exactly. 
-  * `TinyGPS` was located at _(30S 341556 4194126)_, 7m error. 
-  * `GPS device` reported _(30S 341553 4194111)_, 8m error. 
+<img alt="GPS accuracy1" src="images/Screenshot_20230511_222123_psyberia.alpinequest.full.jpg" width="240">
+<img alt="GPS accuracy1" src="images/Screenshot_20230511_222111_psyberia.alpinequest.full.jpg" width="240">&nbsp;
+<img alt="GPS accuracy1" src="images/Screenshot_20230511_221929_psyberia.alpinequest.full.jpg" width="240">
+<img alt="GPS accuracy1" src="images/Screenshot_20230511_221916_psyberia.alpinequest.full.jpg" width="240">&nbsp;
 
-The upgraded NMEA 8 GPS module have concurrent reception of up to 3 GNSS (GPS, Galileo, GLONASS, BeiDou),recognize multiple constellations simultaneously and provide outstanding positioning accuracy in scenarios where urban canyon or weak signals are involved. For even better and faster positioning improvement. For more informatios see [ublox M8 series product page,](https://www.u-blox.com/en/product/neo-m8-series) and [DataSheet.](https://www.u-blox.com/sites/default/files/NEO-M8-FW3_DataSheet_UBX-15031086.pdf)
 
 ## Draw track on map
+The best way to display the track log is use QGIS. 
+<img alt="QGIS." src="images/Captura de pantalla 2023-06-15 134354.png" width="480">&nbsp;
+
+QGIS resources:
+* https://mappinggis.com/2018/03/como-anadir-mapas-base-en-qgis-3-0-openstreetmap-google-carto-stamen/
+* https://qms.nextgis.com/
+
 
 You can upload the file and get the draw on a map using [GPS Visualizer](https://www.gpsvisualizer.com/).
 
@@ -864,6 +928,8 @@ I used SoftwareSPI driver as you can see in the example code 'SoftwareSPI.ino':
 
 When SD card is extracted it is generated an error that can be read with ```card.sdErrorCode()``` function.
 Before write to card it is verified that no error code is return.
+
+https://diyrecorder.wordpress.com/2016/05/23/possible-solutions-for-faster-spi-sd-writes-on-adalogger-samd21/
 
 ## EMA filter and VCC library
 
@@ -932,6 +998,10 @@ You should have received a copy of the GNU General Public License along with Tin
 
 Copyright © 2023 Francisco Rafael Reyes Carmona.
 Contact me: rafael.reyes.carmona@gmail.com
+
+## Recursos
+* https://hexed.it/
+
 
 ## Credits
 

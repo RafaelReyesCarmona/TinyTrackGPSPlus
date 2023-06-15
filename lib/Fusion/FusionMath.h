@@ -215,6 +215,7 @@ static inline float FusionFastInverseSqrt(const float x) {
     return union32.f * (1.69000231f - 0.714158168f * x * union32.f * union32.f);
 }
 // Test this code--------------------------------------------
+// https://pizer.wordpress.com/2008/10/12/fast-inverse-square-root/
 static inline float inv_sqrt(const float x)
 { union { float f; uint32_t u; } y = {x};
 y.u = 0x5F1FFF77ul - (y.u >> 1);
@@ -689,7 +690,7 @@ static inline FusionEuler FusionQuaternionToEuler(const FusionQuaternion quatern
     return euler;
 #undef Q
 }
-
+// https://mariogc.com/post/angular-velocity-quaternions/
 static inline FusionVector FusionQuaternionAngularVelocity(const FusionQuaternion q1, const FusionQuaternion q2, const float deltaTime) {
     FusionVector angular = { .axis = {
         .x = (q1.array[0]*q2.array[1] - q1.array[1]*q2.array[0] - q1.array[2]*q2.array[3] + q1.array[3]*q2.array[2]) * (2.0f / deltaTime),

@@ -296,7 +296,7 @@ bool AGPS() {
     if(file.open(AGPS,O_READ)){
       uint16_t date_AGPS, time_AGPS;
       file.getModifyDateTime(&date_AGPS, &time_AGPS);
-      time32_t time = (clock_rtc.now().unixtime() - SECS_PER_DAY);
+      time32_t time = (clock_rtc.now().unixtime() - (SECS_PER_HOUR * 6));
       uint16_t date = (year(time)-1980) << 9 | month(time) << 5 | day(time);
       if (date <= date_AGPS) {
         String data = file.readString();
@@ -812,6 +812,14 @@ void setup(void) {
   //gpsPort.print("$PCAS02,200*1D\r\n");  // Set gps to 5Hz.
   
   delay(10);
+  
+  gpsPort.print("$PCAS11,0*1D\r\n");    // Config reciever as portable model. <------------------------
+  //gpsPort.print("$PCAS11,1*1C\r\n");    // Config reciever as stationary model.
+  //gpsPort.print("$PCAS11,2*1F\r\n");    // Config reciever as pedestrian model.
+  //gpsPort.print("$PCAS11,3*1E\r\n");    // Config reciever as automotive model.
+  //gpsPort.print("$PCAS11,4*19\r\n");    // Config reciever as sea model.
+  //gpsPort.print("$PCAS11,5*18\r\n");    // Config reciever as airbone<1g model. (drone)
+
   //gpsPort.print("$PCAS04,9,9,9*10\r\n");    // GPS+GALILEO
   //gpsPort.print("$PCAS04,1F,1F,19*21\r\n");    // GPS+BDS+GLONASS+GALILEO
 
