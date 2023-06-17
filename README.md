@@ -84,7 +84,7 @@ Features:
   * Example to write a Assist GPS data downloaded from de u-blox server to out GPS Module.: https://github.com/gokuhs/ublox-agps
   * https://forum.espruino.com/conversations/371360/
 
-This function send agps data to AT6558: 
+This is my function to send agps data to AT6558: 
 ```C++
 // dowload agps data from https://www.espruino.com/agps/casic.base64
 // 6 hours valid data.
@@ -107,14 +107,66 @@ bool AGPS() {
   return false;
 }
 ```
+The file `casic.base64` content is similar ti this: 
+```
+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
+ALAYAPo=
+```
 Visit the manufacturer page for more information about AT6558 GNSS chip:
 https://www-icofchina-com.translate.goog/xiazai/?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB#
 
-In this web you can download (GnssToolkitv3)[https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/26ac3f347aca9fc6c3a23db296b0dec0.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB] and (AGPS.zip (example code))[https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/1108f8726fa725d78a3d2aa928b221d4.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB].
+In this web you can download [GnssToolkitv3](https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/26ac3f347aca9fc6c3a23db296b0dec0.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB) and [AGPS.zip (example code)](https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/1108f8726fa725d78a3d2aa928b221d4.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB).
 
-Bangle.js 2 has AT6558 GNSS chip, so the agps app could give some information about how to do it.
-https://banglejs.com/apps/
-https://github.com/espruino/BangleApps/tree/master/apps/assistedgps
+Bangle.js 2 has AT6558 GNSS chip, so the agps app could give some information about how to do it: 
+* Bnagle Apps: https://banglejs.com/apps/
+* Bangle agps app (GitHub): https://github.com/espruino/BangleApps/tree/master/apps/assistedgps
 
 ### MPU6050 gyroscope and accelerometer
 
@@ -539,6 +591,9 @@ Building .pio\build\seeed_xiao\firmware.bin
 For upload to Seeeduino Xiao use Platformio enviroment or use `platformio.exe run --target upload` command on terminal.
 
 ## Changelog
+### V1.0.23
+  * Added 'GPS_config' function. Config reciever as model: ( PORTABLE, STATIONARY, PEDESTRIAN, AUTOMOTIVE,SEA or AIRBONE_1G).
+  * Updated 'setup' function deleting old routine for display low battery.
 ### V1.0.22
   * Updated 'FusionGPSUpdate' for better accuracy.
   * Changes on 'loop' secuence.

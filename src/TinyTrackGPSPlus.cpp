@@ -301,12 +301,56 @@ bool AGPS() {
       if (date <= date_AGPS) {
         String data = file.readString();
         gpsPort.print(data);
+        //Serial.print(data); // Fos debug only.
       }
       file.close();
       return (date <= date_AGPS) ? true : false;
     }
   }
   return false;
+}
+
+void GPS_config (float vel){
+  enum {
+    PORTABLE,
+    STATIONARY,
+    PEDESTRIAN,
+    AUTOMOTIVE,
+    SEA,
+    AIRBONE_1G
+  } status;
+
+  if(vel < 0.1) status = STATIONARY;
+  else if(vel < 4) status = PEDESTRIAN;
+  else status = AUTOMOTIVE;
+
+  switch(status){
+    case PORTABLE:
+      gpsPort.print("$PCAS11,0*1D\r\n");
+      break;
+    case STATIONARY:
+      gpsPort.print("$PCAS11,1*1C\r\n");
+      break;
+    case PEDESTRIAN:
+      gpsPort.print("$PCAS11,2*1F\r\n");
+      break;
+    case AUTOMOTIVE:
+      gpsPort.print("$PCAS11,3*1E\r\n");
+      break;
+    case SEA:
+      gpsPort.print("$PCAS11,4*19\r\n");
+      break;
+    case AIRBONE_1G:
+      gpsPort.print("$PCAS11,5*18\r\n");
+      break;
+  }
+
+  //gpsPort.print("$PCAS11,0*1D\r\n");    // Config reciever as portable model. <------------------------
+  //gpsPort.print("$PCAS11,1*1C\r\n");    // Config reciever as stationary model.
+  //gpsPort.print("$PCAS11,2*1F\r\n");    // Config reciever as pedestrian model.
+  //gpsPort.print("$PCAS11,3*1E\r\n");    // Config reciever as automotive model.
+  //gpsPort.print("$PCAS11,4*19\r\n");    // Config reciever as sea model.
+  //gpsPort.print("$PCAS11,5*18\r\n");    // Config reciever as airbone<1g model. (drone)
 }
 
 // Variables para gestionar el tiempo local.
@@ -856,21 +900,24 @@ void setup(void) {
   /* Iniciaización del display oled u OLED */
   oled.start();
 
-  if(vcc.GetChargeLevel() < 5) {
-    oled.clear();
-    oled.drawbattery(vcc.GetChargeLevel());
-    oled.draw();
-    do {
-      delay(500);
-      oled.clear();
-      delay(500);
-      oled.drawbattery(vcc.GetChargeLevel());
-      oled.draw();
-      } while(vcc.GetChargeLevel() < 5);
-    //setup();
-    }
-
-  STATE = STARTING;
+  if(vcc.GetChargeLevel() < 5) STATE = LOW_BATTERY;
+  else STATE = STARTING;
+//--------------------------------------------------------------------------------
+//  if(vcc.GetChargeLevel() < 5) {
+//    oled.clear();
+//    oled.drawbattery(vcc.GetChargeLevel());
+//    oled.draw();
+//    do {
+//      delay(500);
+//      oled.clear();
+//      delay(500);
+//      oled.drawbattery(vcc.GetChargeLevel());
+//      oled.draw();
+//      } while(vcc.GetChargeLevel() < 5);
+//    //setup();
+//    }
+//---------------------------------------------------------------------------------
+  
   
   FusionOffsetInitialise(&offset, SAMPLE_RATE);
   FusionAhrsInitialise(&ahrs);
@@ -967,6 +1014,7 @@ void loop(void) {
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
       _time_gps = gps_time_rtc();
+      //GPS_config((float)gps_data.speed_metersph()/3600.0);
     }
   }
 
@@ -1075,7 +1123,8 @@ void loop(void) {
       oled.drawbattery(charge_level());
       oled.DrawLowBat();
       oled.draw();
-      delay(500);
+      gpsPort.print("$PCAS12,1*1F\r\n"); // GNSS Receiver enter in stanby mode for 1s.
+      delay(1000);
       (charge_level() > 10 || charge_level() < 0) ? needcharge = false : needcharge = true;
     }
     //needcharge = false;
