@@ -2,7 +2,7 @@
 
 # TinyTrackGPS+
 [<img src="images/TinyTrackGPS+-red.svg">](README.md)
-[![Version: v1.0.12](https://img.shields.io/badge/Version-v1.0.12-blue?style=for-the-badge&logo=v)]()&nbsp;
+[![Version: v1.0.23](https://img.shields.io/badge/Version-v1.0.23-blue?style=for-the-badge&logo=v)]()&nbsp;
 
 A simple, fast and highly accurate portable GPS track logger with position estimation for greater accuracy, record track on microSD card and featured by Assisted GPS (A-GPS), 10DOF sensors and World Real Time Clock (RTC) with  automatic Summer and Standard Time change.
 
@@ -107,7 +107,7 @@ bool AGPS() {
   return false;
 }
 ```
-The file `casic.base64` content is similar ti this: 
+The file `casic.base64` content is similar to this: 
 ```
 QUdOU1MgZGF0YSBmcm9tIENBU0lDLgpEYXRhTGVuZ3RoOiAyNjgwLgpMaW1pdGF0aW9uOiAxLzEw
 MDAuCrrOSAAIB1j1K93tKQ2hyjSXBhAhUidRUdx0XoNVKET7hmEpq///2CvL/5z/PwUsK/v/CgCX
@@ -165,7 +165,7 @@ https://www-icofchina-com.translate.goog/xiazai/?_x_tr_sl=auto&_x_tr_tl=en&_x_tr
 In this web you can download [GnssToolkitv3](https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/26ac3f347aca9fc6c3a23db296b0dec0.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB) and [AGPS.zip (example code)](https://www-icofchina-com.translate.goog/d/file/xiazai/2020-09-22/1108f8726fa725d78a3d2aa928b221d4.zip?_x_tr_sl=auto&_x_tr_tl=en&_x_tr_hl=en-GB).
 
 Bangle.js 2 has AT6558 GNSS chip, so the agps app could give some information about how to do it: 
-* Bnagle Apps: https://banglejs.com/apps/
+* Bangle Apps: https://banglejs.com/apps/
 * Bangle agps app (GitHub): https://github.com/espruino/BangleApps/tree/master/apps/assistedgps
 
 ### MPU6050 gyroscope and accelerometer
