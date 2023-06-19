@@ -594,6 +594,8 @@ For upload to Seeeduino Xiao use Platformio enviroment or use `platformio.exe ru
 ### V1.0.23
   * Added 'GPS_config' function. Config reciever as model: ( PORTABLE, STATIONARY, PEDESTRIAN, AUTOMOTIVE,SEA or AIRBONE_1G).
   * Updated 'setup' function deleting old routine for display low battery.
+  * Adjust error correction stimation.
+  * Changes in 'FusionGPSUpdate.
 ### V1.0.22
   * Updated 'FusionGPSUpdate' for better accuracy.
   * Changes on 'loop' secuence.

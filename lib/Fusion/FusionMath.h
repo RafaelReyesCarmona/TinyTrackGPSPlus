@@ -231,6 +231,21 @@ return 0.703974056f * y.f * (2.38919526f - x * y.f * y.f);
 static inline float FusionFastSqrt(const float x) {
     return 1.0f / inv_sqrt(x);
 }
+// Function to return the square root of
+// a number using Newtons method
+static inline float FusionFastSqrtNewton(const float n){
+    float x = n;
+    float root = 0.5 * (x + (n / x));;
+    
+    while(x != root){
+        x = root;
+        root = 0.5 * (x + (n / x));
+    }
+    return root;
+}
+static inline float FusionFastInverseSqrtNewton(const float x){
+    return (1.0f / FusionFastSqrtNewton(x));
+}
 #endif
 
 //------------------------------------------------------------------------------

@@ -310,20 +310,16 @@ bool AGPS() {
   return false;
 }
 
-void GPS_config (float vel){
-  enum {
+enum GPS_Mode{
     PORTABLE,
     STATIONARY,
     PEDESTRIAN,
     AUTOMOTIVE,
     SEA,
     AIRBONE_1G
-  } status;
+  };
 
-  if(vel < 0.1) status = STATIONARY;
-  else if(vel < 4) status = PEDESTRIAN;
-  else status = AUTOMOTIVE;
-
+void GPS_Mode_Config(GPS_Mode status){
   switch(status){
     case PORTABLE:
       gpsPort.print("$PCAS11,0*1D\r\n");
@@ -351,6 +347,12 @@ void GPS_config (float vel){
   //gpsPort.print("$PCAS11,3*1E\r\n");    // Config reciever as automotive model.
   //gpsPort.print("$PCAS11,4*19\r\n");    // Config reciever as sea model.
   //gpsPort.print("$PCAS11,5*18\r\n");    // Config reciever as airbone<1g model. (drone)
+}
+
+void GPS_config(float vel){
+  if(vel < 0.1) GPS_Mode_Config(STATIONARY);
+  else if(vel < 4) GPS_Mode_Config(PEDESTRIAN);
+  else GPS_Mode_Config(AUTOMOTIVE);
 }
 
 // Variables para gestionar el tiempo local.
@@ -1008,13 +1010,13 @@ void loop(void) {
       FusionVector magnetometer = {compass.getX(), -compass.getY(), -compass.getZ()}; // replace this with actual magnetometer data in arbitrary units
       float courseIMU = FusionCompassCalculateHeading2(FusionVectorRotatebyQuaternion(magnetometer,quaternion,FusionConventionNed));
       FusionVector GPS_error = { .axis = {
-        .x = gps_data.lon_err() * sign(cosf(courseGPS*DEG_TO_RAD)-cosf(courseIMU*DEG_TO_RAD)),
+        .x = gps_data.lon_err() * sign(cosf(courseIMU*DEG_TO_RAD)-cosf(courseGPS*DEG_TO_RAD)),
         .y = gps_data.lat_err() * sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
         .z = 0.0f
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
       _time_gps = gps_time_rtc();
-      //GPS_config((float)gps_data.speed_metersph()/3600.0);
+      GPS_config((float)gps_data.speed_metersph()/3600.0);
     }
   }
 

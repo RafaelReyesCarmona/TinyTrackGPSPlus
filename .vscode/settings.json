@@ -16,6 +16,7 @@
         "optional": "cpp",
         "limits": "cpp",
         "new": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "cmath": "cpp"
     }
 }
