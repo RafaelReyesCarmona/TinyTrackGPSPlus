@@ -59,8 +59,6 @@ This project use components list above:
 
 Current on this configuration is 60mA average.
 
-<img alt="Current" src="images/IMG_20220201_123759.jpg" width="480" align=center>&nbsp;
-
 ### Seeeduino XIAO
 Seeed Studio XIAO SAMD21 carries the powerful CPU-ARM® Cortex®-M0+(SAMD21G18) running at up to 48Hz. In addition to the powerful CPU, it has 256KB Flash and 32KB SRAM on board and supports the USB Type-C interface which can supply power and download code.
 
@@ -596,6 +594,16 @@ For upload to Seeeduino Xiao use Platformio enviroment or use `platformio.exe ru
   * Updated 'setup' function deleting old routine for display low battery.
   * Adjust error correction stimation.
   * Changes in 'FusionGPSUpdate.
+  * Fixed error convention in Latitude and Longitude introduced in V1.0.21. Convention velocity is NED, so coodenates are saved in 'FusionVector's data :
+    - X - Latitude.
+    - Y - Longitude.
+    - Z - Altitude.
+  * Redefine 'Rew' and 'Rns' as below:
+  ```C++
+  #define     Rew     		6.37813765430217e6      //earth radius 
+  #define     Rns     		6.33515221626792e6      //earth radius 
+  ```
+
 ### V1.0.22
   * Updated 'FusionGPSUpdate' for better accuracy.
   * Changes on 'loop' secuence.
@@ -927,9 +935,11 @@ GNSS module error measured is less than ± 1'5m. In these pictures, you can see 
 
 <img alt="GPS accuracy1" src="images/Screenshot_20230508_065853_psyberia.alpinequest.full.jpg" width="240">
 <img alt="GPS accuracy1" src="images/Screenshot_20230508_070543_psyberia.alpinequest.full.jpg" width="240">&nbsp;
-<img alt="GPS accuracy1" src="images/Screenshot_20230508_193634_psyberia.alpinequest.full.jpg" width="240">
-<img alt="GPS accuracy1" src="images/Screenshot_20230508_194128_psyberia.alpinequest.full.jpg" width="240">&nbsp;
-<img alt="GPS accuracy1" src="images/Screenshot_20230508_195025_psyberia.alpinequest.full.jpg" width="240">&nbsp;
+<center>
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_193634_psyberia.alpinequest.full.jpg" width="160">
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_194128_psyberia.alpinequest.full.jpg" width="160">
+<img alt="GPS accuracy1" src="images/Screenshot_20230508_195025_psyberia.alpinequest.full.jpg" width="160">&nbsp;
+</center>
 
 On route, GNSS module error measured is less than ± 2'5m.
 
@@ -943,6 +953,9 @@ On route, GNSS module error measured is less than ± 2'5m.
 The best way to display the track log is use QGIS. 
 <img alt="QGIS." src="images/Captura de pantalla 2023-06-15 134354.png" width="480">&nbsp;
 
+<img alt="QGIS." src="images/Captura ruta 30-05-2023 V1.0.14.png" width="240">
+<img alt="QGIS." src="images/Ruta v1.0.14.png" width="240">&nbsp;
+
 QGIS resources:
 * https://mappinggis.com/2018/03/como-anadir-mapas-base-en-qgis-3-0-openstreetmap-google-carto-stamen/
 * https://qms.nextgis.com/
@@ -950,13 +963,14 @@ QGIS resources:
 
 You can upload the file and get the draw on a map using [GPS Visualizer](https://www.gpsvisualizer.com/).
 
-<img alt="GPS Visualizer1." src="images/map1.jpg" width="240">&nbsp;
-<img alt="GPS Visualizer2." src="images/map2.jpg" width="240">&nbsp;
-<img alt="GPS Visualizer3." src="images/gpsvisualizer2.png" width="480">&nbsp;
+<img alt="GpsVisualizer.1" src="images/Captura de pantalla 2023-06-20 131115.png" width="480">&nbsp;
+<img alt="GpsVisualizer.2" src="images/Captura de pantalla 2023-05-12 201111.png" width="240">&nbsp;<img alt="GpsVisualizer.3" src="images/Captura de pantalla 2023-05-16 115218.png" width="240">&nbsp;
 
 Or using apps like AlpineQuest.
 
-<img alt="AlpineQuest." src="images/map3.jpg" width="240">&nbsp;
+<img alt="AlpineQuest1." src="images/Screenshot_20230511_222313_psyberia.alpinequest.full.jpg" width="160">
+<img alt="AlpineQuest2." src="images/Screenshot_20230511_221929_psyberia.alpinequest.full.jpg" width="160">
+<img alt="AlpineQuest3." src="images/Screenshot_20230511_222123_psyberia.alpinequest.full.jpg" width="160">&nbsp;
 
 ## SdFat Library
 
