@@ -233,6 +233,7 @@ There are a lot of information about AHRS and INS using EKF and others filters o
  * Arduino AHRS System: https://github.com/pronenewbits/Arduino_AHRS_System
  * Adafruit AHRS: 
  * OpenFlight: https://github.com/hamid-m/OpenFlight/tree/master/FlightCode/navigation. I get part of code from this file:
+ 
 ```C++
 /*! \file nav_functions.c
  *	\brief Auxiliary functions for nav filter
