@@ -77,10 +77,32 @@ Seeed Studio XIAO SAMD21 carries the powerful CPU-ARM® Cortex®-M0+(SAMD21G18) 
 For more information see at :https://www.seeedstudio.com/Seeeduino-XIAO-Arduino-Microcontroller-SAMD21-Cortex-M0+-p-4426.html
 
 ### ATGM336H
-ATGM366H-5N-31 is a GPS module that works with UART (TX and RX) signals. Works with GPS, BDS and operates with a range of 5.0v to 3.3v. It is an small module (16.2x13.8x5.3mm)
+ATGM366H-5N-31 is a GPS module that works with UART (TX and RX) signals. Based on the fourth generation of low-power GNSS SOC Chips – AT6558. Works with GPS, BDS and operates with a range of 5.0v to 3.3v. All on an small size module.
 
-Features:
- * 
+Specifications:
+  * Voltage range (VCC): 3.3-5V DC
+  * I/O Voltage: 3.3V
+  * Standard baud rate: 9600, but can to be changed.
+  * Works with GPS, BDS
+  * LED indication when GPS has a fix (blinking LED)
+  * Dimensions PCB (LxWxH): 16.2x13.8x5.3mm (without header pins)
+  * A-GPS support.
+  * Contains 32 tracking channels that can receive GNSS signals from six satellite navigation systems simultaneously and enables joint positioning, navigation and timing.
+  * Suitable for car navigation, handheld positioning, wearable devices
+  * Can replace Ublox MAX, NEO-6M, 7M, 8M directly.
+  * Output standard NMEA0183 signal from serial.
+  * High sensitivity: Cold start capture sensitivity: -148dBm. Tracking sensitivity: -162dBm
+  * Positioning accuracy: 2.5 meters (CEP50, open area)
+  * First positioning time: 32 seconds
+  * Low power consumption: continuous operation <25mA (@ 3.3V)
+  * Built-in antenna detection and antenna short-circuit protection
+
+Pinout:
+  * VCC: Input voltage
+  * GND: Ground/min
+  * TX: UART connection
+  * RX: UART connection
+  * PPS: Precise Pulse Second; Gives a pulse every second (linked to the UTC time)
 
 #### AGPS
   * Example to write a Assist GPS data downloaded from de u-blox server to out GPS Module.: https://github.com/gokuhs/ublox-agps
@@ -171,6 +193,35 @@ Bangle.js 2 has AT6558 GNSS chip, so the agps app could give some information ab
 * Bangle agps app (GitHub): https://github.com/espruino/BangleApps/tree/master/apps/assistedgps
 
 ### MPU6050 gyroscope and accelerometer
+The MPU6050 is a 6 degrees of freedom (DoF) inertial measurement unit (IMU) as it combines a 3-axis accelerometer and a 3-axis gyroscope on the same silicon die, together with an onboard Digital Motion Processor™ (DMP™). The device can access external magnetometers or other sensors through an auxiliary master I²C bus, allowing the devices to gather a full set of sensor data without intervention from the system processor. Widely used for navigation, direction finding, stabilisation, etc.
+
+For precision tracking of both fast and slow motions, the parts feature a user-programmable gyro full-scale range of ±250, ±500, ±1000, and ±2000 °/sec (dps), and a user-programmable accelerometer full-scale range of ±2g, ±4g, ±8g, and ±16g. Additional features include an embedded temperature sensor and an on-chip oscillator with ±1% variation over the operating temperature range.
+
+Features:
+  * Digital-output of 6-axis MotionFusion data. 9-axis fused data from Motion Processing Library
+  * Tri-Axis angular rate sensor (gyro) with a sensitivity up to 131 LSBs/dps and a full-scale range of ±250, ±500, ±1000, and ±2000dps
+  * Tri-Axis accelerometer with a programmable full scale range of ±2g, ±4g, ±8g and ±16g
+  * Reduced settling effects and sensor drift by elimination of board-level cross-axis alignment errors between accelerometers and gyroscopes
+  * Digital Motion Processing™ (DMP™) engine offloads complex MotionFusion, sensor timing synchronization and gesture detection
+  * MotionApps™ Platform support for Android, Linux, and Windows
+  * Embedded algorithms for run-time bias and compass calibration in library. No user intervention required
+  * Digital-output temperature sensor
+  * Digital input on FSYNC pin to support video Electronic Image Stabilization and GPS
+  * Programmable interrupt supports gesture recognition, panning, zooming, scrolling, and shake detection
+  * VDD Supply voltage range of 2.375V–3.46V; VLOGIC (MPU-6050) at 1.8V±5% or VDD
+  * Gyro operating current: 3.6mA (full power, gyro at all rates)
+  * Gyro + Accel operating current: 3.8mA (full power, gyro at all rates, accel at 1kHz sample rate)
+  * Accel low power mode operating currents: 10µA at 1Hz, 20µA at 5Hz, 70µA at 20Hz, 140µA at 40Hz
+  * Full Chip Idle Mode Supply Current: 5µA
+  * 400kHz Fast Mode I²C or up to 20MHz SPI (MPU-6000 only) serial host interfaces
+  * User self test
+  * 10,000g shock tolerant
+  * Smallest and thinnest package for portable devices (4x4x0.9mm QFN)
+  * RoHS and Green compliant
+
+Resources:
+  * https://naylampmechatronics.com/blog/45_tutorial-mpu6050-acelerometro-y-giroscopio.html
+  * https://invensense.tdk.com/products/motion-tracking/6-axis/mpu-6050/
 
 ### QMC5883L magnetometer
 
@@ -233,7 +284,7 @@ There are a lot of information about AHRS and INS using EKF and others filters o
  * Arduino AHRS System: https://github.com/pronenewbits/Arduino_AHRS_System
  * Adafruit AHRS: 
  * OpenFlight: https://github.com/hamid-m/OpenFlight/tree/master/FlightCode/navigation. I get part of code from this file:
- 
+
 ```C++
 /*! \file nav_functions.c
  *	\brief Auxiliary functions for nav filter
