@@ -673,12 +673,12 @@ inline void CardDetectFunction() {
 
 FusionVector calculateNEDVelocity(const FusionVector accelerometer, const FusionVector magnetometer, const float deltatime) {
   //float courseGPS = gps_data.heading() * NeoGPS::Location_t::RAD_PER_DEG;
-  float course = FusionCompassCalculateHeading(FusionConventionNed, accelerometer, magnetometer);
+  float course = FusionCompassCalculateHeading(FusionConventionNed, accelerometer, magnetometer) * DEG_TO_RAD;
   //float courseIMU = FusionCompassCalculateHeading2(magnetometer);
   //Serial.print("Course: ");Serial.print(courseIMU);Serial.print("\t");
   //float course = (courseGPS + courseIMU) / 2;
   //float course = FusionDegreesToRadiansf((float)compass.readHeading());
-  float speed_m_per_s = (float)(gps_data.speed_metersph()) / 3600.0f;
+  float speed_m_per_s = (float)(gps_data.speed_metersph()) / 3600.0f; // m/s.
   const FusionVector NED = { .axis = {
     .x = round( speed_m_per_s * cos( course ) ),
     .y = round( speed_m_per_s * sin( course ) ),
@@ -709,8 +709,8 @@ if (gps_data.valid.location) {
       FusionVector magnetometer = {compass.getX(), -compass.getY(), -compass.getZ()}; // replace this with actual magnetometer data in arbitrary units
       float courseIMU = FusionCompassCalculateHeading2(FusionVectorRotatebyQuaternion(magnetometer,quaternion,FusionConventionNed));
       FusionVector GPS_error = { .axis = {
-        .x = gps_data.lon_err() * (float)sign(cosf(courseGPS*DEG_TO_RAD)-cosf(courseIMU*DEG_TO_RAD)),
-        .y = gps_data.lat_err() * (float)sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
+        .x = gps_data.lat_err() * (float)sign(cosf(courseIMU*DEG_TO_RAD)-cosf(courseGPS*DEG_TO_RAD)),
+        .y = gps_data.lon_err() * (float)sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
         .z = 0.0f
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
@@ -1010,8 +1010,8 @@ void loop(void) {
       FusionVector magnetometer = {compass.getX(), -compass.getY(), -compass.getZ()}; // replace this with actual magnetometer data in arbitrary units
       float courseIMU = FusionCompassCalculateHeading2(FusionVectorRotatebyQuaternion(magnetometer,quaternion,FusionConventionNed));
       FusionVector GPS_error = { .axis = {
-        .x = gps_data.lon_err() * (float)sign(cosf(courseGPS*DEG_TO_RAD)-cosf(courseIMU*DEG_TO_RAD)),
-        .y = gps_data.lat_err() * (float)sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
+        .x = gps_data.lat_err() * (float)sign(cosf(courseIMU*DEG_TO_RAD)-cosf(courseGPS*DEG_TO_RAD)),
+        .y = gps_data.lon_err() * (float)sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
         .z = 0.0f
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
@@ -1059,8 +1059,8 @@ void loop(void) {
       FusionVectorDouble GPS_loc = {(double)gps_data.latitudeL()/10e6, (double)gps_data.longitudeL()/10e6, (double)gps_data.altitude()};
       FusionVector velocity = calculateNEDVelocityGPS();
       FusionVector GPS_error = { .axis = {
-        .x = gps_data.lon_err(),
-        .y = gps_data.lat_err(),
+        .x = gps_data.lat_err(),
+        .y = gps_data.lon_err(),
         .z = 0.0f
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
