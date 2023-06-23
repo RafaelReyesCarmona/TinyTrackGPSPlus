@@ -29,6 +29,10 @@ Before the first display, the GNSS module is configured and A-GPS info is sent i
 
 When GPS signal fixed, TinyTrackGPS+ adjust the date and time to the configured timezone into config file. Timezone is calculated based on the coordinates where the device is turn on.
 
+<img alt="Qgis1." src="./images/Captura de pantalla 2023-06-22 164013.png" width="480" align=center>
+<img alt="Qgis1." src="./images/Captura de pantalla 2023-06-23 101431.png" width="480" align=center><center>QGIS visualization data.</center>&nbsp;
+
+
 TinyTrackGPS features:
 * Show estimated GPS coordenates in Grades and UTM (WG86) formats, based on GPS info and other movements' sensors as gyroscope, accelerometer, magnetometer and barometer.
 * Save a tracklog in CSV format.
@@ -203,7 +207,8 @@ Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimis
 * Fusion: https://github.com/xioTechnologies/Fusion/
 * uNavINS: https://github.com/FlyTheThings/uNavINS
 
-
+<img alt="GQSerian Monitor." src="images/export-2.png" width="480" align=center>
+<center>Using QtSerial Monitor for plot `Serial.print` values.</center>&nbsp;
 
 #### AHRS algorithm
 The Attitude And Heading Reference System (AHRS) algorithm combines gyroscope, accelerometer, and magnetometer data into a single measurement of orientation relative to the Earth. 
@@ -965,6 +970,7 @@ You can upload the file and get the draw on a map using [GPS Visualizer](https:/
 
 <img alt="GpsVisualizer.1" src="images/Captura de pantalla 2023-06-20 131115.png" width="480">&nbsp;
 <img alt="GpsVisualizer.2" src="images/Captura de pantalla 2023-05-12 201111.png" width="240">&nbsp;<img alt="GpsVisualizer.3" src="images/Captura de pantalla 2023-05-16 115218.png" width="240">&nbsp;
+<img alt="GpsVisualizer.4" src="images/20220222.carrera.png" width="480">&nbsp;
 
 Or using apps like AlpineQuest.
 
@@ -1070,8 +1076,9 @@ You should have received a copy of the GNU General Public License along with Tin
 Copyright © 2023 Francisco Rafael Reyes Carmona.
 Contact me: rafael.reyes.carmona@gmail.com
 
-## Recursos
+## Additional resources for this project
 * https://hexed.it/
+* https://realfavicongenerator.net/
 
 
 ## Credits
