@@ -224,10 +224,79 @@ Resources:
   * https://invensense.tdk.com/products/motion-tracking/6-axis/mpu-6050/
 
 ### QMC5883L magnetometer
+The QMC5883L is a multi-chip three-axis magnetic sensor. The QMC5883L has integrated magnetic sensors with signal condition ASIC, targeted for high precision applications such as compassing, navigation and gaming in drone, robot, mobile and personal hand-held devices.
+
+The QMC5883L is based on the state-of-the-art, high resolution, magneto-resistive technology licensed from Honeywell AMR technology. Along with custom-designed 16-bit ADC ASIC, it offers the advantages of low noise, high accuracy, low power consumption, offset cancellation and temperature compensation. QMC5883L enables 1° to 2° compass heading accuracy. The I²C serial bus allows for easy interface with the device and other componets.
+
+Features:
+  * 3-Axis Magneto-Resistive Sensors in a 3x3x0.9 mm3 Land Grid Array Package (LGA), guaranteed to operate over an extended temperature range of -40 °C to +85 °C. 
+  * 16 Bit ADC With Low Noise AMR Sensors Achieves 2 Milli-Gauss Field Resolution 
+  * Enables 1° To 2° Degree Compass Heading Accuracy, allows for Navigation and LBS Applications 
+  * Wide Magnetic Field Range (±8 Gauss)
+  * Temperature Compensated Data Output and Temperature Output 
+  * I²C Interface with Standard and Fast Modes. High-Speed Interfaces for Fast Data Communications. 
+Maximum 200Hz Data Output Rate. The I²C address is “0x0D”.
+  * Wide Range Operation Voltage (2.16V To 3.6V) and Low Power Consumption (75uA). Compatible with Battery Powered Applications 
+  * Compassing Heading, Hard Iron, Soft Iron, and Auto Calibration Libraries Available.
+
+  Resources:
+  * https://qstcorp.com/upload/pdf/202202/13-52-04%20QMC5883L%20Datasheet%20Rev.%20A(1).pdf
 
 ### BMP180 barometer
+The BMP180 is the function compatible successor of the BMP085, a new generation of high precision digital pressure sensors for consumer applications.
 
+The ultra-low power, low voltage electronics of the BMP180 is optimized for use in mobile phones, PDAs, GPS navigation devices and outdoor equipment. With a low altitude noise of merely 0.25m at fast conversion time, the BMP180 offers superior performance. The I2C interface allows for easy system integration with a microcontroller. 
+
+Features: 
+  * Pressure range: 300 ... 1100hPa (+9000m ... -500m relating to sea level)
+  * Supply voltage: 1.8 ... 3.6V (VDD), 1.62V ... 3.6V (VDDIO)
+  * Low power: 5µA at 1 sample / sec. in standard mode
+  * Low noise: 0.06hPa (0.5m) in ultra low power mode, 0.02hPa (0.17m) ultra high resolution mode.
+  * Temperature measurement included.
+  * I²C Interface
+  * Fully calibrated
+  * Pb-free, halogen-free and RoHS compliant,
+  * MSL 1
+  * Typical applications: 
+    - Enhancement of GPS navigation (dead-reckoning, slope detection, etc.)
+    - In- and out-door navigation
+    - Leisure and sports
+    - Weather forecast
+    - Vertical velocity indication (rise/sink speed)
+
+Resources: 
+  * https://media.digikey.com/pdf/Data%20Sheets/Bosch/BMP180.pdf
 ### DS3231 RTC
+The DS3231 is a low-cost, extremely accurate I²C real-time clock (RTC) with an integrated temperature-compensated crystal oscillator (TCXO) and crystal. The device incorporates a battery input, and maintains accurate timekeeping when main power to the device is interrupted. The integration of the crystal resonator enhances the long-term accuracy of the device.
+
+The RTC maintains seconds, minutes, hours, day, date, month, and year information. The date at the end of the month is automatically adjusted for months with fewer than 31 days, including corrections for leap year. The clock operates in either the 24-hour or 12-hour format with an active-low AM/PM indicator. Two programmable time-of-day alarms and a programmable square-wave output are provided. Address and data are transferred serially through an I²C bidirectional bus.
+
+A precision temperature-compensated voltage reference and comparator circuit monitors the status of VCC to detect power failures, to provide a reset output, and to automatically switch to the backup supply when necessary. Additionally, the active-low RST pin is monitored as a pushbutton input for generating a µP reset.
+
+Features:
+  * Highly Accurate RTC Completely Manages All Timekeeping Functions
+    - Real-Time Clock Counts Seconds, Minutes, Hours, Date of the Month, Month, Day of the Week, and Year, with Leap-Year Compensation Valid Up to 2100
+    - Accuracy ±2ppm from 0°C to +40°C
+    - Accuracy ±3.5ppm from -40°C to +85°C
+    - Digital Temp Sensor Output: ±3°C Accuracy
+    - Register for Aging Trim
+    - Active-Low RST Output/Pushbutton Reset Debounce Input
+    - Two Time-of-Day Alarms
+    - Programmable Square-Wave Output Signal
+  * Fast (400kHz) I2C Interface
+  * Battery-Backup Input for Continuous Timekeeping
+    - Low Power Operation Extends Battery-Backup Run Time
+    - 3.3V Operation
+  * Operating Temperature Ranges: Commercial (0°C to +70°C) and Industrial (-40°C to +85°C)
+  * Applications: 
+    - Global Positioning Systems (GPS)
+    - Servers
+    - Telematics
+    - Utility Power Meters
+
+Resources:
+  * https://www.analog.com/en/products/ds3231.html#product-overview
+  * https://www.analog.com/media/en/technical-documentation/data-sheets/DS3231.pdf
 
 ## Source
 
@@ -236,7 +305,7 @@ TinyTrackGPS+ is free software, see **License** section for more information. Th
   * NeoGPS library, Paul Stoffregen (https://github.com/PaulStoffregen/TinyGPS).
   * SdFat library, Bill Greiman (https://github.com/greiman/SdFat).
   * U8g2 library, oliver (https://github.com/olikraus/u8g2).
-  * UTMConversion library v1.2, Rafael Reyes (https://github.com/RafaelReyesCarmona/UTMConversion). Modified version for greater precision. Source in 'lib'.
+  * UTMConversion library v1.2, Rafael Reyes (https://github.com/RafaelReyesCarmona/UTMConversion). Modified version for greater precision. Published at Platformio and GitHub.
   * Timezone32 library, Rafael Reyes (https://github.com/RafaelReyesCarmona/Timezone32).
   * Time32 library, Rafael Reyes (https://github.com/RafaelReyesCarmona/Time32).
   * Seeed Arduino RTC library, Seeed Studio (https://github.com/Seeed-Studio/Seeed_Arduino_RTC). RTC library for SAMD21 and SAMD51.
@@ -253,20 +322,20 @@ TinyTrackGPS+ is free software, see **License** section for more information. Th
   * QMC5883L library, Douglas Thain (https://github.com/dthain/QMC5883L). Source in 'lib'.
   * Fusion library, modified version of Seb Madgwick' Fusion library (https://github.com/xioTechnologies/Fusion/). Added functions to fuse GPS data with AHRS. Source in 'lib'.
 
-### Fusion library
+### Fusion library fork
 Fusion is a sensor fusion library for Inertial Measurement Units (IMUs), optimised for embedded systems. But I get the source and added some functions to estimate the Latitude, longitude, and altitude from IMU and GPS data. I used AHRS algorithm from Fusion and a free implementation of The uNav Inertial Navigation System (INS) that it is a 15 state Extended Kalman Filter (EKF). 
 * Fusion: https://github.com/xioTechnologies/Fusion/
 * uNavINS: https://github.com/FlyTheThings/uNavINS
 
-<img alt="GQSerian Monitor." src="images/export-2.png" width="480" align=center>
-<center>Using QtSerial Monitor for plot `Serial.print` values.</center>&nbsp;
-
-#### AHRS algorithm
+#### FusionAHRS algorithm
 The Attitude And Heading Reference System (AHRS) algorithm combines gyroscope, accelerometer, and magnetometer data into a single measurement of orientation relative to the Earth. 
 
 The algorithm is based on the revised AHRS algorithm presented in chapter 7 of Madgwick's PhD thesis. This is a different algorithm to the better-known initial AHRS algorithm presented in chapter 3, commonly referred to as the Madgwick algorithm.
 
 The algorithm calculates the orientation as the integration of the gyroscope summed with a feedback term. The feedback term is equal to the error in the current measurement of orientation as determined by the other sensors, multiplied by a gain. The algorithm therefore functions as a complementary filter that combines high-pass filtered gyroscope measurements with low-pass filtered measurements from other sensors with a corner frequency determined by the gain. A low gain will 'trust' the gyroscope more and so be more susceptible to drift. A high gain will increase the influence of other sensors and the errors that result from accelerations and magnetic distortions. A gain of zero will ignore the other sensors so that the measurement of orientation is determined by only the gyroscope.
+
+<img alt="GQSerian Monitor." src="images/export-2.png" width="480" align=center>
+<center>Using QtSerial Monitor for plot `Serial.print` values.</center>&nbsp;
 
 #### uNavINS 
 The uNav Inertial Navigation System (INS) is a 15 state Extended Kalman Filter (EKF) to estimate the following from IMU and GPS data:
@@ -278,6 +347,8 @@ The uNav Inertial Navigation System (INS) is a 15 state Extended Kalman Filter (
 The 15 states comprise the inertial position, inertial velocity, a quaternion, accelerometer biases, and gyro biases. This algorithm was developed by Adhika Lie at the University of Minnesota UAS Research Labs, where it has been used since 2006 as a baseline navigation algorithm to gauge the performance of other algorithms in simulation studies and flight tests. uNav INS provides excellent estimates of attitude, inertial position, and inertial velocity once it has converged on a solution.
 
 This library requires Eigen to compile. So I don't use this, I get the source code and write my own solution using Fusion library as base.
+
+#### FusionGPS
 
 #### Other libraries
 There are a lot of information about AHRS and INS using EKF and others filters on the web. 
@@ -421,6 +492,8 @@ MATRIX llarate(MATRIX V, MATRIX lla, MATRIX lla_dot)
 
  #### 
 ## How to compile
+I used VisualStudio Code and Platformio for this project. 
+
 ### Config
 Edit 'config.h' file before, to configure display type uncommenting the proper line:
 ```C++
