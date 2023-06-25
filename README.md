@@ -492,7 +492,73 @@ MATRIX llarate(MATRIX V, MATRIX lla, MATRIX lla_dot)
 
  #### 
 ## How to compile
-I used VisualStudio Code and Platformio for this project. 
+I used VisualStudio Code and Platformio for this project. Before compiling see [Config]. See [Platformio] for instrucctions of compile and upload info.
+
+There are three files that configure the behaviour of TinyTrackGPS+:
+- `casic.base64`: A-GPS data file. [AGPS]
+- `ConfProg.cfg`: Default time config file. [set-auto-time-zone-based-on-location]
+- `Time.cfg`: Time config file. [set-the-time-zone-in-the-timecfg-file]
+
+The order to configure TinyTrackGPS+ is:
+  1. Initialize and config sensors.
+  2. If `casic.base64` is present in sdcard, and file time less than 6 hours, configure GNSS with AGPS information.
+  3. If `ConfProg.cfg` is present in sdcard, read the info and configure time zone. If `ConfProg.cfg` is not in sdcard, time zone is configured as UTC or as the program sketch define in line 285 into `loadConfigurationProgram()`:
+  ![loadConfigurationProgram function](./images/loadConfigurationProgram.png)
+  4. If `ConfProg.cfg` is configured to load `Time.cfg`, time zone will be configured as `Time.cfg`. [set-the-time-zone-in-the-timecfg-file]. If `Time.cfg` is not present, time zone wil be configured as previous point.
+  5. If `ConfProg.cfg` is configured to config time zone based on location, time and date will be ajusted when GPS signal get a location. Then time zone willbe configured as rules of your country. See [timezonemapper-library] for information about it.
+
+### Platformio
+Run command `pio.exe run`.
+```
+Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
+--------------------------------------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
+PLATFORM: Atmel SAM (8.1.0) > Seeeduino XIAO
+HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
+DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
+PACKAGES:
+ - framework-arduino-samd-seeed @ 1.8.1
+ - framework-cmsis @ 2.50400.181126 (5.4.0)
+ - framework-cmsis-atmel @ 1.2.2
+ - tool-bossac @ 1.10700.190624 (1.7.0)
+ - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+Dependency Graph
+|-- U8g2 @ 2.34.17
+|-- EMA @ 0.1.1
+|-- Timezone32 @ 1.1.0
+|-- Time32 @ 1.1.3
+|-- NeoGPS @ 4.2.9
+|-- SdFat @ 2.2.2
+|-- Seeed Arduino RTC @ 2.0.0
+|-- ConfigFile
+|-- Fusion
+|-- SAMDBattery
+|-- Semphr
+|-- TimeZoneMapper
+|-- DS3232RTC @ 2.0.1
+|-- elapsedMillis @ 1.0.6
+|-- MPU6050_light @ 1.1.0
+|-- QMC5883L @ 1.0.9
+|-- BMP180 @ 0.0.0-alpha+sha.efac46bd8d
+|-- SoftwareSerial
+|-- SPI @ 1.0
+|-- UTMConversion @ 1.1
+|-- Wire @ 1.0
+Building in release mode
+Compiling .pio\build\seeed_xiao\src\TinyTrackGPSPlus.cpp.o
+Linking .pio\build\seeed_xiao\firmware.elf
+Checking size .pio\build\seeed_xiao\firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [==        ]  21.7% (used 7096 bytes from 32768 bytes)
+Flash: [========= ]  88.3% (used 231396 bytes from 262144 bytes)
+Building .pio\build\seeed_xiao\firmware.bin
+```
+For upload to Seeeduino Xiao use Platformio enviroment or use `platformio.exe run --target upload` command on terminal.
 
 ### Config
 Edit 'config.h' file before, to configure display type uncommenting the proper line:
@@ -518,7 +584,7 @@ TinyTrackGPS+ use `TimeZoneMapper` library for get local time information based 
 
 `TimeZonerMapper` is a modified version of Andrew Giblin's TimeZone, MIT licensed. (https://github.com/AndrewGiblin/LatLongToTimezone)
 
-Example file 'ConfProg.cfg' for auto config based on location given from GNSS module.
+Example file `ConfProg.cfg` for auto config based on location given from GNSS module.
 **File format: ```TIMEZONE=<value>```** 
 ```conf
 #Conf. Prog.
@@ -665,58 +731,24 @@ enum dow_t {Sun=1, Mon, Tue, Wed, Thu, Fri, Sat};
 enum month_t {Jan=1, Feb, Mar, Apr, May, Jun, Jul, Aug, Sep, Oct, Nov, Dec};
 ```
 
-### Platformio
-Run command `pio.exe run`.
-```
-Processing seeed_xiao (platform: atmelsam; board: seeed_xiao; framework: arduino)
---------------------------------------------------------------------------------------------------------------
-Verbose mode can be enabled via `-v, --verbose` option
-CONFIGURATION: https://docs.platformio.org/page/boards/atmelsam/seeed_xiao.html
-PLATFORM: Atmel SAM (8.1.0) > Seeeduino XIAO
-HARDWARE: SAMD21G18A 48MHz, 32KB RAM, 256KB Flash
-DEBUG: Current (atmel-ice) External (atmel-ice, blackmagic, jlink)
-PACKAGES:
- - framework-arduino-samd-seeed @ 1.8.1
- - framework-cmsis @ 2.50400.181126 (5.4.0)
- - framework-cmsis-atmel @ 1.2.2
- - tool-bossac @ 1.10700.190624 (1.7.0)
- - toolchain-gccarmnoneeabi @ 1.70201.0 (7.2.1)
-LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
-LDF Modes: Finder ~ chain, Compatibility ~ soft
-Found 33 compatible libraries
-Scanning dependencies...
-Dependency Graph
-|-- U8g2 @ 2.34.17
-|-- EMA @ 0.1.1
-|-- Timezone32 @ 1.1.0
-|-- Time32 @ 1.1.3
-|-- NeoGPS @ 4.2.9
-|-- SdFat @ 2.2.2
-|-- Seeed Arduino RTC @ 2.0.0
-|-- ConfigFile
-|-- Fusion
-|-- SAMDBattery
-|-- Semphr
-|-- TimeZoneMapper
-|-- DS3232RTC @ 2.0.1
-|-- elapsedMillis @ 1.0.6
-|-- MPU6050_light @ 1.1.0
-|-- QMC5883L @ 1.0.9
-|-- BMP180 @ 0.0.0-alpha+sha.efac46bd8d
-|-- SoftwareSerial
-|-- SPI @ 1.0
-|-- UTMConversion @ 1.1
-|-- Wire @ 1.0
-Building in release mode
-Compiling .pio\build\seeed_xiao\src\TinyTrackGPSPlus.cpp.o
-Linking .pio\build\seeed_xiao\firmware.elf
-Checking size .pio\build\seeed_xiao\firmware.elf
-Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
-RAM:   [==        ]  21.7% (used 7096 bytes from 32768 bytes)
-Flash: [========= ]  88.3% (used 231396 bytes from 262144 bytes)
-Building .pio\build\seeed_xiao\firmware.bin
-```
-For upload to Seeeduino Xiao use Platformio enviroment or use `platformio.exe run --target upload` command on terminal.
+#### TimeZoneMapper library
+TimeZoneMapper is an own adaptation from `Lat/long to timezone mapper in PHP` code by Andrew Giblin.
+
+Library return **TimeChangeRule** data struct for Summer or Standart Time of a given location. This example of use config time zone based on location:
+```C++
+TimeChangeRule UST;
+TimeChangeRule UST;
+TimeZoneMapper TimeZoneGPS;
+
+UT = TimeZoneGPS.latLongToTimezone((float)latitude, (float)longitude);
+UST = TimeZoneGPS.latLongToTimezone_summer((float)latitude, (float)longitude);
+TimeZone.setRules(UST, UT);
+ ```
+
+Resources:
+  * https://github.com/AndrewGiblin/LatLongToTimezone
+  * https://github.com/drtimcooper/LatLongToTimezone
+  * https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java
 
 ## Changelog
 ### V1.0.23
