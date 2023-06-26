@@ -449,7 +449,28 @@ $$
 Su matriz de cofactores viene dada por:
 
 $$
-{\displaystyle cof \mathbf A ={\left(\begin{array}{ccc}
+{\displaystyle 
+\left(
+\begin{array}{ccc}
+ \left|\begin{array}{cc}
+         a_{11} & a_{12} \\
+         a_{21} & a_{22} \\
+  \end{array}\right| & \mathbf{0} & \mathbf{0} \\
+  \mathbf{0} & \left|\begin{array}{ccc}
+                       b_{11} & b_{12} & b_{13}\\ 
+                       b_{21} & b_{22} & b_{23}\\
+                       b_{31} & b_{32} & b_{33}\\
+                      \end{array}\right| & \mathbf{0}\\
+\mathbf{0} & \mathbf{0} & \left| \begin{array}{cc}
+                                   c_{11} & c_{12} \\
+                                   c_{21} & c_{22} \\
+                                  \end{array}\right| \\
+\end{array}\right)}
+$$
+
+$$
+{\displaystyle cof \mathbf A =
+{\left(\begin{array}{ccc}
 +{\left\rvert\begin{array}{cc}
 A_{22} & A_{23} \\
 A_{32} & A_{33}\end{array}\right\rvert} & 
