@@ -406,11 +406,11 @@ $$
 **Determinante de una matriz 3x3**
 
 $$
-{\displaystyle |A|=\left|{\begin{array}{ccc}
+{\displaystyle |A|={\begin{vmatrix}
 a _{11} & a _{12} & a _{13} \\
 a _{21} & a _{22} & a _{23} \\
 a _{31} & a _{32} & a _{33}
-\end{array}}\right|=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
+\end{vmatrix}}=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
 $$
 
 **Identity matrix**
