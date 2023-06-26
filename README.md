@@ -476,7 +476,13 @@ $$
         A_{11} & A_{12} \\
         A_{31} & A_{32} \\
   \end{array}\right| \\
-  \mathbf{0} & \mathbf{0} & \left| \begin{array}{cc}
+  \left| \begin{array}{cc}
+                                   c_{11} & c_{12} \\
+                                   c_{21} & c_{22} \\
+                                  \end{array}\right| &  \left| \begin{array}{cc}
+                                   c_{11} & c_{12} \\
+                                   c_{21} & c_{22} \\
+                                  \end{array}\right| & \left| \begin{array}{cc}
                                    c_{11} & c_{12} \\
                                    c_{21} & c_{22} \\
                                   \end{array}\right| \\
