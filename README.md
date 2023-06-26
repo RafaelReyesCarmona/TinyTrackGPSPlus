@@ -355,7 +355,11 @@ All the libraries I have consulted use the Kalman filter, or derivatives, for th
 
 $$
 {\displaystyle {\begin{aligned} 
-\hat {\textbf {x}}_{k}&=f({\textbf {x}}_{k-1},{\textbf {u}}_{k})+{\textbf {w}}_{k}\\
+\hat {\textbf {x}}_{k}&=f({\textbf {x}}_{k-1},{\textbf {u}}_{k})+{\textbf {w}}_{k}\end{aligned}}}
+$$
+
+$$
+{\displaystyle {\begin{aligned} 
 {\textbf {z}}_{k}&=h({\textbf {x}}_{k})+{\textbf {v}}_{k}
 \end{aligned}}}
 $$
