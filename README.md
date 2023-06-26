@@ -406,11 +406,11 @@ $$
 **Determinante de una matriz 3x3**
 
 $$
-{\displaystyle |A|={\begin{vmatrix}
-a _{11} & a _{12} & a _{13} \\
-a _{21} & a _{22} & a _{23} \\
-a _{31} & a _{32} & a _{33}
-\end{vmatrix}}=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
+{\displaystyle |A|=\begin{vmatrix}
+a_{11} & a_{12} & a_{13} \\
+a_{21} & a_{22} & a_{23} \\
+a_{31} & a_{32} & a_{33}
+\end{vmatrix}=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
 $$
 
 **Identity matrix**
@@ -426,7 +426,7 @@ $$
 **Inverse matrix**
 
 $$
-\mathbf M * \mathbf M^{-1} = \mathbf M^{-1} * \mathbf M = \mathbf I\\
+\mathbf M * \mathbf M^{-1} = \mathbf M^{-1} * \mathbf M = \mathbf I \\
 \mathbf M^{-1} = {1 \over \begin{vmatrix}\mathbf M\end{vmatrix}} * cof(\mathbf M)^{T}
 $$
 
