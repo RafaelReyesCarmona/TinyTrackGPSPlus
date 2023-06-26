@@ -33,7 +33,7 @@ When GPS signal fixed, TinyTrackGPS+ adjust the date and time to the configured 
 <img alt="Qgis1." src="./images/Captura de pantalla 2023-06-23 101431.png" width="480" align=center><center>QGIS visualization data.</center>&nbsp;
 
 
-TinyTrackGPS features:
+TinyTrackGPS+ features:
 * Show estimated GPS coordenates in Grades and UTM (WG86) formats, based on GPS info and other movements' sensors as gyroscope, accelerometer, magnetometer and barometer.
 * Save a tracklog in CSV format.
 * Save time in tracklog on local time.
@@ -61,7 +61,9 @@ This project use components list above:
   * Lipo 3,7V 700mAh 603035 with protect.
   * MicroUsb charge module.
 
-Current on this configuration is 60mA average.
+Current on this configuration is 60mA at 5,082VDC average, so 304.92mW. It will be an autonomy of 8,5h.
+
+<img alt="Autonomy." src="images/Captura%20de%20pantalla%202023-06-26%20104425.png" align=center>&nbsp;
 
 ### Seeeduino XIAO
 Seeed Studio XIAO SAMD21 carries the powerful CPU-ARM® Cortex®-M0+(SAMD21G18) running at up to 48Hz. In addition to the powerful CPU, it has 256KB Flash and 32KB SRAM on board and supports the USB Type-C interface which can supply power and download code.
@@ -349,11 +351,102 @@ The 15 states comprise the inertial position, inertial velocity, a quaternion, a
 This library requires Eigen to compile. So I don't use this, I get the source code and write my own solution using Fusion library as base.
 
 #### FusionGPS
+All the libraries I have consulted use the Kalman filter, or derivatives, for the calculations, making use of matrices to simplify the process. In the case of the uNavINS library, it uses an Extended Kalman filter. The Extended Kalman filter formulas are:
+$$
+{\hat {\textbf {x}}}_{k\mid k}=f({\textbf {x}}_{k \mid k-1},{\textbf {u}}_{k \mid k})+{\textbf {w}}_{k \mid k} \newline
+{\textbf {z}}_{k \mid k}=h({\textbf {x}}_{k \mid k})+{\textbf {v}}_{k \mid k}
+$$
 
+The Kalman filtering equations provide an estimate of the state ${\hat {\mathbf {x} }}_{k\mid k}$ and its error covariance $
+\mathbf {P} _{k\mid k}$ recursively. The estimate and its quality depend on the system parameters and the noise statistics fed as inputs to the estimator. 
+
+$$
+{\displaystyle {\begin{aligned}
+\mathbf {K} _{k}&=\mathbf {P} _{k\mid k-1}\mathbf {H} _{k}^{\textsf {T}}\left(\mathbf {H} _{k}\mathbf {P} _{k\mid k-1}\mathbf {H} _{k}^{\textsf {T}}+\mathbf {R} _{k}\right)^{-1}\\
+\mathbf {P} _{k\mid k}&=\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)
+\mathbf {P} _{k\mid k-1}\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)^{\textsf {T}}+\mathbf {K} _{k}\mathbf {R} _{k}\mathbf {K} _{k}^{\textsf {T}}
+\end{aligned}}}
+$$
+
+To calc ${\hat {\mathbf {x} }}_{k\mid k}$ :
+$${\hat {\mathbf {x} }}_{k\mid k} = \mathbf {K} _{k} * \mathbf {y}
+$$
+
+**y** - the difference between calculated and predicted.
+
+${\hat {\mathbf {x} }}_{k\mid k}$ and $\mathbf {y}$ are vectors, so $\mathbf {K} _{k}$ and $\mathbf {P} _{k\mid k}$ are 3x3 matrix that I had trasnsformed in vectors to accelerate calcs.
+
+#### From matrix to vectors.
+First will difine four matrix concepts:
+**Transpose of a matrix**
+$$
+\begin{pmatrix}
+\mathbf a_1 & a_2 & a_3\\
+b_1 & \mathbf b_2 & b_3\\
+c_1 & c_2 & \mathbf c_3
+\end{pmatrix}^{T} = \begin{pmatrix}
+\mathbf a_1 & b_1 & c_1\\
+a_2 & \mathbf b_2 & c_2\\
+a_3 & b_3 & \mathbf c_3
+\end{pmatrix}
+$$
+
+**Determinante de una matriz 3x3**
+$$
+{\displaystyle |A|=\left|{\begin{array}{ccc}a_{11}&a_{12}&a_{13}\\a_{21}&a_{22}&a_{23}\\a_{31}&a_{32}&a_{33}\end{array}}\right|=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
+$$
+
+**Identity matrix**
+$$\mathbf I = 
+\begin{pmatrix}
+\mathbf 1 & 0 & 0\\
+0 & \mathbf 1 & 0\\
+0 & 0 & \mathbf 1
+\end{pmatrix}
+$$
+
+**Inverse matrix**
+$$
+\mathbf M * \mathbf M^{-1} = \mathbf M^{-1} * \mathbf M = \mathbf I\\
+\mathbf M^{-1} = {1 \over \begin{vmatrix}\mathbf M\end{vmatrix}} * cof(\mathbf M)^{T}
+$$
+
+Dada la matrix 3x3 A:
+$$
+{\displaystyle \mathbf {A} ={\begin{pmatrix}A_{11}&A_{12}&A_{13}\\A_{21}&A_{22}&A_{23}\\A_{31}&A_{32}&A_{33}\end{pmatrix}}}
+$$
+
+Su matriz de cofactores viene dada por:
+$$
+{\displaystyle {{cof}}(\mathbf {A} )={\begin{pmatrix}+\left|{\begin{matrix}A_{22}&A_{23}\\A_{32}&A_{33}\end{matrix}}\right|&-\left|{\begin{matrix}A_{21}&A_{23}\\A_{31}&A_{33}\end{matrix}}\right|&+\left|{\begin{matrix}A_{21}&A_{22}\\A_{31}&A_{32}\end{matrix}}\right|\\&&\\-\left|{\begin{matrix}A_{12}&A_{13}\\A_{32}&A_{33}\end{matrix}}\right|&+\left|{\begin{matrix}A_{11}&A_{13}\\A_{31}&A_{33}\end{matrix}}\right|&-\left|{\begin{matrix}A_{11}&A_{12}\\A_{31}&A_{32}\end{matrix}}\right|\\&&\\+\left|{\begin{matrix}A_{12}&A_{13}\\A_{22}&A_{23}\end{matrix}}\right|&-\left|{\begin{matrix}A_{11}&A_{13}\\A_{21}&A_{23}\end{matrix}}\right|&+\left|{\begin{matrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{matrix}}\right|\end{pmatrix}}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32}&A_{23}A_{31}-A_{21}A_{33}&A_{21}A_{32}-A_{22}A_{31}\\A_{32}A_{13}-A_{33}A_{12}&A_{33}A_{11}-A_{31}A_{13}&A_{31}A_{12}-A_{32}A_{11}\\A_{12}A_{23}-A_{13}A_{22}&A_{13}A_{21}-A_{11}A_{23}&A_{11}A_{22}-A_{12}A_{21}\end{pmatrix}}}
+$$
+y por lo tanto la traspuesta de la matriz de cofactores es la matriz Adjunta:
+
+$$
+{\displaystyle {{cof}}(\mathbf {A} )^{T}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32}& A_{32}A_{13}-A_{33}A_{12} & A_{12}A_{23}-A_{13}A_{22} \\A_{23}A_{31}-A_{21}A_{33}&A_{33}A_{11}-A_{31}A_{13}& A_{13}A_{21}-A_{11}A_{23} \\A_{21}A_{32}-A_{22}A_{31} & A_{31}A_{12}-A_{32}A_{11}&A_{11}A_{22}-A_{12}A_{21}\end{pmatrix}}}
+$$
+For calcuation:
+$$
+{\displaystyle |A|=\left|{\begin{array}{ccc}a_{11}&a_{12}&a_{13}\\a_{21}&a_{22}&a_{23}\\a_{31}&a_{32}&a_{33}\end{array}}\right|=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
+$$
+$$
+{\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over  \begin{vmatrix} \mathbf A\end{vmatrix}}& {A_{32}A_{13}-A_{33}A_{12} \over \begin{vmatrix}\mathbf A\end{vmatrix}}& {A_{12}A_{23}-A_{13}A_{22} \over \begin{vmatrix}\mathbf A\end{vmatrix}}\\{A_{23}A_{31}-A_{21}A_{33} \over \begin{vmatrix}\mathbf A\end{vmatrix}} & {A_{33}A_{11}-A_{31}A_{13} \over \begin{vmatrix}\mathbf A\end{vmatrix}}& {A_{13}A_{21}-A_{11}A_{23} \over \begin{vmatrix}\mathbf A\end{vmatrix}}\\ {A_{21}A_{32}-A_{22}A_{31} \over \begin{vmatrix}\mathbf A\end{vmatrix}} & {A_{31}A_{12}-A_{32}A_{11} \over \begin{vmatrix}\mathbf A\end{vmatrix}} & {A_{11}A_{22}-A_{12}A_{21} \over \begin{vmatrix}\mathbf A\end{vmatrix}}\end{pmatrix}}}
+$$
+
+----------------------------------------------------
+$$
+{\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{32}A_{13}-A_{33}A_{12} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{12}A_{23}-A_{13}A_{22} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\\{A_{23}A_{31}-A_{21}A_{33} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{33}A_{11}-A_{31}A_{13} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{13}A_{21}-A_{11}A_{23} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\\ {A_{21}A_{32}-A_{22}A_{31} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{31}A_{12}-A_{32}A_{11} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{11}A_{22}-A_{12}A_{21} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\end{pmatrix}}}
+$$
+
+Resources:
+  * https://es.wikipedia.org/wiki/Matriz_de_adjuntos
 #### Other libraries
-There are a lot of information about AHRS and INS using EKF and others filters on the web. 
+There are a lot of information about AHRS and INS using EKF and others filters on the web:
  * Arduino AHRS System: https://github.com/pronenewbits/Arduino_AHRS_System
- * Adafruit AHRS: 
+ * Adafruit AHRS: https://github.com/adafruit/Adafruit_AHRS
+ * Reefwing-AHRS: https://github.com/Reefwing-Software/Reefwing-AHRS
+ * SFWA: https://github.com/sfwa/ukf
+ * Extended Kalman Filter (GPS, Velocity and IMU fusion): https://github.com/balamuruganky/EKF_IMU_GPS
  * OpenFlight: https://github.com/hamid-m/OpenFlight/tree/master/FlightCode/navigation. I get part of code from this file:
 
 ```C++

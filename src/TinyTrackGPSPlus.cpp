@@ -1010,8 +1010,8 @@ void loop(void) {
       FusionVector magnetometer = {compass.getX(), -compass.getY(), -compass.getZ()}; // replace this with actual magnetometer data in arbitrary units
       float courseIMU = FusionCompassCalculateHeading2(FusionVectorRotatebyQuaternion(magnetometer,quaternion,FusionConventionNed));
       FusionVector GPS_error = { .axis = {
-        .x = gps_data.lat_err() * (float)sign(cosf(courseIMU*DEG_TO_RAD)-cosf(courseGPS*DEG_TO_RAD)),
-        .y = gps_data.lon_err() * (float)sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
+        .x = (gps_data.speed_mph()/3600.0f > 2.5f) ? 0.0f : gps_data.lat_err() * (float)sign(cosf(courseIMU*DEG_TO_RAD)-cosf(courseGPS*DEG_TO_RAD)),
+        .y = (gps_data.speed_mph()/3600.0f > 2.5f) ? 0.0f : gps_data.lon_err() * (float)sign(sinf(courseIMU*DEG_TO_RAD)-sinf(courseGPS*DEG_TO_RAD)),
         .z = 0.0f
       }};
       FusionGPSUpdate(&GPS, GPS_loc, velocity, GPS_error);
