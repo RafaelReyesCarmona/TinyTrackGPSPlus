@@ -449,11 +449,38 @@ $$
 Su matriz de cofactores viene dada por:
 
 $$
-{\displaystyle cof \mathbf A ={\begin{pmatrix}+{\begin{vmatrix}A_{22}&A_{23}\\A_{32}&A_{33}\end{vmatrix}}&-{\begin{vmatrix}A_{21}&A_{23}\\A_{31}&A_{33}\end{vmatrix}}&+{\begin{vmatrix}A_{21}&A_{22}\\A_{31}&A_{32}\end{vmatrix}}\\
+{\displaystyle cof \mathbf A ={\begin{pmatrix}+{\begin{vmatrix}
+A_{22} & A_{23} \\
+A_{32} & A_{33}\end{vmatrix}} & 
+-{\begin{vmatrix}
+A_{21} & A_{23} \\
+A_{31} & A_{33}\end{vmatrix}} & 
++{\begin{vmatrix}
+A_{21} & A_{22} \\
+A_{31} & A_{32}\end{vmatrix}} \\
 &&
-\\-{\begin{vmatrix}A_{12}&A_{13}\\A_{32}&A_{33}\end{vmatrix}}&+{\begin{vmatrix}A_{11}&A_{13}\\A_{31}&A_{33}\end{vmatrix}}&-{\begin{vmatrix}A_{11}&A_{12}\\A_{31}&A_{32}\end{vmatrix}}\\
+\\
+-{\begin{vmatrix}
+A_{12} & A_{13} \\
+A_{32} & A_{33}\end{vmatrix}} &
++{\begin{vmatrix}
+A_{11} & A_{13} \\
+A_{31} & A_{33}\end{vmatrix}} &
+-{\begin{vmatrix}
+A_{11} & A_{12} \\
+A_{31} & A_{32}\end{vmatrix}} \\
 &&
-\\+{\begin{vmatrix}A_{12}&A_{13}\\A_{22}&A_{23}\end{vmatrix}}&-{\begin{vmatrix}A_{11}&A_{13}\\A_{21}&A_{23}\end{vmatrix}}&+{\begin{vmatrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{vmatrix}}\end{pmatrix}}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32}&A_{23}A_{31}-A_{21}A_{33}&A_{21}A_{32}-A_{22}A_{31}\\A_{32}A_{13}-A_{33}A_{12}&A_{33}A_{11}-A_{31}A_{13}&A_{31}A_{12}-A_{32}A_{11}\\A_{12}A_{23}-A_{13}A_{22}&A_{13}A_{21}-A_{11}A_{23}&A_{11}A_{22}-A_{12}A_{21}\end{pmatrix}}}
+\\
++{\begin{vmatrix}
+A_{12} & A_{13} \\
+A_{22} & A_{23}\end{vmatrix}} &
+-{\begin{vmatrix}
+A_{11} & A_{13} \\
+A_{21} & A_{23}\end{vmatrix}} &
++{\begin{vmatrix}
+A_{11} & A_{12} \\
+A_{21} & A_{22}\end{vmatrix}}
+\end{pmatrix}}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32}&A_{23}A_{31}-A_{21}A_{33}&A_{21}A_{32}-A_{22}A_{31}\\A_{32}A_{13}-A_{33}A_{12}&A_{33}A_{11}-A_{31}A_{13}&A_{31}A_{12}-A_{32}A_{11}\\A_{12}A_{23}-A_{13}A_{22}&A_{13}A_{21}-A_{11}A_{23}&A_{11}A_{22}-A_{12}A_{21}\end{pmatrix}}}
 $$
 
 y por lo tanto la traspuesta de la matriz de cofactores es la matriz Adjunta:
@@ -481,12 +508,6 @@ $$
 {A_{23}A_{31}-A_{21}A_{33} \over |\mathbf A|} & {A_{33}A_{11}-A_{31}A_{13} \over |\mathbf A|} & {A_{13}A_{21}-A_{11}A_{23} \over |\mathbf A|} \\
  {A_{21}A_{32}-A_{22}A_{31} \over |\mathbf A|} & {A_{31}A_{12}-A_{32}A_{11} \over |\mathbf A|} & {A_{11}A_{22}-A_{12}A_{21} \over |\mathbf A|}\end{pmatrix}}
  }
-$$
-
-----------------------------------------------------
-
-$$
-{\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{32}A_{13}-A_{33}A_{12} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{12}A_{23}-A_{13}A_{22} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\\{A_{23}A_{31}-A_{21}A_{33} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{33}A_{11}-A_{31}A_{13} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{13}A_{21}-A_{11}A_{23} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\\ {A_{21}A_{32}-A_{22}A_{31} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{31}A_{12}-A_{32}A_{11} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{11}A_{22}-A_{12}A_{21} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\end{pmatrix}}}
 $$
 
 Resources:
