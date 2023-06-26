@@ -415,19 +415,25 @@ $$
 
 **Identity matrix**
 
-$$\mathbf I = 
+$$
+{\displaystyle
+\mathbf I = 
 \begin{pmatrix}
 \mathbf 1 & 0 & 0\\
 0 & \mathbf 1 & 0\\
 0 & 0 & \mathbf 1
 \end{pmatrix}
+}
 $$
 
 **Inverse matrix**
 
 $$
-\mathbf M * \mathbf M^{-1} = \mathbf M^{-1} * \mathbf M = \mathbf I \\
-\mathbf M^{-1} = {1 \over \begin{vmatrix}\mathbf M\end{vmatrix}} * cof(\mathbf M)^{T}
+{\displaystyle {\begin{aligned}
+\mathbf M * \mathbf M^{-1} &= \mathbf M^{-1} * \mathbf M = \mathbf I \\
+\mathbf M^{-1} &= {1 \over \begin{vmatrix}\mathbf M\end{vmatrix}} * cof(\mathbf M)^{T}
+\end{aligned}}
+}
 $$
 
 Dada la matrix 3x3 A:
