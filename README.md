@@ -406,7 +406,7 @@ $$
 **Determinante de una matriz 3x3**
 
 $$
-{\displaystyle |\mathbf {A}|=\left|{\begin{array}{ccc}
+{\displaystyle |A|=\left|{\begin{array}{ccc}
 a _{11} & a _{12} & a _{13} \\
 a _{21} & a _{22} & a _{23} \\
 a _{31} & a _{32} & a _{33}
