@@ -450,37 +450,37 @@ Su matriz de cofactores viene dada por:
 
 $$
 {\displaystyle cof \mathbf A ={\begin{pmatrix}
-+{\left\rvert\begin{matrix}
++{\left\rvert\begin{array}{cc}
 A_{22} & A_{23} \\
-A_{32} & A_{33}\end{matrix}\right\rvert} & 
--{\left\rvert\begin{matrix}
+A_{32} & A_{33}\end{array}\right\rvert} & 
+-{\left\rvert\begin{array}{cc}
 A_{21} & A_{23} \\
-A_{31} & A_{33}\end{matrix}\right\rvert} & 
-+{\left\rvert\begin{matrix}
+A_{31} & A_{33}\end{array}\right\rvert} & 
++{\left\rvert\begin{array}{cc}
 A_{21} & A_{22} \\
-A_{31} & A_{32}\end{matrix}\right\rvert} \\
+A_{31} & A_{32}\end{array}\right\rvert} \\
 &&
 \\
--{\begin{matrix}
+-{\left\rvert\begin{array}{cc}
 A_{12} & A_{13} \\
-A_{32} & A_{33}\end{matrix}} &
-+{\begin{matrix}
+A_{32} & A_{33}\end{array}\right\rvert} &
++{\left\rvert\begin{array}{cc}
 A_{11} & A_{13} \\
-A_{31} & A_{33}\end{matrix}} &
--{\begin{matrix}
+A_{31} & A_{33}\end{array}\right\rvert} &
+-{\left\rvert\begin{array}{cc}
 A_{11} & A_{12} \\
-A_{31} & A_{32}\end{matrix}} \\
+A_{31} & A_{32}\end{array}\right\rvert} \\
 &&
 \\
-+{\begin{matrix}
++{\left\rvert\begin{array}{cc}
 A_{12} & A_{13} \\
-A_{22} & A_{23}\end{matrix}} &
--{\begin{matrix}
+A_{22} & A_{23}\end{array}\right\rvert} &
+-{\left\rvert\begin{array}{cc}
 A_{11} & A_{13} \\
-A_{21} & A_{23}\end{matrix}} &
-+{\begin{matrix}
+A_{21} & A_{23}\end{array}\right\rvert} &
++{\left\rvert\begin{array}{cc}
 A_{11} & A_{12} \\
-A_{21} & A_{22}\end{matrix}}
+A_{21} & A_{22}\end{array}\right\rvert}
 \end{pmatrix}}={\begin{pmatrix}
 A_{22}A_{33}-A_{23}A_{32} & A_{23}A_{31}-A_{21}A_{33} & A_{21}A_{32}-A_{22}A_{31} \\ && \\
 A_{32}A_{13}-A_{33}A_{12} & A_{33}A_{11}-A_{31}A_{13} & A_{31}A_{12}-A_{32}A_{11} \\ && \\
