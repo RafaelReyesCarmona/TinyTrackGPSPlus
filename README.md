@@ -352,13 +352,13 @@ This library requires Eigen to compile. So I don't use this, I get the source co
 
 #### FusionGPS
 All the libraries I have consulted use the Kalman filter, or derivatives, for the calculations, making use of matrices to simplify the process. In the case of the uNavINS library, it uses an Extended Kalman filter. The Extended Kalman filter formulas are:
+
 $$
 {\hat {\textbf {x}}}_{k\mid k}=f({\textbf {x}}_{k \mid k-1},{\textbf {u}}_{k \mid k})+{\textbf {w}}_{k \mid k} \newline
 {\textbf {z}}_{k \mid k}=h({\textbf {x}}_{k \mid k})+{\textbf {v}}_{k \mid k}
 $$
 
-The Kalman filtering equations provide an estimate of the state ${\hat {\mathbf {x} }}_{k\mid k}$ and its error covariance $
-\mathbf {P} _{k\mid k}$ recursively. The estimate and its quality depend on the system parameters and the noise statistics fed as inputs to the estimator. 
+The Kalman filtering equations provide an estimate of the state ${\hat {\mathbf {x} }}_{k\mid k}$ and its error covariance $\mathbf {P} _{k\mid k}$ recursively. The estimate and its quality depend on the system parameters and the noise statistics fed as inputs to the estimator. 
 
 $$
 {\displaystyle {\begin{aligned}
@@ -369,7 +369,9 @@ $$
 $$
 
 To calc ${\hat {\mathbf {x} }}_{k\mid k}$ :
-$${\hat {\mathbf {x} }}_{k\mid k} = \mathbf {K} _{k} * \mathbf {y}
+
+$$
+{\hat {\mathbf {x} }}_{k\mid k} = \mathbf {K} _{k} * \mathbf {y}
 $$
 
 **y** - the difference between calculated and predicted.
@@ -379,6 +381,7 @@ ${\hat {\mathbf {x} }}_{k\mid k}$ and $\mathbf {y}$ are vectors, so $\mathbf {K}
 #### From matrix to vectors.
 First will difine four matrix concepts:
 **Transpose of a matrix**
+
 $$
 \begin{pmatrix}
 \mathbf a_1 & a_2 & a_3\\
@@ -392,11 +395,13 @@ a_3 & b_3 & \mathbf c_3
 $$
 
 **Determinante de una matriz 3x3**
+
 $$
 {\displaystyle |A|=\left|{\begin{array}{ccc}a_{11}&a_{12}&a_{13}\\a_{21}&a_{22}&a_{23}\\a_{31}&a_{32}&a_{33}\end{array}}\right|=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
 $$
 
 **Identity matrix**
+
 $$\mathbf I = 
 \begin{pmatrix}
 \mathbf 1 & 0 & 0\\
@@ -406,34 +411,42 @@ $$\mathbf I =
 $$
 
 **Inverse matrix**
+
 $$
 \mathbf M * \mathbf M^{-1} = \mathbf M^{-1} * \mathbf M = \mathbf I\\
 \mathbf M^{-1} = {1 \over \begin{vmatrix}\mathbf M\end{vmatrix}} * cof(\mathbf M)^{T}
 $$
 
 Dada la matrix 3x3 A:
+
 $$
 {\displaystyle \mathbf {A} ={\begin{pmatrix}A_{11}&A_{12}&A_{13}\\A_{21}&A_{22}&A_{23}\\A_{31}&A_{32}&A_{33}\end{pmatrix}}}
 $$
 
 Su matriz de cofactores viene dada por:
+
 $$
 {\displaystyle {{cof}}(\mathbf {A} )={\begin{pmatrix}+\left|{\begin{matrix}A_{22}&A_{23}\\A_{32}&A_{33}\end{matrix}}\right|&-\left|{\begin{matrix}A_{21}&A_{23}\\A_{31}&A_{33}\end{matrix}}\right|&+\left|{\begin{matrix}A_{21}&A_{22}\\A_{31}&A_{32}\end{matrix}}\right|\\&&\\-\left|{\begin{matrix}A_{12}&A_{13}\\A_{32}&A_{33}\end{matrix}}\right|&+\left|{\begin{matrix}A_{11}&A_{13}\\A_{31}&A_{33}\end{matrix}}\right|&-\left|{\begin{matrix}A_{11}&A_{12}\\A_{31}&A_{32}\end{matrix}}\right|\\&&\\+\left|{\begin{matrix}A_{12}&A_{13}\\A_{22}&A_{23}\end{matrix}}\right|&-\left|{\begin{matrix}A_{11}&A_{13}\\A_{21}&A_{23}\end{matrix}}\right|&+\left|{\begin{matrix}A_{11}&A_{12}\\A_{21}&A_{22}\end{matrix}}\right|\end{pmatrix}}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32}&A_{23}A_{31}-A_{21}A_{33}&A_{21}A_{32}-A_{22}A_{31}\\A_{32}A_{13}-A_{33}A_{12}&A_{33}A_{11}-A_{31}A_{13}&A_{31}A_{12}-A_{32}A_{11}\\A_{12}A_{23}-A_{13}A_{22}&A_{13}A_{21}-A_{11}A_{23}&A_{11}A_{22}-A_{12}A_{21}\end{pmatrix}}}
 $$
+
 y por lo tanto la traspuesta de la matriz de cofactores es la matriz Adjunta:
 
 $$
 {\displaystyle {{cof}}(\mathbf {A} )^{T}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32}& A_{32}A_{13}-A_{33}A_{12} & A_{12}A_{23}-A_{13}A_{22} \\A_{23}A_{31}-A_{21}A_{33}&A_{33}A_{11}-A_{31}A_{13}& A_{13}A_{21}-A_{11}A_{23} \\A_{21}A_{32}-A_{22}A_{31} & A_{31}A_{12}-A_{32}A_{11}&A_{11}A_{22}-A_{12}A_{21}\end{pmatrix}}}
 $$
+
 For calcuation:
+
 $$
 {\displaystyle |A|=\left|{\begin{array}{ccc}a_{11}&a_{12}&a_{13}\\a_{21}&a_{22}&a_{23}\\a_{31}&a_{32}&a_{33}\end{array}}\right|=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
 $$
+
 $$
 {\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over  \begin{vmatrix} \mathbf A\end{vmatrix}}& {A_{32}A_{13}-A_{33}A_{12} \over \begin{vmatrix}\mathbf A\end{vmatrix}}& {A_{12}A_{23}-A_{13}A_{22} \over \begin{vmatrix}\mathbf A\end{vmatrix}}\\{A_{23}A_{31}-A_{21}A_{33} \over \begin{vmatrix}\mathbf A\end{vmatrix}} & {A_{33}A_{11}-A_{31}A_{13} \over \begin{vmatrix}\mathbf A\end{vmatrix}}& {A_{13}A_{21}-A_{11}A_{23} \over \begin{vmatrix}\mathbf A\end{vmatrix}}\\ {A_{21}A_{32}-A_{22}A_{31} \over \begin{vmatrix}\mathbf A\end{vmatrix}} & {A_{31}A_{12}-A_{32}A_{11} \over \begin{vmatrix}\mathbf A\end{vmatrix}} & {A_{11}A_{22}-A_{12}A_{21} \over \begin{vmatrix}\mathbf A\end{vmatrix}}\end{pmatrix}}}
 $$
 
 ----------------------------------------------------
+
 $$
 {\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{32}A_{13}-A_{33}A_{12} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{12}A_{23}-A_{13}A_{22} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\\{A_{23}A_{31}-A_{21}A_{33} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{33}A_{11}-A_{31}A_{13} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}& {A_{13}A_{21}-A_{11}A_{23} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\\ {A_{21}A_{32}-A_{22}A_{31} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{31}A_{12}-A_{32}A_{11} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})} & {A_{11}A_{22}-A_{12}A_{21} \over (a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}\end{pmatrix}}}
 $$
