@@ -354,8 +354,8 @@ This library requires Eigen to compile. So I don't use this, I get the source co
 All the libraries I have consulted use the Kalman filter, or derivatives, for the calculations, making use of matrices to simplify the process. In the case of the uNavINS library, it uses an Extended Kalman filter. The Extended Kalman filter formulas are:
 
 $$
-{\displaystyle {\begin{aligned} {\hat {\textbf {x}}}_{k\mid k}&=f({\textbf {x}}_{k \mid k-1},{\textbf {u}}_{k \mid k})+{\textbf {w}}_{k \mid k} \\
-{\textbf {z}}_{k \mid k}&=h({\textbf {x}}_{k \mid k})+{\textbf {v}}_{k \mid k}
+{\displaystyle {\begin{aligned} {\hat {\textbf {x}}}_{k\mid k}&=f({\textbf {x}}_{k \mid k-1},{\textbf {u}}_{k\mid k})+{\textbf {w}}_{k\mid k} \\
+{\textbf {z}}_{k\mid k}&=h({\textbf {x}}_{k \mid k})+{\textbf {v}}_{k\mid k}
 \end{aligned}}}
 $$
 
