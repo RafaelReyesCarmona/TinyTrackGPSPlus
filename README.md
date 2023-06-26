@@ -448,6 +448,8 @@ $$
 
 Su matriz de cofactores viene dada por:
 
+<img alt="Qgis1." src="./images/Matrix%20cof%20A.png" width="480" align=center><center>QGIS visualization data.</center>&nbsp;
+
 $$
 {\displaystyle cof (\mathbf A) =
 \left(
