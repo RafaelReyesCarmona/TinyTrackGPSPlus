@@ -452,9 +452,9 @@ $$
 {\displaystyle 
 \left(
 \begin{array}{ccc}
- \left|\begin{array}{cc}
-         a_{11} & a_{12} \\
-         a_{21} & a_{22} \\
+ +\left|\begin{array}{cc}
+         A_{22} & A_{23} \\
+         A_{32} & A_{33} \\
   \end{array}\right| & \mathbf{0} & \mathbf{0} \\
   \mathbf{0} & \left|\begin{array}{ccc}
                        b_{11} & b_{12} & b_{13}\\ 
@@ -472,46 +472,46 @@ $$
 {\displaystyle 
 cof \mathbf A =
 \left(\begin{array}{ccc}
-+{\left|\begin{array}{cc}
++\left|\begin{array}{cc}
 A_{22} & A_{23} \\
 A_{32} & A_{33} \\
-\end{array}\right|} & 
--{\left|\begin{array}{cc}
+\end{array}\right| & 
+-\left|\begin{array}{cc}
 A_{21} & A_{23} \\
 A_{31} & A_{33} \\
-\end{array}\right|} & 
-+{\left|\begin{array}{cc}
+\end{array}\right| & 
++\left|\begin{array}{cc}
 A_{21} & A_{22} \\
 A_{31} & A_{32} \\
-\end{array}\right|} \\
+\end{array}\right| \\
 &&
 \\
--{\left|\begin{array}{cc}
+-\left|\begin{array}{cc}
 A_{12} & A_{13} \\
 A_{32} & A_{33} \\
-\end{array}\right|} &
-+{\left|\begin{array}{cc}
+\end{array}\right| &
++\left|\begin{array}{cc}
 A_{11} & A_{13} \\
 A_{31} & A_{33} \\
-\end{array}\right|} &
--{\left|\begin{array}{cc}
+\end{array}\right| &
+-\left|\begin{array}{cc}
 A_{11} & A_{12} \\
 A_{31} & A_{32} \\
-\end{array}\right|} \\
+\end{array}\right| \\
 &&
 \\
-+{\left|\begin{array}{cc}
++\left|\begin{array}{cc}
 A_{12} & A_{13} \\
 A_{22} & A_{23} \\
-\end{array}\right|} &
--{\left|\begin{array}{cc}
+\end{array}\right| &
+-\left|\begin{array}{cc}
 A_{11} & A_{13} \\
 A_{21} & A_{23} \\
-\end{array}\right|} &
-+{\left|\begin{array}{cc}
+\end{array}\right| &
++\left|\begin{array}{cc}
 A_{11} & A_{12} \\
 A_{21} & A_{22} \\
-\end{array}\right|} \\
+\end{array}\right| \\
 \end{array}\right)=\begin{pmatrix}
 A_{22}A_{33}-A_{23}A_{32} & A_{23}A_{31}-A_{21}A_{33} & A_{21}A_{32}-A_{22}A_{31} \\ && \\
 A_{32}A_{13}-A_{33}A_{12} & A_{33}A_{11}-A_{31}A_{13} & A_{31}A_{12}-A_{32}A_{11} \\ && \\
