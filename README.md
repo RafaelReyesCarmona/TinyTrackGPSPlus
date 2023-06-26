@@ -360,14 +360,9 @@ $$
 $$
 
 $$
-{\displaystyle {\begin{aligned} 
-\hat {\textbf {x}}_{k}&=f({\textbf {x}}_{k-1},{\textbf {u}}_{k})+{\textbf {w}}_{k}\end{aligned}}}
-$$
-
-$$
-{\displaystyle {\begin{aligned} 
-{\textbf {z}}_{k}&=h({\textbf {x}}_{k})+{\textbf {v}}_{k}
-\end{aligned}}}
+{\displaystyle
+\mathbf {z} _k=h(\mathbf {x} _k) + \mathbf {v}_k
+}
 $$
 
 The Kalman filtering equations provide an estimate of the state ${\hat {\mathbf {x} }}_{k\mid k}$ and its error covariance $\mathbf {P} _{k\mid k}$ recursively. The estimate and its quality depend on the system parameters and the noise statistics fed as inputs to the estimator. 
