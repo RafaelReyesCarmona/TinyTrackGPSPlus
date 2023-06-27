@@ -29,8 +29,8 @@ Before the first display, the GNSS module is configured and A-GPS info is sent i
 
 When GPS signal fixed, TinyTrackGPS+ adjust the date and time to the configured timezone into config file. Timezone is calculated based on the coordinates where the device is turn on.
 
-<img alt="Qgis1." src="./images/Captura de pantalla 2023-06-22 164013.png" width="480" align=center>
-<img alt="Qgis1." src="./images/Captura de pantalla 2023-06-23 101431.png" width="480" align=center><center>QGIS visualization data.</center>&nbsp;
+<img alt="Qgis1." src="images/Captura de pantalla 2023-06-22 164013.png" width="480" align=center>
+<img alt="Qgis1." src="images/Captura de pantalla 2023-06-23 101431.png" width="480" align=center><center>QGIS visualization data.</center>&nbsp;
 
 
 TinyTrackGPS+ features:
@@ -448,34 +448,40 @@ $$
 
 Su matriz de cofactores viene dada por:
 
-<img alt="cof(A)" src="./images/Matrix%20cof%20A.png" align=center>&nbsp;
+<img alt="cof(A)" src="images/Matrix%20cof%20A.png" align=center>&nbsp;
 
 y por lo tanto la traspuesta de la matriz de cofactores es la matriz Adjunta:
 
-$$
+<!-- $$
 {\displaystyle cof (\mathbf A) ^{\textsf {T}}={\begin{pmatrix}A_{22}A_{33}-A_{23}A_{32} & A_{32}A_{13}-A_{33}A_{12} & A_{12}A_{23}-A_{13}A_{22} \\ \\
 A_{23}A_{31}-A_{21}A_{33} & A_{33}A_{11}-A_{31}A_{13} & A_{13}A_{21}-A_{11}A_{23} \\ \\
 A_{21}A_{32}-A_{22}A_{31} & A_{31}A_{12}-A_{32}A_{11} & A_{11}A_{22}-A_{12}A_{21}
 \end{pmatrix}}
 }
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5Cdisplaystyle%20cof%20(%5Cmathbf%20A)%20%5E%7B%5Ctextsf%20%7BT%7D%7D%3D%7B%5Cbegin%7Bpmatrix%7DA_%7B22%7DA_%7B33%7D-A_%7B23%7DA_%7B32%7D%20%26%20A_%7B32%7DA_%7B13%7D-A_%7B33%7DA_%7B12%7D%20%26%20A_%7B12%7DA_%7B23%7D-A_%7B13%7DA_%7B22%7D%20%5C%5C%20%5C%5C%0D%0AA_%7B23%7DA_%7B31%7D-A_%7B21%7DA_%7B33%7D%20%26%20A_%7B33%7DA_%7B11%7D-A_%7B31%7DA_%7B13%7D%20%26%20A_%7B13%7DA_%7B21%7D-A_%7B11%7DA_%7B23%7D%20%5C%5C%20%5C%5C%0D%0AA_%7B21%7DA_%7B32%7D-A_%7B22%7DA_%7B31%7D%20%26%20A_%7B31%7DA_%7B12%7D-A_%7B32%7DA_%7B11%7D%20%26%20A_%7B11%7DA_%7B22%7D-A_%7B12%7DA_%7B21%7D%0D%0A%5Cend%7Bpmatrix%7D%7D%0D%0A%7D%0D"></div>
 
 For calcuation:
 
-$$
+<!-- $$
 {\displaystyle |\mathbf A|={\begin{vmatrix}
 a_{11} & a_{12} & a_{13} \\
 a_{21} & a_{22} & a_{23} \\
 a_{31} & a_{32} & a_{33}
 \end{vmatrix}}=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
-$$
+$$ --> 
 
-$$
+<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5Cdisplaystyle%20%7C%5Cmathbf%20A%7C%3D%7B%5Cbegin%7Bvmatrix%7D%0D%0Aa_%7B11%7D%20%26%20a_%7B12%7D%20%26%20a_%7B13%7D%20%5C%5C%0D%0Aa_%7B21%7D%20%26%20a_%7B22%7D%20%26%20a_%7B23%7D%20%5C%5C%0D%0Aa_%7B31%7D%20%26%20a_%7B32%7D%20%26%20a_%7B33%7D%0D%0A%5Cend%7Bvmatrix%7D%7D%3D(a_%7B11%7Da_%7B22%7Da_%7B33%7D%2Ba_%7B12%7Da_%7B23%7Da_%7B31%7D%2Ba_%7B13%7Da_%7B21%7Da_%7B32%7D)-(a_%7B31%7Da_%7B22%7Da_%7B13%7D%2Ba_%7B32%7Da_%7B23%7Da_%7B11%7D%2Ba_%7B33%7Da_%7B21%7Da_%7B12%7D)%7D%0D"></div>
+
+<!-- $$
 {\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over |\mathbf A|} & {A_{32}A_{13}-A_{33}A_{12} \over |\mathbf A|} & {A_{12}A_{23}-A_{13}A_{22} \over |\mathbf A|} \\
 {A_{23}A_{31}-A_{21}A_{33} \over |\mathbf A|} & {A_{33}A_{11}-A_{31}A_{13} \over |\mathbf A|} & {A_{13}A_{21}-A_{11}A_{23} \over |\mathbf A|} \\
  {A_{21}A_{32}-A_{22}A_{31} \over |\mathbf A|} & {A_{31}A_{12}-A_{32}A_{11} \over |\mathbf A|} & {A_{11}A_{22}-A_{12}A_{21} \over |\mathbf A|}\end{pmatrix}}
  }
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5Cdisplaystyle%20%5Cmathbf%20A%20%5E%7B-1%7D%3D%7B%5Cbegin%7Bpmatrix%7D%7BA_%7B22%7DA_%7B33%7D-A_%7B23%7DA_%7B32%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B32%7DA_%7B13%7D-A_%7B33%7DA_%7B12%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B12%7DA_%7B23%7D-A_%7B13%7DA_%7B22%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%5C%5C%0D%0A%7BA_%7B23%7DA_%7B31%7D-A_%7B21%7DA_%7B33%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B33%7DA_%7B11%7D-A_%7B31%7DA_%7B13%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B13%7DA_%7B21%7D-A_%7B11%7DA_%7B23%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%5C%5C%0D%0A%20%7BA_%7B21%7DA_%7B32%7D-A_%7B22%7DA_%7B31%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B31%7DA_%7B12%7D-A_%7B32%7DA_%7B11%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B11%7DA_%7B22%7D-A_%7B12%7DA_%7B21%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%5Cend%7Bpmatrix%7D%7D%0D%0A%20%7D%0D"></div>
 
 Resources:
   * https://es.wikipedia.org/wiki/Matriz_de_adjuntos
