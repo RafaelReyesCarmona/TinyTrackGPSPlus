@@ -353,37 +353,45 @@ This library requires Eigen to compile. So I don't use this, I get the source co
 #### FusionGPS
 All the libraries I have consulted use the Kalman filter, or derivatives, for the calculations, making use of matrices to simplify the process. In the case of the uNavINS library, it uses an Extended Kalman filter. The Extended Kalman filter formulas are:
 
-$$
+<!-- $$
 {\displaystyle
 \hat {\mathbf {x}} _k=f(\mathbf {x} _{k-1},\mathbf {u}_k)+\mathbf {w} _k
 }
-$$
+$$ --> 
 
-$$
+<div align="center"><img style="background: white;" src="svg\7btArPoDyW.svg"></div>
+
+<!-- $$
 {\displaystyle
 \mathbf {z} _k=h(\mathbf {x} _k) + \mathbf {v}_k
 }
-$$
+$$ --> 
 
-The Kalman filtering equations provide an estimate of the state ${\hat {\mathbf {x} }}_{k\mid k}$ and its error covariance $\mathbf {P} _{k\mid k}$ recursively. The estimate and its quality depend on the system parameters and the noise statistics fed as inputs to the estimator. 
+<div align="center"><img style="background: white;" src="svg\a54Y90L7tS.svg"></div>
 
-$$
+The Kalman filtering equations provide an estimate of the state <!-- ${\hat {\mathbf {x} }}_{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> and its error covariance <!-- $\mathbf {P} _{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k%7D"> recursively. The estimate and its quality depend on the system parameters and the noise statistics fed as inputs to the estimator. 
+
+<!-- $$
 {\displaystyle {\begin{aligned}
 \mathbf {K} _{k}&=\mathbf {P} _{k\mid k-1}\mathbf {H} _{k}^{\textsf {T}}\left(\mathbf {H} _{k}\mathbf {P} _{k\mid k-1}\mathbf {H} _{k}^{\textsf {T}}+\mathbf {R} _{k}\right)^{-1}\\
 \mathbf {P} _{k\mid k}&=\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)
 \mathbf {P} _{k\mid k-1}\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)^{\textsf {T}}+\mathbf {K} _{k}\mathbf {R} _{k}\mathbf {K} _{k}^{\textsf {T}}
 \end{aligned}}}
-$$
+$$ --> 
 
-To calc ${\hat {\mathbf {x} }}_{k\mid k}$ :
+<div align="center"><img style="background: white;" src="svg\hIuPzKHtOs.svg"></div>
 
-$$
+To calc <!-- ${\hat {\mathbf {x} }}_{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> :
+
+<!-- $$
 {\hat {\mathbf {x} }}_{k\mid k} = \mathbf {K} _{k} * \mathbf {y}
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="svg\xiLlcSgu86.svg"></div>
 
 **y** - the difference between calculated and predicted.
 
-${\hat {\mathbf {x} }}_{k\mid k}$ and $\mathbf {y}$ are vectors, so $\mathbf {K} _{k}$ and $\mathbf {P} _{k\mid k}$ are 3x3 matrix that I had trasnsformed in vectors to accelerate calcs.
+<!-- ${\hat {\mathbf {x} }}_{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> and <!-- $\mathbf {y}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7By%7D"> are vectors, so <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> and <!-- $\mathbf {P} _{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k%7D"> are 3x3 matrix that I had trasnsformed in vectors to accelerate calcs.
 
 #### From matrix to vectors.
 
@@ -391,7 +399,7 @@ First will difine four matrix concepts:
 
 **Transpose of a matrix**
 
-$$
+<!-- $$
 \begin{pmatrix}
 \mathbf a_1 & a_2 & a_3\\
 b_1 & \mathbf b_2 & b_3\\
@@ -401,21 +409,25 @@ c_1 & c_2 & \mathbf c_3
 a_2 & \mathbf b_2 & c_2\\
 a_3 & b_3 & \mathbf c_3
 \end{pmatrix}
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="svg\rOsCyXnw0g.svg"></div>
 
 **Determinante de una matriz 3x3**
 
-$$
+<!-- $$
 {\displaystyle |A|=\begin{vmatrix}
 a_{11} & a_{12} & a_{13} \\
 a_{21} & a_{22} & a_{23} \\
 a_{31} & a_{32} & a_{33}
 \end{vmatrix}=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="svg\Ea1RR3y4se.svg"></div>
 
 **Identity matrix**
 
-$$
+<!-- $$
 {\displaystyle
 \mathbf I = 
 \begin{pmatrix}
@@ -424,27 +436,33 @@ $$
 0 & 0 & \mathbf 1
 \end{pmatrix}
 }
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="svg\tpY5CuOsLd.svg"></div>
 
 **Inverse matrix**
 
-$$
+<!-- $$
 {\displaystyle {\begin{aligned}
 \mathbf M * \mathbf M^{-1} &= \mathbf M^{-1} * \mathbf M = \mathbf I \\
 \mathbf M^{-1} &= {1 \over \begin{vmatrix}\mathbf M\end{vmatrix}} * cof(\mathbf M)^{\textsf {T}}
 \end{aligned}}
 }
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="svg\X9XZgkiYL0.svg"></div>
 
 Dada la matrix 3x3 A:
 
-$$
+<!-- $$
 {\displaystyle \mathbf A ={\begin{pmatrix}
 A_{11} & A_{12} & A_{13} \\
 A_{21} & A_{22} & A_{23} \\
 A_{31} & A_{32} & A_{33}
 \end{pmatrix}}}
-$$
+$$ --> 
+
+<div align="center"><img style="background: white;" src="svg\IvL49zUonT.svg"></div>
 
 Su matriz de cofactores viene dada por:
 
@@ -460,7 +478,7 @@ A_{21}A_{32}-A_{22}A_{31} & A_{31}A_{12}-A_{32}A_{11} & A_{11}A_{22}-A_{12}A_{21
 }
 $$ --> 
 
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5Cdisplaystyle%20cof%20(%5Cmathbf%20A)%20%5E%7B%5Ctextsf%20%7BT%7D%7D%3D%7B%5Cbegin%7Bpmatrix%7DA_%7B22%7DA_%7B33%7D-A_%7B23%7DA_%7B32%7D%20%26%20A_%7B32%7DA_%7B13%7D-A_%7B33%7DA_%7B12%7D%20%26%20A_%7B12%7DA_%7B23%7D-A_%7B13%7DA_%7B22%7D%20%5C%5C%20%5C%5C%0D%0AA_%7B23%7DA_%7B31%7D-A_%7B21%7DA_%7B33%7D%20%26%20A_%7B33%7DA_%7B11%7D-A_%7B31%7DA_%7B13%7D%20%26%20A_%7B13%7DA_%7B21%7D-A_%7B11%7DA_%7B23%7D%20%5C%5C%20%5C%5C%0D%0AA_%7B21%7DA_%7B32%7D-A_%7B22%7DA_%7B31%7D%20%26%20A_%7B31%7DA_%7B12%7D-A_%7B32%7DA_%7B11%7D%20%26%20A_%7B11%7DA_%7B22%7D-A_%7B12%7DA_%7B21%7D%0D%0A%5Cend%7Bpmatrix%7D%7D%0D%0A%7D%0D"></div>
+<div align="center"><img style="background: white;" src="svg\RB9HmobqP0.svg"></div>
 
 For calcuation:
 
@@ -472,7 +490,7 @@ a_{31} & a_{32} & a_{33}
 \end{vmatrix}}=(a_{11}a_{22}a_{33}+a_{12}a_{23}a_{31}+a_{13}a_{21}a_{32})-(a_{31}a_{22}a_{13}+a_{32}a_{23}a_{11}+a_{33}a_{21}a_{12})}
 $$ --> 
 
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5Cdisplaystyle%20%7C%5Cmathbf%20A%7C%3D%7B%5Cbegin%7Bvmatrix%7D%0D%0Aa_%7B11%7D%20%26%20a_%7B12%7D%20%26%20a_%7B13%7D%20%5C%5C%0D%0Aa_%7B21%7D%20%26%20a_%7B22%7D%20%26%20a_%7B23%7D%20%5C%5C%0D%0Aa_%7B31%7D%20%26%20a_%7B32%7D%20%26%20a_%7B33%7D%0D%0A%5Cend%7Bvmatrix%7D%7D%3D(a_%7B11%7Da_%7B22%7Da_%7B33%7D%2Ba_%7B12%7Da_%7B23%7Da_%7B31%7D%2Ba_%7B13%7Da_%7B21%7Da_%7B32%7D)-(a_%7B31%7Da_%7B22%7Da_%7B13%7D%2Ba_%7B32%7Da_%7B23%7Da_%7B11%7D%2Ba_%7B33%7Da_%7B21%7Da_%7B12%7D)%7D%0D"></div>
+<div align="center"><img style="background: white;" src="svg\tgI70dj9IF.svg"></div>
 
 <!-- $$
 {\displaystyle \mathbf A ^{-1}={\begin{pmatrix}{A_{22}A_{33}-A_{23}A_{32} \over |\mathbf A|} & {A_{32}A_{13}-A_{33}A_{12} \over |\mathbf A|} & {A_{12}A_{23}-A_{13}A_{22} \over |\mathbf A|} \\
@@ -481,7 +499,7 @@ $$ -->
  }
 $$ --> 
 
-<div align="center"><img style="background: white;" src="https://render.githubusercontent.com/render/math?math=%7B%5Cdisplaystyle%20%5Cmathbf%20A%20%5E%7B-1%7D%3D%7B%5Cbegin%7Bpmatrix%7D%7BA_%7B22%7DA_%7B33%7D-A_%7B23%7DA_%7B32%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B32%7DA_%7B13%7D-A_%7B33%7DA_%7B12%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B12%7DA_%7B23%7D-A_%7B13%7DA_%7B22%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%5C%5C%0D%0A%7BA_%7B23%7DA_%7B31%7D-A_%7B21%7DA_%7B33%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B33%7DA_%7B11%7D-A_%7B31%7DA_%7B13%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B13%7DA_%7B21%7D-A_%7B11%7DA_%7B23%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%5C%5C%0D%0A%20%7BA_%7B21%7DA_%7B32%7D-A_%7B22%7DA_%7B31%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B31%7DA_%7B12%7D-A_%7B32%7DA_%7B11%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%20%26%20%7BA_%7B11%7DA_%7B22%7D-A_%7B12%7DA_%7B21%7D%20%5Cover%20%7C%5Cmathbf%20A%7C%7D%5Cend%7Bpmatrix%7D%7D%0D%0A%20%7D%0D"></div>
+<div align="center"><img style="background: white;" src="svg\BeqW8eRkoy.svg"></div>
 
 Resources:
   * https://es.wikipedia.org/wiki/Matriz_de_adjuntos
