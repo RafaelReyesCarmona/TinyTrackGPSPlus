@@ -196,6 +196,10 @@ void Display::print_PChar_sat(byte c){
   */
 }
 
+void Display::print_AGPS(){
+  u8g2->drawGlyph(127-21,8,0xe023);
+}
+
 void Display::print_PChar_Nosat(){
   u8g2->drawGlyph(127-18,6,0x78);
   u8g2->drawGlyph(127-21,7,0xe21f);

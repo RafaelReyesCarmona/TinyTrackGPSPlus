@@ -2,7 +2,7 @@
 
 # TinyTrackGPS+
 [<img src="images/TinyTrackGPS+-red.svg">](README.md)
-[![Version: v1.0.23](https://img.shields.io/badge/Version-v1.0.23-blue?style=for-the-badge&logo=v)]()&nbsp;
+[![Version: v1.0.24](https://img.shields.io/badge/Version-v1.0.24-blue?style=for-the-badge&logo=v)]()&nbsp;
 
 A simple, fast and highly accurate portable GPS track logger with position estimation for greater accuracy, record track on microSD card and featured by Assisted GPS (A-GPS), 10DOF sensors and World Real Time Clock (RTC) with  automatic Summer and Standard Time change.
 
@@ -381,17 +381,22 @@ $$ -->
 
 <div align="center"><img style="background: white;" src="svg\hIuPzKHtOs.svg"></div>
 
-To calc <!-- ${\hat {\mathbf {x} }}_{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> :
-
 <!-- $$
 {\hat {\mathbf {x} }}_{k\mid k} = \mathbf {K} _{k} * \mathbf {y}
 $$ --> 
 
 <div align="center"><img style="background: white;" src="svg\xiLlcSgu86.svg"></div>
 
-**y** - the difference between calculated and predicted.
+  * <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> - Stimated state.
+  * <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> - Kalman gain matrix.
+  * <!-- $\mathbf {H} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BH%7D%20_%7Bk%7D"> - The observation model matrix. Correlation among variables.
+  * <!-- $\mathbf {R} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BR%7D%20_%7Bk%7D"> - Noise std dev matrix.
+  * <!-- $\mathbf {P} _{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k%7D"> - Covariance matrix.
+  * **I** - Identity matrix.
+  * **y** - the difference between calculated and predicted.
 
-<!-- ${\hat {\mathbf {x} }}_{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> and <!-- $\mathbf {y}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7By%7D"> are vectors, so <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> and <!-- $\mathbf {P} _{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k%7D"> are 3x3 matrix that I had trasnsformed in vectors to accelerate calcs.
+<!-- ${\hat {\mathbf {x} }}_{k\mid k}$ --> 
+<img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%7B%5Chat%20%7B%5Cmathbf%20%7Bx%7D%20%7D%7D_%7Bk%5Cmid%20k%7D"> and <!-- $\mathbf {y}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7By%7D"> are vectors, so <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> and <!-- $\mathbf {P} _{k\mid k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k%7D"> are 3x3 matrix that I had trasnsformed in vectors to accelerate calcs.
 
 #### From matrix to vectors.
 
@@ -503,6 +508,241 @@ $$ -->
 
 Resources:
   * https://es.wikipedia.org/wiki/Matriz_de_adjuntos
+
+En la ecuación:
+<div align="center"><img style="background: white;" src="svg\hIuPzKHtOs.svg"></div>
+
+**H** and **R** are defined as below:
+
+$$
+{\displaystyle \mathbf H _k={\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}} = \mathbf H _k ^{\textsf {T}}}
+$$
+
+$$
+{\displaystyle \mathbf R _k={\begin{pmatrix}
+r_x^2 & 0 & 0 \\
+0 & r_y^2 & 0 \\
+0 & 0 & r_z^2
+\end{pmatrix}}}
+$$
+
+$$
+{\displaystyle \mathbf P _{k\mid {k-1}}={\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}}
+\mathbf P _{1\mid 0}={\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}} Initial\space values}
+$$
+__________________________
+$$
+\mathbf K _k=\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix} \left(
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}+\begin{pmatrix}
+r_x^2 & 0 & 0 \\
+0 & r_y^2 & 0 \\
+0 & 0 & r_z^2
+\end{pmatrix}
+\right)^{-1}
+$$
+
+$$
+\mathbf K _k=\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}
+\left(
+\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}
++\begin{pmatrix}
+r_x^2 & 0 & 0 \\
+0 & r_y^2 & 0 \\
+0 & 0 & r_z^2
+\end{pmatrix}
+\right)^{-1}
+$$
+
+$$
+\mathbf K _k=\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}
+\begin{pmatrix}
+p_x+r_x^2 & 0 & 0 \\
+0 & p_y+r_y^2 & 0 \\
+0 & 0 & p_z+r_z^2
+\end{pmatrix}^{-1}
+$$
+
+$$
+\mathbf K _k=\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}
+\begin{pmatrix}
+1\over{p_x+r_x^2} & 0 & 0 \\
+0 & 1\over{p_y+r_y^2} & 0 \\
+0 & 0 & 1\over{p_z+r_z^2}
+\end{pmatrix}
+$$
+
+$$
+\mathbf K _k=
+\begin{pmatrix}
+p_x\over{p_x+r_x^2} & 0 & 0 \\
+0 & p_y\over{p_y+r_y^2} & 0 \\
+0 & 0 & p_z\over{p_z+r_z^2}
+\end{pmatrix}
+$$
+
+$$
+\bar {\mathbf {K}} _k=
+\begin{pmatrix}
+p_x\over{p_x+r_x^2} & p_y\over{p_y+r_y^2} & p_z\over{p_z+r_z^2}
+\end{pmatrix}
+$$
+
+$$
+\mathbf {P} _{k\mid k}=\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)
+\mathbf {P} _{k\mid k-1}\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)^{\textsf {T}}+\mathbf {K} _{k}\mathbf {R} _{k}\mathbf {K} _{k}^{\textsf {T}}
+$$
+
+$$
+\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)
+\mathbf {P} _{k\mid k-1}=\left(\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}-
+\begin{pmatrix}
+p_x\over{p_x+r_x^2} & 0 & 0 \\
+0 & p_y\over{p_y+r_y^2} & 0 \\
+0 & 0 & p_z\over{p_z+r_z^2}
+\end{pmatrix}
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+\right)\begin{pmatrix}
+p_x & 0 & 0 \\
+0 & p_y & 0 \\
+0 & 0 & p_z
+\end{pmatrix}=\begin{pmatrix}
+p_x-{p_x^2\over{p_x+r_x^2}} & 0 & 0 \\
+0 & p_y-{p_y^2\over{p_y+r_y^2}} & 0 \\
+0 & 0 & p_z-{p_z^2\over{p_z+r_z^2}}
+\end{pmatrix}
+$$
+
+$$\left(\mathbf {I} -\mathbf {K} _{k}\mathbf {H} _{k}\right)^{\textsf {T}}=\left(\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}-
+\begin{pmatrix}
+p_x\over{p_x+r_x^2} & 0 & 0 \\
+0 & p_y\over{p_y+r_y^2} & 0 \\
+0 & 0 & p_z\over{p_z+r_z^2}
+\end{pmatrix}
+\begin{pmatrix}
+1 & 0 & 0 \\
+0 & 1 & 0 \\
+0 & 0 & 1
+\end{pmatrix}
+\right)^{\textsf {T}}=\begin{pmatrix}
+1-{p_x\over{p_x+r_x^2}} & 0 & 0 \\
+0 & 1-{p_y\over{p_y+r_y^2}} & 0 \\
+0 & 0 & 1-{p_z\over{p_z+r_z^2}}
+\end{pmatrix}
+$$
+
+$$
+\mathbf {K} _{k}\mathbf {R} _{k}\mathbf {K} _{k}^{\textsf {T}}=\begin{pmatrix}
+p_x\over{p_x+r_x^2} & 0 & 0 \\
+0 & p_y\over{p_y+r_y^2} & 0 \\
+0 & 0 & p_z\over{p_z+r_z^2}
+\end{pmatrix}\begin{pmatrix}
+r_x^2 & 0 & 0 \\
+0 & r_y^2 & 0 \\
+0 & 0 & r_z^2
+\end{pmatrix}\begin{pmatrix}
+p_x\over{p_x+r_x^2} & 0 & 0 \\
+0 & p_y\over{p_y+r_y^2} & 0 \\
+0 & 0 & p_z\over{p_z+r_z^2}
+\end{pmatrix}^{\textsf {T}}=\begin{pmatrix}
+r_x^2 {\left({p_x\over{p_x+r_x^2}}\right)^2} & 0 & 0 \\
+0 & r_y^2 {\left({p_y\over{p_y+r_y^2}}\right)^2} & 0 \\
+0 & 0 & r_z^2 {\left({p_z\over{p_z+r_z^2}}\right)^2}
+\end{pmatrix}
+$$
+
+$$
+\mathbf {P} _{k\mid k}=\begin{pmatrix}
+p_x-{p_x^2\over{p_x+r_x^2}} & 0 & 0 \\
+0 & p_y-{p_y^2\over{p_y+r_y^2}} & 0 \\
+0 & 0 & p_z-{p_z^2\over{p_z+r_z^2}}
+\end{pmatrix}\begin{pmatrix}
+1-{p_x\over{p_x+r_x^2}} & 0 & 0 \\
+0 & 1-{p_y\over{p_y+r_y^2}} & 0 \\
+0 & 0 & 1-{p_z\over{p_z+r_z^2}}
+\end{pmatrix}+\begin{pmatrix}
+r_x^2 {\left({p_x\over{p_x+r_x^2}}\right)^2} & 0 & 0 \\
+0 & r_y^2 {\left({p_y\over{p_y+r_y^2}}\right)^2} & 0 \\
+0 & 0 & r_z^2 {\left({p_z\over{p_z+r_z^2}}\right)^2}
+\end{pmatrix}
+$$
+
+$$
+\mathbf {P} _{k\mid k}=\begin{pmatrix}
+{r_x^2 p_x\over{p_x+r_x^2}} & 0 & 0 \\
+0 & {r_y^2 p_y\over{p_y+r_y^2}} & 0 \\
+0 & 0 & {r_z^2 p_z\over{p_z+r_z^2}}
+\end{pmatrix}
+$$
+
+$$
+\bar {\mathbf {P}} _{k\mid k}=\begin{pmatrix}
+{r_x^2 p_x\over{p_x+r_x^2}} & {r_y^2 p_y\over{p_y+r_y^2}} & {r_z^2 p_z\over{p_z+r_z^2}}
+\end{pmatrix}
+$$
+
 #### Other libraries
 There are a lot of information about AHRS and INS using EKF and others filters on the web:
  * Arduino AHRS System: https://github.com/pronenewbits/Arduino_AHRS_System
@@ -907,6 +1147,11 @@ Resources:
   * https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java
 
 ## Changelog
+### V1.0.24
+  * Fixed 'FusionGPSUpdate'. Error on <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> & <!-- $\mathbf {P} _{k\mid k-1}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k-1%7D">. Adjustment on coordenates calculation.
+  * Changes on 'FusionGPS.c' relative to velocity and INS.
+  * New icon for AGPS status on boot.
+
 ### V1.0.23
   * Added 'GPS_config' function. Config reciever as model: ( PORTABLE, STATIONARY, PEDESTRIAN, AUTOMOTIVE,SEA or AIRBONE_1G).
   * Updated 'setup' function deleting old routine for display low battery.

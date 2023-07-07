@@ -160,6 +160,7 @@ static NMEAGPS gps;
 static gps_fix gps_data;
 static GPS_UTM utm;
 bool gps_signal;
+bool AGPS_status;
 
 // Variables para configurar Timezone.
 static TimeChangeRule UT = {"UTC", Last, Sun, Mar, 1, 0};     // UTC
@@ -890,7 +891,8 @@ void setup(void) {
   (SDReady) ? Serial.println(F("Done.")) : Serial.println(F("FAILED!")); //
   
   Serial.print(F("Writing AGPS data..."));
-  if (AGPS()) Serial.print(F("\tOK.\n"));
+  AGPS_status = AGPS();
+  if (AGPS_status) Serial.print(F("\tOK.\n"));
   else Serial.print(F("\tFAILED!!!\n"));
 
   // Config TimeZone (_localtime) with 'Time.cfg' file on SD.
@@ -1031,6 +1033,7 @@ void loop(void) {
       //if (bluetooth_connected) oled.print_PChar(5);  // No tiene módulo Bluetooth.
       oled.print(81,55,VERSION);
       oled.DrawLogo();
+      if (AGPS_status) oled.print_AGPS();
       oled.draw();
       oled.wait_anin(_prevtime.second());
     }
@@ -1077,6 +1080,7 @@ void loop(void) {
         (SDReady) ? oled.print_PChar(3) : oled.print_PChar(4);
         //if (bluetooth_connected) oled.print_PChar(5);  // No tiene módulo Bluetooth.
         oled.DrawCalibrate();
+        if (AGPS_status) oled.print_AGPS();
         oled.draw();
         oled.wait_anin(_prevtime.second());
         delay(1000);

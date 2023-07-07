@@ -80,6 +80,7 @@ class Display {
         void print_UTM_x(long);
         void print_UTM_y(long);
         void print_promt();
+        void print_AGPS();
         void DrawLogo();
         void DrawLowBat();
         void DrawCalibrate();
