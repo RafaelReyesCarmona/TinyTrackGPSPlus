@@ -743,6 +743,8 @@ $$
 \end{pmatrix}
 $$
 
+See for more information to calc the last: https://mathsolver.microsoft.com/es/solve-problem/@ji3vuqwc
+
 #### Other libraries
 There are a lot of information about AHRS and INS using EKF and others filters on the web:
  * Arduino AHRS System: https://github.com/pronenewbits/Arduino_AHRS_System
@@ -1151,6 +1153,7 @@ Resources:
   * Fixed 'FusionGPSUpdate'. Error on <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> & <!-- $\mathbf {P} _{k\mid k-1}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k-1%7D">. Adjustment on coordenates calculation.
   * Changes on 'FusionGPS.c' relative to velocity and INS.
   * New icon for AGPS status on boot.
+  * New calc to determine 'Rew' and 'Rns'.
 
 ### V1.0.23
   * Added 'GPS_config' function. Config reciever as model: ( PORTABLE, STATIONARY, PEDESTRIAN, AUTOMOTIVE,SEA or AIRBONE_1G).
