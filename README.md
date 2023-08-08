@@ -2,7 +2,10 @@
 
 # TinyTrackGPS+
 [<img src="images/TinyTrackGPS+-red.svg">](README.md)
-[![Version: v1.0.25](https://img.shields.io/badge/Version-v1.0.25-blue?style=for-the-badge&logo=v)]()&nbsp;
+[![Version: v1.0.25](https://img.shields.io/badge/Version-v1.0.25-blue?style=for-the-badge&logo=v)]()
+<a href="https://github.com/pedromxavier/flag-badges">
+    <img src="https://raw.githubusercontent.com/pedromxavier/flag-badges/main/badges/ES.svg" alt="made in ES">
+</a>&nbsp;
 
 A simple, fast and highly accurate portable GPS track logger with position estimation for greater accuracy, record track on microSD card and featured by Assisted GPS (A-GPS), 10DOF sensors and World Real Time Clock (RTC) with  automatic Summer and Standard Time change.
 
