@@ -10,6 +10,12 @@ A simple, fast and highly accurate portable GPS track logger with position estim
 
 <img alt="Location example." src="images/IMG_20230512_072414.png" width="240" align=center>&nbsp;
 
+## Donations
+You can donate at:
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate/?hosted_button_id=TSCH5FJDVYWP6)
+
+Thanks.
 ## Features
 TinyTrackGPS+ is the next generation concept of the old [TinyTrackGPS](https://rafaelreyescarmona.github.io/TinyTrackGPS/), whith more features but the same intention, to be a simple use portable GPS track log. You can find some similar projects like [Arduino GPS Tracker](https://makersportal.com/blog/portable-gps-tracker-with-arduino) (or [Github](https://github.com/makerportal/arduino-gps-tracker)) of 
 [Maker Portal](https://makersportal.com/), which uses similar hardware.
