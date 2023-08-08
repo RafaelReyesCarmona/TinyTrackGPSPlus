@@ -1024,7 +1024,7 @@ void loop(void) {
 
   if(STATE == STARTING) {
     if(_prevtime < clock_rtc.now()) {
-      update_time();
+      _localtime = clock_rtc.now().unixtime(); //update_time();
       oled.clear();
       oled.print_date(_localtime);
       oled.print_time(trc->abbrev, _localtime);

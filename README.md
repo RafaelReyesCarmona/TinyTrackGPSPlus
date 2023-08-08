@@ -2,7 +2,7 @@
 
 # TinyTrackGPS+
 [<img src="images/TinyTrackGPS+-red.svg">](README.md)
-[![Version: v1.0.24](https://img.shields.io/badge/Version-v1.0.24-blue?style=for-the-badge&logo=v)]()&nbsp;
+[![Version: v1.0.25](https://img.shields.io/badge/Version-v1.0.25-blue?style=for-the-badge&logo=v)]()&nbsp;
 
 A simple, fast and highly accurate portable GPS track logger with position estimation for greater accuracy, record track on microSD card and featured by Assisted GPS (A-GPS), 10DOF sensors and World Real Time Clock (RTC) with  automatic Summer and Standard Time change.
 
@@ -1149,6 +1149,9 @@ Resources:
   * https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java
 
 ## Changelog
+### V1.0.25
+  * Fixed _localtime value before GPS signal to fix brown display value at start.
+
 ### V1.0.24
   * Fixed 'FusionGPSUpdate'. Error on <!-- $\mathbf {K} _{k}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BK%7D%20_%7Bk%7D"> & <!-- $\mathbf {P} _{k\mid k-1}$ --> <img style="transform: translateY(0.1em); background: white;" src="https://latex.codecogs.com/svg.latex?%5Cmathbf%20%7BP%7D%20_%7Bk%5Cmid%20k-1%7D">. Adjustment on coordenates calculation.
   * Changes on 'FusionGPS.c' relative to velocity and INS.
