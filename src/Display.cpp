@@ -265,7 +265,7 @@ const unsigned char epd_bitmap_brujula [] PROGMEM = {
     0x32, 0x19, 0x08, 0x06, 0x03, 0x01, 0x00, 0x00
     };
     */
-    this->print(4,0,VERSION);
+    //this->print(4,0,VERSION);
     u8g2->drawBitmap( 47, 23, 4, 32, epd_bitmap_brujula);//____________________________
     //u8g2->drawTile(6, 3, 4, Logo_UP[0]);
     //u8g2->drawTile(6, 4, 4, Logo_DOWN[0]);

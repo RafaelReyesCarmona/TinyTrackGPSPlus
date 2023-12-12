@@ -287,7 +287,9 @@ void loadConfigurationProgram() {
   
   ConfProg.end();
 
-  if(TimeZoneConfig == TIMEZONE_FILE) 
+  TimeZone.setRules(UT,UT);
+
+  if(TimeZoneConfig == TIMEZONE_FILE)
     if(loadConfiguration(&UST,&UT)) TimeZone.setRules(UST,UT);
 }
 
@@ -512,6 +514,10 @@ bool GPSData() {
   return (save && SDReady);
 }
 
+int sign(double num) {
+  return (num < 0.0) ? -1 : 1;
+}
+
 void ScreenPrint(){
   char line[17];
 
@@ -549,9 +555,14 @@ void ScreenPrint(){
   //Serial.println(line); //
 
   oled.print(0,44,"LAT:");
-  int int_lat = GPS.location_ins.axis.x;
-  long f_lat = (GPS.location_ins.axis.x - int_lat)*10000000L ;
-  sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? f_lat : -(f_lat));
+  double abs_lat = abs(GPS.location_ins.axis.x);
+  int int_lat = (int)abs_lat;
+  long f_lat = (abs_lat - int_lat)*10000000L ;
+  //sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? f_lat : -(f_lat));
+  if(sign(GPS.location_ins.axis.x)>0)
+    sprintf(line, "%d.%07ld",int_lat, f_lat);
+  else
+    sprintf(line, "-%d.%07ld",int_lat, f_lat);
   //int int_lat = gps_data.latitudeL() / 10000000L;
   //sprintf(line, "%d.%07ld",int_lat, (int_lat > 0) ? gps_data.latitudeL()-(long)int_lat*10000000L : -(gps_data.latitudeL()-(long)int_lat*10000000L));
   //sprintf(line,"%f",GPS.location_ins.axis.x);
@@ -559,9 +570,14 @@ void ScreenPrint(){
   //Serial.print("Latitude:\t");Serial.println(line); //
 
   oled.print(0,54,"LON:");
-  int int_lon = GPS.location_ins.axis.y;
-  long f_lon = (GPS.location_ins.axis.y - int_lon)*10000000L ;
-  sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? f_lon : -(f_lon));  
+  double abs_lon = abs(GPS.location_ins.axis.y);
+  int int_lon = abs_lon;
+  long f_lon = (abs_lon - int_lon)*10000000L ;
+  //sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? f_lon : -(f_lon));
+  if(sign(GPS.location_ins.axis.y)>0)
+    sprintf(line, "%d.%07ld",int_lon, f_lon);
+  else
+    sprintf(line, "-%d.%07ld",int_lon, f_lon);
   //int int_lon = gps_data.longitudeL() / 10000000L;
   //sprintf(line, "%d.%07ld",int_lon, (int_lon > 0) ? gps_data.longitudeL()-(long)int_lon*10000000L : -(gps_data.longitudeL()-(long)int_lon*10000000L));
   //sprintf(line,"%f",Filter.getLongitude_rad()*RAD_TO_DEG);
@@ -697,9 +713,6 @@ FusionVector calculateNEDVelocityGPS() {
   return NED;
 }
 
-int sign(float num) {
-  return (num < 0.0f) ? -1 : 1;
-}
 /*----------------------------------------------------------------------------------------------------
 void gps_update_info() {
 if (gps_data.valid.location) {
@@ -1024,7 +1037,9 @@ void loop(void) {
 
   if(STATE == STARTING) {
     if(_prevtime < clock_rtc.now()) {
-      _localtime = clock_rtc.now().unixtime(); //update_time();
+      _prevtime = clock_rtc.now();
+      //_localtime = clock_rtc.now().unixtime(); //update_time();
+      _localtime = TimeZone.toLocal(clock_rtc.now().unixtime(),&trc);
       oled.clear();
       oled.print_date(_localtime);
       oled.print_time(trc->abbrev, _localtime);

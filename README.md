@@ -2,7 +2,7 @@
 
 # TinyTrackGPS+
 [<img src="images/TinyTrackGPS+-red.svg">](README.md)
-[![Version: v1.0.25](https://img.shields.io/badge/Version-v1.0.25-blue?style=for-the-badge&logo=v)]()
+[![Version: v1.0.26](https://img.shields.io/badge/Version-v1.0.26-blue?style=for-the-badge&logo=v)]()
 <a href="https://github.com/pedromxavier/flag-badges">
     <img src="https://raw.githubusercontent.com/pedromxavier/flag-badges/main/badges/ES.svg" alt="made in ES">
 </a>&nbsp;
@@ -316,7 +316,7 @@ TinyTrackGPS+ is free software, see **License** section for more information. Th
   * NeoGPS library, Paul Stoffregen (https://github.com/PaulStoffregen/TinyGPS).
   * SdFat library, Bill Greiman (https://github.com/greiman/SdFat).
   * U8g2 library, oliver (https://github.com/olikraus/u8g2).
-  * UTMConversion library v1.2, Rafael Reyes (https://github.com/RafaelReyesCarmona/UTMConversion). Modified version for greater precision. Published at Platformio and GitHub.
+  * UTMConversion library v1.3, Rafael Reyes (https://github.com/RafaelReyesCarmona/UTMConversion). Modified version for greater precision. Published at Platformio and GitHub.
   * Timezone32 library, Rafael Reyes (https://github.com/RafaelReyesCarmona/Timezone32).
   * Time32 library, Rafael Reyes (https://github.com/RafaelReyesCarmona/Time32).
   * Seeed Arduino RTC library, Seeed Studio (https://github.com/Seeed-Studio/Seeed_Arduino_RTC). RTC library for SAMD21 and SAMD51.
@@ -1158,6 +1158,10 @@ Resources:
   * https://github.com/drtimcooper/LatLongToTimezone/blob/master/src/main/java/com/skedgo/converter/TimezoneMapper.java
 
 ## Changelog
+### V1.0.26
+  * Fixed display error when latitude is between -1 and 0.
+  * Fixed display error on starting screen.
+  * Fixed local time error when starting device.
 ### V1.0.25
   * Fixed _localtime value before GPS signal to fix brown display value at start.
 
